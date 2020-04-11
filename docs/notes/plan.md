@@ -8,21 +8,25 @@
    2. Ruch samolotów w czasie rzeczywistym
    3. Połączenia lotnicze
    4. Rozprzestrzenianie się wirusa SARS-CoV-2
-4. Architektura i granice architektoniczne systemu
+4. Wymagania
+   1. Twórce
+   2. Odbiorca
+   3. Aplikacja
+5. Architektura i granice architektoniczne systemu
    1. Silnik wizualizacji
    2. Wizualizacja jako konfigurowalna abstrakcja
-5. Wykorzystane biblioteki i technologie
-6. Konstruowanie scen na podstawie pozyskanych danych
+6. Wykorzystane biblioteki i technologie
+7. Konstruowanie scen na podstawie pozyskanych danych
    1. Wysokość zabudowy Wrocławia
    2. Ruch samolotów w czasie rzeczywistym
    3. Połączenia lotnicze
    4. Rozprzestrzenianie się wirusa SARS-CoV-2
-7. Implementacja aplikacji
+8. Implementacja aplikacji
    1. Silnik wizualizacji
    2. Wizualizacje wraz z interfejsem użytkownika
-8. Testy systemu
-   1. Testy jednostkowe składowych systemu
-   2. Testy integracyjne algorytmów parsowania danych
-   3. Testy wizualnej regresji
-9.  Możliwości dalszego rozwoju
-10. Podsumowanie
+9.  Testy systemu
+   3. Testy jednostkowe składowych systemu
+   4. Testy integracyjne algorytmów parsowania danych
+   5. Testy wizualnej regresji
+10. Możliwości dalszego rozwoju
+11. Podsumowanie
