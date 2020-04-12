@@ -1,0 +1,25 @@
+@startuml helicopter_view
+'skinparam linetype ortho
+actor Audience
+actor Creator
+interface "Browser\ninterface" as browser
+frame "GeoVis\nApplication" {
+    component "GeoVis\nLibrary" as geovis
+    interface "Vis Entrypoint\nInterface" as vis
+    component "Visualization A" as vis_a {
+        component "Scene definition" as sd_a
+        component "Controls" as c_a
+    }
+   
+}
+
+Audience .l.> browser : <<uses>>
+browser -- geovis
+
+geovis -- vis
+
+vis_a ..> vis
+
+
+Creator ..> vis_a : <<defines>>
+@enduml

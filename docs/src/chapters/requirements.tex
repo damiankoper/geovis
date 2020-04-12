@@ -2,12 +2,12 @@
 
 Ze względu na możliwy podział funkcjonalności projektu na wiele typów, zdefiniowano następujące pojęcia:
 \begin{enumerate}
-    \item Biblioteka - zbiór komponentów odpowiedzialnych za definicję i wyświetlenie wizualizacji.
+    \item Silnik - zbiór komponentów odpowiedzialnych za definicję i wyświetlenie wizualizacji.
     \item Wizualizacja - konfigurowalny widok przedstawiający obiekty, których położenie zdefiniowano za pomocą współrzędnych geograficznych, na powierzchni sfery.
     \item Aplikacja - uruchomiona w przeglądarce użytkownika strona umożliwiająca wybór i~wyświetlenie wizualizacji.
 \end{enumerate}
 
-Biblioteka dostarcza komponenty i interfejs programistyczny, dzięki którym można definiować, wyświetlać i zarządzać wizualizacją.
+Silnik dostarcza komponenty i interfejs programistyczny, dzięki którym można definiować, wyświetlać i zarządzać wizualizacją.
 Pozwala także na zdefiniowane wielu niezależnych wizualizacji. Z tego powodu można wyróżnić dwa typy użytkowników:
 
 \begin{enumerate}
@@ -24,12 +24,13 @@ Struktura danych definiująca renderowany obraz, zwana dalej będzie sceną.
 \subsection{Wymagania funkcjonalne}
 
 \begin{enumerate}
-    \item Twórca może zdefiniować metadane wizualizacji określone przez interfejs Biblioteki.
+    \item Twórca może zdefiniować metadane wizualizacji określone przez interfejs Silnika.
     \item Twórca może zdefiniować statyczną scenę określając położenie obiektów na sferze z wykorzystaniem
           długości i szerokości geograficznej oraz wysokości nad poziomem morza.
     \item Twórca do definicji sceny może wykorzystać interfejs tworzenia obiektów dostarczony przez aplikację
           lub załadować obiekty, materiały i tekstury z zewnętrznego źródła.
-    \item Twórca może budować sceny na podstawie scen predefiniowanych w bibliotece, oraz scen wcześniej stworzonych przez siebie.
+    \item Twórca może zagnieżdząć sceny predefiniowane w silniku, oraz sceny wcześniej stworzonych przez siebie.
+    \item Twórca może parametryzować sceny w celu określonej ich modyfikacji w procesie zagnieżdżania.
     \item Twórca może określić parametry początkowe obserwatora, dynamikę i zakres jego ruchów:
           \begin{enumerate}
               \item położenie,
@@ -39,14 +40,14 @@ Struktura danych definiująca renderowany obraz, zwana dalej będzie sceną.
           \end{enumerate}
     \item Twórca może zdefiniować wygląd i funkcjonalność panelu kontrolnego.
           Panel ten służyć będzie do zmiany parametrów wizualizacji i obsługiwany będzie przez odbiorcę.
-    \item Twórca, poprzez interfejs programistyczny dostarczony przez bibliotekę, może aktualizować scenę w dowolnym momencie, określonym przez siebie w definicji wizualizacji.
+    \item Twórca, poprzez interfejs programistyczny dostarczony przez silnik, może aktualizować scenę w dowolnym momencie, określonym przez siebie w definicji wizualizacji.
     \item Twórca może definiować zachowania, które będą odpowiedzią na zdarzenia związane z poruszaniem się po scenie generowane przez odbiorcę.
 \end{enumerate}
 
 \subsection{Wymagania niefunkcjonalne}
 
 \begin{enumerate}
-    \item Biblioteka powinna definiować i w sposób jasny przekazywać potencjalnemu twórcy akceptowalną strukturę danych, plików i katalogów, określającą jedną wizualizację.
+    \item Silnik powinna definiować i w sposób jasny przekazywać potencjalnemu twórcy akceptowalną strukturę danych, plików i katalogów, określającą jedną wizualizację.
     \item Włączenie zdefiniowanej wizualizacji do ich zbioru w aplikacji powinno ustanowione być tylko w jednym miejscu poprzez prosty interfejs.
     \item Dane wizualizacji muszą być ładowane asynchronicznie. Dane źródłowe definiujące scenę mogą być przetwarzane po stronie odbiorcy lub być przetworzone wcześniej i pobrane.
 \end{enumerate}
@@ -60,6 +61,7 @@ Struktura danych definiująca renderowany obraz, zwana dalej będzie sceną.
     \item Odbiorca może poruszać się po wizualizacji, zmieniając położenia kamery, używając myszki lub klawiatury.
     \item Odbiorca może wyświetlić lub ukryć przyciski sterowania kamerą.
     \item Odbiorca może wyświetlić lub ukryć panel sterujący wizualizacją dostarczony przez twórcę.
+    \item Odbiorca może ustawić poziom szczegółowości grafiki. Ustawienia te przekazywane są twórcy i mogą, ale nie muszą, być respektowane.
 \end{enumerate}
 \subsection{Wymagania niefunkcjonalne}
 \begin{enumerate}
@@ -74,3 +76,5 @@ Struktura danych definiująca renderowany obraz, zwana dalej będzie sceną.
     \item Jeśli to możliwe aplikacja powinna wykorzystywać sprzętową akcelerację obliczeń graficznych.
     \item Aplikacja powinna ustawiać i obsługiwać adres URL w przeglądarce jednoznacznie definiujący jej widok.
 \end{enumerate}
+
+

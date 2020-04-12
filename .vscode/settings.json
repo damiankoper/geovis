@@ -9,5 +9,8 @@
     "latex",
     "plaintext"
   ],
-  "latex-workshop.latex.outDir": "../out"
+  "latex-workshop.latex.outDir": "../out",
+  "plantuml.diagramsRoot": "docs/src/diagrams/src",
+  "plantuml.exportOutDir": "docs/src/diagrams/out",
+  "plantuml.exportSubFolder": false
 }
