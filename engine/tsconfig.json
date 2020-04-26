@@ -22,8 +22,11 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
+    "stories/**/*.ts",
+    "stories/**/*.tsx",
+    "stories/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "tests/**/*.tsx", "stories/Welcome.js"
   ],
   "exclude": ["node_modules"]
 }
