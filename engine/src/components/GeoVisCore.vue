@@ -9,7 +9,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import GeoVisCore from "../core/GeoVisCore";
-import Visualization from "../core/domain/visualization/models/Visualization";
+import Visualization from "../core/domain/Visualization/models/Visualization";
 
 @Component
 export default class GeoVisCoreVue extends Vue {
@@ -20,13 +20,11 @@ export default class GeoVisCoreVue extends Vue {
     const container = this.$refs.threeContainer;
     if (container) {
       this.geoVisCore = new GeoVisCore(container as HTMLElement);
-      if (this.visualization) this.geoVisCore.run(this.visualization);
+      this.onVisChange(this.visualization);
 
       const resizeObserver = new window.ResizeObserver(entry => {
-        entry.forEach(e => {
-          console.log(e);
-          
-          this.geoVisCore.setSize()
+        entry.forEach(() => {
+          if (this.geoVisCore) this.geoVisCore.setSize();
         });
       });
       resizeObserver.observe(container);
@@ -35,7 +33,9 @@ export default class GeoVisCoreVue extends Vue {
 
   @Watch("visualization")
   onVisChange(v?: Visualization) {
-    if (this.visualization) this.geoVisCore.run(this.visualization);
+    if (v && this.geoVisCore) {
+      this.geoVisCore.run(v);
+    }
   }
 }
 </script>

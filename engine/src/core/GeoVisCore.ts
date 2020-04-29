@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import Visualization from "./domain/visualization/models/Visualization";
+import Visualization from "./domain/Visualization/models/Visualization";
+import TrackballController from "./domain/Camera/controllers/TrackballController";
 
 export default class GeoVisCore {
   private readonly container: HTMLElement;
@@ -9,17 +10,25 @@ export default class GeoVisCore {
   private readonly camera: THREE.PerspectiveCamera;
   private readonly renderer: THREE.Renderer;
 
+  private cameraController: TrackballController;
+
   constructor(container: HTMLElement) {
     this.container = container;
 
     this.scene = new THREE.Scene();
 
-    this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    
-    this.camera.position.z = 5;
+    this.camera = new THREE.PerspectiveCamera(60, 1, 0.01, 10000);
 
-    this.renderer = new THREE.WebGLRenderer();
+    this.renderer = new THREE.WebGLRenderer({
+      logarithmicDepthBuffer:true,
+      antialias:true
+    });
     container.appendChild(this.renderer.domElement);
+
+    this.cameraController = new TrackballController(
+      this.camera,
+      this.renderer.domElement
+    );
   }
 
   setSize() {
@@ -27,19 +36,20 @@ export default class GeoVisCore {
     const height = this.container.offsetHeight;
     this.renderer.setSize(width, height);
     this.camera.aspect = width / height;
-    this.camera.updateProjectionMatrix()
+    this.camera.updateProjectionMatrix();
   }
 
   public run(visualization: Visualization) {
     this.scene.dispose();
     this.visualization = visualization;
-    this.visualization._setup(this.scene);
+    this.visualization._setup(this.scene, this.cameraController);
 
     this._run();
   }
 
   private _run() {
     requestAnimationFrame(() => this._run());
+    this.cameraController.update()
     this.renderer.render(this.scene, this.camera);
   }
 }

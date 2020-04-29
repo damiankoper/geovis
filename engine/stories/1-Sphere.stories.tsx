@@ -1,7 +1,7 @@
-import { linkTo } from "@storybook/addon-links";
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import GeoVisCore from "@/components/GeoVisCore.vue";
-import SphereVis from "@/core/domain/visualization/examples/SphereVis";
+import SphereVis from "@/core/domain/Visualization/examples/SphereVis";
 
 export default {
   title: "SphereVis",
@@ -10,7 +10,7 @@ export default {
 
 export const Basic = () => ({
   components: { GeoVisCore },
-  render(h:any) {
+  render(h: any) {
     return (
       <div style="width:95vw; height:95vh">
         <geo-vis-core visualization={(this as any).vis} />
