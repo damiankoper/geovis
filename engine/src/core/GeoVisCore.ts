@@ -20,8 +20,8 @@ export default class GeoVisCore {
     this.camera = new THREE.PerspectiveCamera(60, 1, 0.01, 10000);
 
     this.renderer = new THREE.WebGLRenderer({
-      logarithmicDepthBuffer:true,
-      antialias:true
+      logarithmicDepthBuffer: true,
+      antialias: true
     });
     container.appendChild(this.renderer.domElement);
 
@@ -49,7 +49,7 @@ export default class GeoVisCore {
 
   private _run() {
     requestAnimationFrame(() => this._run());
-    this.cameraController.update()
+    this.cameraController.update();
     this.renderer.render(this.scene, this.camera);
   }
 }

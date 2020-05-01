@@ -9,19 +9,30 @@ export default class SphereVis extends Visualization {
   setupScene(scene: THREE.Scene): void {
     console.info("setup scene");
     const r = 6371;
-    const box = new THREE.SphereBufferGeometry(6371, 200, 200);
-    const material = new THREE.MeshBasicMaterial({ color: 0xbada55 });
-    const boxMesh = new THREE.Mesh(box, material);
-    const box1 = new THREE.BoxBufferGeometry(0.01, 0.01, 0.01).applyMatrix4(
-      new Matrix4().makeTranslation(0, r, 0)
-    );
-    const material1 = new THREE.MeshBasicMaterial({ color: 0x5500ff });
-    const boxMesh1 = new THREE.Mesh(box1, material1);
-    const axesHelper = new THREE.AxesHelper(10);
 
+    const sphere = new THREE.SphereBufferGeometry(6371, 200, 200);
+    const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xbada55 });
+    const sphereMesh = new THREE.Mesh(sphere, sphereMaterial);
+    scene.add(sphereMesh);
+
+    const testBoxes = [
+      new THREE.BoxBufferGeometry(0.01, 0.01, 0.01),
+      new THREE.BoxBufferGeometry(0.1, 0.1, 0.1),
+      new THREE.BoxBufferGeometry(1, 1, 1),
+      new THREE.BoxBufferGeometry(10, 10, 10),
+      new THREE.BoxBufferGeometry(100, 100, 100)
+    ];
+
+    const boxMaterial = new THREE.MeshBasicMaterial({ color: 0x5500ff });
+    testBoxes.forEach((box, i) => {
+      box.applyMatrix4(new Matrix4().makeTranslation(0, r, 0));
+      box.applyMatrix4(new Matrix4().makeTranslation(0, 0, -(10 ** (i - 2))));
+      const boxMesh = new THREE.Mesh(box, boxMaterial);
+      scene.add(boxMesh);
+    });
+
+    const axesHelper = new THREE.AxesHelper(2 * r);
     scene.add(axesHelper);
-    scene.add(boxMesh);
-    scene.add(boxMesh1);
   }
   update(): void {
     console.info("update");
