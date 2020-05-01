@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import GeoVisCore from "@/components/GeoVisCore.vue";
 import SphereVis from "@/core/domain/Visualization/examples/SphereVis";
-
+import TouchEmulator from "hammer-touchemulator";
 export default {
   title: "SphereVis",
   component: GeoVisCore

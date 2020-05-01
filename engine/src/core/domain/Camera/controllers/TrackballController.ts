@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Vector3, Quaternion } from "three";
+import { Vector3, Quaternion, Vector2 } from "three";
 import GeoPosition from "../../GeoPosition/interfaces/GeoPosition";
 import GeoPosMapper from "../../GeoPosition/services/GeoPosMapperService";
 import Hammer from "hammerjs";
@@ -8,10 +8,14 @@ import Hammer from "hammerjs";
 export default class TrackballController {
   private camera: THREE.Camera;
   private eventSource: HTMLCanvasElement;
-  private mc: HammerManager;
 
-  private globalOrbit = new Vector3(0, 6371, 0);
-  private localOrbit = new Vector3(0.1, 0.1, 0.1);
+  private globalOrbit = new Vector3(0, 637.1, 0);
+  private localOrbit = new Vector3(0.01, 0.015, 0.01).multiplyScalar(1000);
+
+  private mc: HammerManager;
+  private panDelta = new Vector2();
+  private panMotionQuaternion = new Quaternion();
+  private noQuaternion = new Quaternion();
 
   constructor(camera: THREE.Camera, eventSource: HTMLCanvasElement) {
     this.camera = camera;
@@ -37,6 +41,9 @@ export default class TrackballController {
   }
 
   update() {
+    this.panMotionQuaternion.slerp(this.noQuaternion, 0.05);
+    this.globalOrbit.applyQuaternion(this.panMotionQuaternion);
+
     const globalNormal = new Vector3().copy(this.globalOrbit).normalize();
     const rotation = new Quaternion().setFromUnitVectors(
       new Vector3(0, 1, 0),
@@ -56,10 +63,64 @@ export default class TrackballController {
   }
 
   private setEvents() {
-    const pan = new Hammer.Pan({ direction: Hammer.DIRECTION_ALL });
-    this.mc.add(pan);
-    this.mc.on("panmove", function(ev) {
-      console.log(ev);
+    const pan = new Hammer.Pan({
+      direction: Hammer.DIRECTION_ALL,
+      threshold: 0
     });
+    this.mc.add(pan);
+    this.mc.on("panstart", () => {
+      this.panDelta.set(0, 0);
+      this.stopMovement();
+    });
+
+    this.mc.on("panmove", ev => {
+      const allDelta = new Vector2(ev.deltaX, ev.deltaY);
+      const currentDelta = allDelta.clone().sub(this.panDelta);
+
+      const horizontalAxis = new Vector3().crossVectors(
+        this.camera.position,
+        this.globalOrbit
+      );
+      const verticalAxis = new Vector3().crossVectors(
+        this.camera.position,
+        horizontalAxis
+      );
+
+      const localOrbitRadius = this.localOrbit.length();
+
+      const slower = 2000000;
+      const qVertical = new Quaternion().setFromAxisAngle(
+        horizontalAxis.clone().normalize(),
+        (currentDelta.y / slower) *
+          (localOrbitRadius + this.globalOrbit.length())
+      );
+      const qHorizontal = new Quaternion().setFromAxisAngle(
+        verticalAxis.clone().normalize(),
+        (currentDelta.x / slower) *
+          (localOrbitRadius + this.globalOrbit.length())
+      );
+
+      const panMotionQuaternion = new Quaternion().multiplyQuaternions(
+        qVertical,
+        qHorizontal
+      );
+
+      if (currentDelta.manhattanLength() > 2) {
+        this.panMotionQuaternion = panMotionQuaternion;
+      } else {
+        this.panMotionQuaternion = new Quaternion();
+        this.globalOrbit.applyQuaternion(panMotionQuaternion);
+      }
+
+      this.panDelta.copy(allDelta);
+    });
+
+    this.eventSource.addEventListener("mousedown", () => {
+      this.stopMovement();
+    });
+  }
+
+  private stopMovement() {
+    this.panMotionQuaternion = new Quaternion();
   }
 }
