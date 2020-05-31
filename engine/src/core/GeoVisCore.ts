@@ -16,17 +16,18 @@ export default class GeoVisCore {
     this.container = container;
 
     this.scene = new THREE.Scene();
-
-    this.camera = new THREE.PerspectiveCamera(60, 1, 0.01, 10000);
+    // TODO: Scene same origin as lookAt camera's point
+    this.camera = new THREE.PerspectiveCamera(60, 1, 0.001, 50000);
 
     this.renderer = new THREE.WebGLRenderer({
       logarithmicDepthBuffer: true,
-      antialias: true
+      antialias: true,
     });
     container.appendChild(this.renderer.domElement);
 
     this.cameraController = new TrackballController(
       this.camera,
+      this.scene,
       this.renderer.domElement
     );
   }
