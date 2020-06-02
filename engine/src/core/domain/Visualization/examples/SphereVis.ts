@@ -3,28 +3,23 @@ import * as THREE from "three";
 import { Matrix4, Quaternion, Vector3 } from "three";
 //import TrackballController from "../../Camera/controllers/TrackballController";
 export default class SphereVis extends Visualization {
-  private scene?: THREE.Scene;
+  private scene?: THREE.Object3D;
 
   setupCamera(/* controller: TrackballController */): void {
     console.info("setup camera");
   }
-  setupScene(scene: THREE.Scene): void {
-    this.scene = scene;
+  setupScene(scene: THREE.Object3D): void {
     console.info("setup scene");
+    this.scene = scene;
     const r = 6371;
-    const scale = 32
-    // TODO: LOD with scale based on distance -> lowet distance = bigger scale
 
-    const sphere = new THREE.SphereBufferGeometry(r/scale, 100, 100);
+    const sphere = new THREE.SphereGeometry(r, 100, 100);
     const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xbada55 });
     const sphereMesh = new THREE.Mesh(sphere, sphereMaterial);
     const material = new THREE.LineBasicMaterial({ color: 0xffffff });
     const wireframe = new THREE.LineSegments(sphereMesh.geometry, material);
-    
-    //TODO: Adjust position when updated
-    sphereMesh.position.setY(r/scale*(scale-1))
+
     scene.add(sphereMesh);
-    sphereMesh.position.setY(r/scale*(scale-1))
     scene.add(wireframe);
 
     const testBoxes = [
@@ -38,6 +33,7 @@ export default class SphereVis extends Visualization {
 
     const boxGroup = new THREE.Group();
     boxGroup.applyMatrix4(new Matrix4().makeTranslation(0, r, 0));
+    boxGroup.applyMatrix4(new Matrix4().makeRotationX(Math.PI / 2));
 
     const boxMaterial = new THREE.MeshBasicMaterial({ color: 0x5500ff });
     testBoxes.forEach((box, i) => {
@@ -47,11 +43,8 @@ export default class SphereVis extends Visualization {
     });
     scene.add(boxGroup);
 
-    /*     const axesHelper = new THREE.AxesHelper(2 * r);
+    const axesHelper = new THREE.AxesHelper(1.25 * r);
     scene.add(axesHelper);
-    if (this.scene) {
-      console.log(this.scene.children);
-    } */
   }
   update(): void {
     console.info("update");

@@ -7,6 +7,7 @@ export default class GeoVisCore {
   private visualization?: Visualization;
 
   private readonly scene: THREE.Scene;
+  private group: THREE.Group;
   private readonly camera: THREE.PerspectiveCamera;
   private readonly renderer: THREE.Renderer;
 
@@ -16,6 +17,9 @@ export default class GeoVisCore {
     this.container = container;
 
     this.scene = new THREE.Scene();
+    this.group = new THREE.Group();
+    this.scene.add(this.group);
+
     // TODO: Scene same origin as lookAt camera's point
     this.camera = new THREE.PerspectiveCamera(60, 1, 0.001, 50000);
 
@@ -28,6 +32,7 @@ export default class GeoVisCore {
     this.cameraController = new TrackballController(
       this.camera,
       this.scene,
+      this.group,
       this.renderer.domElement
     );
   }
@@ -43,14 +48,14 @@ export default class GeoVisCore {
   public run(visualization: Visualization) {
     this.scene.dispose();
     this.visualization = visualization;
-    this.visualization._setup(this.scene, this.cameraController);
+    this.visualization._setup(this.group, this.cameraController);
 
     this._run();
   }
 
   private _run() {
-    requestAnimationFrame(() => this._run());
     this.cameraController.update();
     this.renderer.render(this.scene, this.camera);
+    requestAnimationFrame(() => this._run());
   }
 }
