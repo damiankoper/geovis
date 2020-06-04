@@ -3,14 +3,14 @@ import * as THREE from "three";
 import { Matrix4, Quaternion, Vector3 } from "three";
 //import TrackballController from "../../Camera/controllers/TrackballController";
 export default class SphereVis extends Visualization {
-  private scene?: THREE.Object3D;
+  private scene?: THREE.Group;
 
   setupCamera(/* controller: TrackballController */): void {
     console.info("setup camera");
   }
-  setupScene(scene: THREE.Object3D): void {
+  setupScene(group: THREE.Group): void {
     console.info("setup scene");
-    this.scene = scene;
+    this.scene = group;
     const r = 6371;
 
     const sphere = new THREE.SphereGeometry(r, 100, 100);
@@ -19,8 +19,8 @@ export default class SphereVis extends Visualization {
     const material = new THREE.LineBasicMaterial({ color: 0xffffff });
     const wireframe = new THREE.LineSegments(sphereMesh.geometry, material);
 
-    scene.add(sphereMesh);
-    scene.add(wireframe);
+    group.add(sphereMesh);
+    group.add(wireframe);
 
     const testBoxes = [
       new THREE.BoxBufferGeometry(0.001, 0.001, 0.001),
@@ -41,10 +41,10 @@ export default class SphereVis extends Visualization {
       const boxMesh = new THREE.Mesh(box, boxMaterial);
       boxGroup.add(boxMesh);
     });
-    scene.add(boxGroup);
+    group.add(boxGroup);
 
     const axesHelper = new THREE.AxesHelper(1.25 * r);
-    scene.add(axesHelper);
+    group.add(axesHelper);
   }
   update(): void {
     console.info("update");

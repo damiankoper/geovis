@@ -3,14 +3,14 @@ import TrackballController from "../../Camera/controllers/TrackballController";
 export default abstract class Visualization {
   private parents: Visualization[] = [];
 
-  public _setup(scene: THREE.Group, cameraController: TrackballController) {
+  public _setup(group: THREE.Group, cameraController: TrackballController) {
     this.parents.forEach(p => {
-      p._setup(scene, cameraController);
+      p._setup(group, cameraController);
     });
     this.setupCamera(cameraController);
-    this.setupScene(scene);
+    this.setupScene(group);
   }
-  abstract setupScene(scene: THREE.Object3D): void;
+  abstract setupScene(group: THREE.Group): void;
   abstract setupCamera(controller: TrackballController): void;
 
   public _update() {
