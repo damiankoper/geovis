@@ -1,3 +1,1 @@
-export default interface CameraOptions{
-    
-}
+export default interface CameraOptions {}

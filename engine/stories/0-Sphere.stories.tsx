@@ -2,10 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import GeoVisCore from "@/components/GeoVisCore.vue";
 import SphereVis from "@/core/domain/Visualization/examples/SphereVis";
-import TouchEmulator from "hammer-touchemulator";
 export default {
   title: "SphereVis",
-  component: GeoVisCore
+  component: GeoVisCore,
 };
 
 export const Basic = () => ({
@@ -18,6 +17,6 @@ export const Basic = () => ({
     );
   },
   props: {
-    vis: { default: new SphereVis() }
-  }
+    vis: { default: new SphereVis() },
+  },
 });

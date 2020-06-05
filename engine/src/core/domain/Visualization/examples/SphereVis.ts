@@ -1,6 +1,6 @@
 import Visualization from "../models/Visualization";
 import * as THREE from "three";
-import { Matrix4, Quaternion, Vector3 } from "three";
+import { Matrix4 } from "three";
 //import TrackballController from "../../Camera/controllers/TrackballController";
 export default class SphereVis extends Visualization {
   private scene?: THREE.Group;
@@ -8,6 +8,7 @@ export default class SphereVis extends Visualization {
   setupCamera(/* controller: TrackballController */): void {
     console.info("setup camera");
   }
+  
   setupScene(group: THREE.Group): void {
     console.info("setup scene");
     this.scene = group;
@@ -46,9 +47,11 @@ export default class SphereVis extends Visualization {
     const axesHelper = new THREE.AxesHelper(1.25 * r);
     group.add(axesHelper);
   }
+
   update(): void {
     console.info("update");
   }
+
   destroy(): void {
     console.info("destroy");
   }

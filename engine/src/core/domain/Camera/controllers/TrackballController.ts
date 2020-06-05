@@ -10,7 +10,6 @@ import {
 import GeoPosition from "../../GeoPosition/interfaces/GeoPosition";
 import GeoPosMapper from "../../GeoPosition/services/GeoPosMapperService";
 import Hammer from "hammerjs";
-import _ from "lodash";
 
 /* TODO implements CameraController */
 export default class TrackballController {
@@ -129,12 +128,11 @@ export default class TrackballController {
 
     this.eventSource.addEventListener("wheel", (ev) => {
       this.stopMovement();
-      this.localOrbit.setLength(this.localOrbitZoomTargetLength)
+      this.localOrbit.setLength(this.localOrbitZoomTargetLength);
       if (ev.deltaY > 0) {
         this.localOrbitZoomTargetLength = this.localOrbit.length() * 0.8;
       } else if (ev.deltaY < 0) {
-        this.localOrbitZoomTargetLength =
-          this.localOrbit.length() * 1.25;
+        this.localOrbitZoomTargetLength = this.localOrbit.length() * 1.25;
       }
     });
   }

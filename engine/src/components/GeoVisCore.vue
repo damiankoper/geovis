@@ -22,7 +22,7 @@ export default class GeoVisCoreVue extends Vue {
       this.geoVisCore = new GeoVisCore(container as HTMLElement);
       this.onVisChange(this.visualization);
 
-      const resizeObserver = new window.ResizeObserver(entry => {
+      const resizeObserver = new window.ResizeObserver((entry) => {
         entry.forEach(() => {
           if (this.geoVisCore) this.geoVisCore.setSize();
         });
