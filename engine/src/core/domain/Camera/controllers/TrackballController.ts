@@ -1,95 +1,87 @@
 import * as THREE from "three";
-import {
-  Vector3,
-  Quaternion,
-  Vector2,
-  Euler,
-  Matrix4,
-  ArrowHelper,
-} from "three";
+import { Vector3, Quaternion, Vector2, Euler, Matrix4 } from "three";
 import GeoPosition from "../../GeoPosition/interfaces/GeoPosition";
 import GeoPosMapper from "../../GeoPosition/services/GeoPosMapperService";
-import Hammer from "hammerjs";
-
+import * as d3 from "d3-ease";
+import _ from "lodash";
+import Range from "../../GeoPosition/interfaces/Range";
 /* TODO implements CameraController */
 export default class TrackballController {
-  readonly r = 6371;
+  private readonly defaultUpEuler = new Euler(-Math.PI / 2);
 
-  private globalOrbit = new Vector3(0, 0, this.r);
+  private globalOrbitRadius = 6371;
+  private globalOrbit = new Vector3(0, 0, this.globalOrbitRadius);
   private globalOrbitUp = this.globalOrbit
     .clone()
-    .applyEuler(new Euler(0, Math.PI / 2));
-  private localOrbit = new Vector3(0, 0.001, 1)
-    .multiplyScalar(10000)
-    .applyEuler(new Euler(0, -Math.PI / 6, -Math.PI / 6));
+    .normalize()
+    .applyEuler(this.defaultUpEuler);
+  private globalOrbitSlowFactor = 0.001;
+  private globalOrbitLatBounds = new Range(-15, 15);
+  private globalOrbitLongBounds = new Range(90, 90);
+
+  private localOrbit = new Vector3(0, 0, 10000);
   private localOrbitUp = this.localOrbit
     .clone()
-    .applyEuler(new Euler(0, Math.PI / 2))
+    .applyEuler(this.defaultUpEuler)
     .normalize();
-  private localOrbitZoomTargetLength = this.localOrbit.length();
+  private localOrbitSlowFactor = 0.008;
+  private readonly localOrbitElevationBounds = new Range(5, 85);
 
-  private mc: HammerManager;
-  private panMotionQuaternion = new Quaternion();
-  private arrow: ArrowHelper;
-  private arrow2: ArrowHelper;
+  private zoomClock = new THREE.Clock(false);
+  private zoomFactor = 0.5;
+  private zoomTime = 0.15;
+  private localOrbitZoomFrom = this.localOrbit.clone();
+  private localOrbitZoomTarget = this.localOrbit.clone();
+
+  private panBreakTime = 1;
+  private panClock = new THREE.Clock(false);
+  private lastPanPosition = new Vector2();
+  private avgPanDelta = new Vector2();
+  private lastPanDelta = new Vector2();
 
   constructor(
     private readonly camera: THREE.Camera,
-    private readonly scene: THREE.Scene,
     private readonly group: THREE.Group,
     private readonly eventSource: HTMLCanvasElement
   ) {
     this.camera = camera;
+    this.camera.up = this.localOrbitUp;
     this.eventSource = eventSource;
-    this.mc = new Hammer(this.eventSource);
-
-    this.camera.up.set(0, 0, this.r);
-
-    this.arrow = new THREE.ArrowHelper(
-      this.globalOrbit.clone().normalize(),
-      new Vector3(0, 0, -this.globalOrbit.length()),
-      this.r * 1.5,
-      0xffff00
-    );
-
-    this.arrow2 = new THREE.ArrowHelper(
-      this.globalOrbit.clone().normalize(),
-      new Vector3(0, 0, -this.globalOrbit.length()),
-      this.r * 1.5,
-      0xff2200
-    );
 
     this.group.matrixAutoUpdate = false;
-    this.scene.add(this.arrow);
-    this.scene.add(this.arrow2);
     this.setEvents();
-    this.update();
+    this.update(0);
+
+    group?.parent?.add(new THREE.AxesHelper(9000));
   }
 
   setGlobalOrbitRadius(radius: number) {
     this.globalOrbit.setLength(radius);
+    this.globalOrbitRadius = radius;
   }
 
   setGlobalOrbitPosition(position: GeoPosition) {
     const rotation = GeoPosMapper.toRotationMatrix(position);
     const length = this.globalOrbit.length();
     this.globalOrbit = new Vector3(0, 0, length).applyMatrix4(rotation);
-    this.globalOrbitUp = new Vector3(0, length, 0);
+    this.globalOrbitUp.copy(this.globalOrbit).applyEuler(this.defaultUpEuler);
   }
 
-  update() {
-    this.panMotionQuaternion.slerp(new Quaternion(), 0.05);
-    this.globalOrbit.applyQuaternion(this.panMotionQuaternion);
+  update(delta: number) {
+    // TODO: Zooming with localOrbit pan bug
+    this.clockAniamtionUpdate(this.panClock, this.panBreakTime, (f) => {
+      const s = 1 - d3.easeQuadOut(f);
+      this.handleGlobalOrbitRotate(this.avgPanDelta.clone().multiplyScalar(s));
+    });
 
-    this.localOrbit.lerp(
-      this.localOrbit.clone().setLength(this.localOrbitZoomTargetLength),
-      0.5
-    );
-
-    this.arrow.setDirection(this.globalOrbit.clone().normalize());
-
-    this.group.matrix.identity();
-    this.group.matrix.multiply(new Matrix4().makeTranslation(0, 0, -this.r));
+    this.clockAniamtionUpdate(this.zoomClock, this.zoomTime, (f) => {
+      this.localOrbit.lerpVectors(
+        this.localOrbitZoomFrom,
+        this.localOrbitZoomTarget,
+        d3.easeQuadOut(f)
+      );
+    });
+    this.group.matrix.makeTranslation(0, 0, -this.globalOrbitRadius);
     this.group.matrix.multiply(
       new Matrix4().lookAt(
         new Vector3(),
@@ -98,84 +90,91 @@ export default class TrackballController {
       )
     );
 
-    const camPosition = this.localOrbit;
-    this.camera.position.copy(camPosition);
+    this.camera.position.copy(this.localOrbit);
     this.camera.lookAt(0, 0, 0);
   }
 
   private setEvents() {
-    const pan = new Hammer.Pan({
-      direction: Hammer.DIRECTION_ALL,
-      threshold: 0,
-    });
-    this.mc.add(pan);
-    this.mc.on("panstart", () => {
+    this.eventSource.addEventListener("pointerdown", (e) => {
+      this.eventSource.setPointerCapture(e.pointerId);
+      this.lastPanPosition.set(e.clientX, e.clientY);
       this.stopMovement();
     });
+    this.eventSource.addEventListener("pointerup", (e) => {
+      this.eventSource.releasePointerCapture(e.pointerId);
+      if (!e.shiftKey) this.panClock.start();
+    });
+    this.eventSource.addEventListener("pointermove", (e) => {
+      if (e.buttons & 1) {
+        this.lastPanDelta = new Vector2(
+          e.clientX - this.lastPanPosition.x,
+          e.clientY - this.lastPanPosition.y
+        );
+        if (this.avgPanDelta.lengthSq() === 0) {
+          this.avgPanDelta.copy(this.lastPanDelta);
+        } else {
+          this.avgPanDelta.add(this.lastPanDelta).divideScalar(2);
+        }
 
-    this.mc.on("panmove", (ev) => {
-      const allDelta = new Vector2(ev.velocityX, ev.velocityY);
-      if (ev.srcEvent.shiftKey) {
-        this.handleLocalOrbitRotate(allDelta);
-      } else {
-        this.handleGlobalOrbitRotate(allDelta);
+        if (e.shiftKey) {
+          this.handleLocalOrbitRotate(this.lastPanDelta);
+        } else {
+          this.handleGlobalOrbitRotate(this.lastPanDelta);
+        }
+        this.lastPanPosition.set(e.clientX, e.clientY);
       }
     });
-
-    this.eventSource.addEventListener("mousedown", () => {
+    this.eventSource.addEventListener("wheel", (e) => {
       this.stopMovement();
-    });
-
-    this.eventSource.addEventListener("wheel", (ev) => {
-      this.stopMovement();
-      this.localOrbit.setLength(this.localOrbitZoomTargetLength);
-      if (ev.deltaY > 0) {
-        this.localOrbitZoomTargetLength = this.localOrbit.length() * 0.8;
-      } else if (ev.deltaY < 0) {
-        this.localOrbitZoomTargetLength = this.localOrbit.length() * 1.25;
+      this.localOrbitZoomFrom.copy(this.localOrbit);
+      this.localOrbitZoomTarget.copy(this.localOrbit);
+      if (e.deltaY > 0) {
+        this.localOrbitZoomTarget.multiplyScalar(this.zoomFactor);
+      } else if (e.deltaY < 0) {
+        this.localOrbitZoomTarget.multiplyScalar(1 / this.zoomFactor);
       }
+      this.zoomClock.start();
     });
   }
 
-  handleLocalOrbitRotate(delta: THREE.Vector2) {
-    const slowFactor = 0.05;
+  private handleLocalOrbitRotate(delta: THREE.Vector2) {
     const qHorizontal = new Quaternion().setFromAxisAngle(
       new Vector3(0, 0, 1),
-      -delta.x * slowFactor
+      -delta.x * this.localOrbitSlowFactor
     );
+
     const horizontalAxis = new Vector3()
-      .crossVectors(this.localOrbit, new Vector3(0, 0, 1))
+      .crossVectors(this.localOrbit, this.localOrbitUp)
       .normalize();
+
     const qVertical = new Quaternion().setFromAxisAngle(
       horizontalAxis,
-      delta.y * slowFactor * 0.5
+      delta.y * this.localOrbitSlowFactor * 0.5
     );
     const panMotionQuaternion = new Quaternion().multiplyQuaternions(
       qHorizontal,
       qVertical
     );
-
-    const bottom = (5 * Math.PI) / 180;
-    const top = (5 * Math.PI) / 180;
-
+    const oldZ = this.localOrbitUp.z;
     this.localOrbit.applyQuaternion(panMotionQuaternion);
     this.localOrbitUp.applyQuaternion(panMotionQuaternion);
 
-    //Bottom
-    const bottomAngle = this.localOrbit.angleTo(
-      this.localOrbit.clone().setZ(0)
-    );
+    const from = (this.localOrbitElevationBounds.from * Math.PI) / 180;
+    const to = (this.localOrbitElevationBounds.to * Math.PI) / 180;
+    let angle = this.localOrbit.angleTo(new Vector3(0, 0, 1));
     if (
-      bottomAngle < bottom ||
-      (this.localOrbit.z < 0 && this.localOrbitUp.z > 0)
+      !_.inRange(angle, from, to) ||
+      Math.sign(oldZ) !== Math.sign(this.localOrbitUp.z)
     ) {
-      this.localOrbit = this.localOrbit
-        .clone()
-        .setZ(0)
-        .setLength(this.localOrbit.length())
-        .applyQuaternion(
-          new Quaternion().setFromAxisAngle(horizontalAxis, bottom)
-        );
+      angle = _.clamp(angle, from, to);
+      horizontalAxis.applyQuaternion(qHorizontal);
+      this.localOrbit = new Vector3(
+        0,
+        0,
+        this.localOrbit.length()
+      ).applyQuaternion(
+        new Quaternion().setFromAxisAngle(horizontalAxis, -angle)
+      );
       this.localOrbitUp.copy(
         this.localOrbit
           .clone()
@@ -185,64 +184,70 @@ export default class TrackballController {
           .normalize()
       );
     }
-
-    //Top
-    const topAngle = this.localOrbit.angleTo(new Vector3(0, 0, 1));
-    if (topAngle < top || (this.localOrbit.z > 0 && this.localOrbitUp.z < 0)) {
-      this.localOrbit = new Vector3(0, 0, this.localOrbit.length())
-        .applyQuaternion(
-          new Quaternion().setFromAxisAngle(horizontalAxis, -top)
-        )
-        .applyQuaternion(qHorizontal);
-      this.localOrbitUp.copy(
-        new Vector3(0, 0, 1)
-          .applyQuaternion(
-            new Quaternion().setFromAxisAngle(
-              horizontalAxis,
-              -top + Math.PI / 2
-            )
-          )
-          .normalize()
-      );
-    }
   }
 
   private handleGlobalOrbitRotate(delta: THREE.Vector2) {
-    const slowFactor = 0.000001;
-
-    const horizontalAxis = new Vector3().crossVectors(
-      this.localOrbit.clone().normalize(),
-      new Vector3(0, 0, 1)
-    );
-
-    this.arrow2.setDirection(horizontalAxis.normalize());
-
     const localOrbitRadius = this.localOrbit.length();
+    const slowFactor =
+      (this.globalOrbitSlowFactor * localOrbitRadius) / this.globalOrbitRadius;
+
+    const horizontalAxis = new Vector3()
+      .crossVectors(this.localOrbitUp, this.localOrbit)
+      .normalize();
+    const verticalAxis = this.localOrbitUp.clone().normalize();
+    // Vertical pan
     const qVertical = new Quaternion().setFromAxisAngle(
       horizontalAxis,
-      -delta.y * localOrbitRadius * slowFactor
+      delta.y * slowFactor
     );
-
+    // Horizontal pan
     const qHorizontal = new Quaternion().setFromAxisAngle(
-      this.localOrbit.clone().setZ(0).normalize(),
-      -delta.x * localOrbitRadius * slowFactor
+      verticalAxis,
+      delta.x * slowFactor
     );
-
-    const panMotionQuaternion = new Quaternion().multiplyQuaternions(
-      qHorizontal,
-      qVertical
-    );
-    if (delta.manhattanLength() > 2) {
-      this.panMotionQuaternion = panMotionQuaternion;
-    } else {
-      this.panMotionQuaternion = new Quaternion();
+    const qPan = qHorizontal.clone().multiply(qVertical);
+    if (delta.length() <= 2) {
+      this.stopMovement();
     }
 
-    this.globalOrbit.applyQuaternion(panMotionQuaternion);
-    this.globalOrbitUp.applyQuaternion(panMotionQuaternion);
+    this.globalOrbit.applyQuaternion(qPan);
+    this.globalOrbitUp.applyQuaternion(qPan);
+
+    // Latitude
+    /*  const from = (this.globalOrbitLatBounds.from * Math.PI) / 180;
+    const to = (this.globalOrbitLatBounds.to * Math.PI) / 180;
+    let angle = this.globalOrbit
+      .clone()
+      .projectOnPlane(new Vector3(0, 1, 0))
+      .angleTo(new Vector3(0, 0, 1));
+    console.log(angle, from, to);
+
+    if (!_.inRange(angle, from, to)) {
+      angle = _.clamp(angle, from, to);
+      this.globalOrbit = new Vector3(
+        0,
+        0,
+        this.globalOrbit.length()
+      ).applyQuaternion(
+        new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), -angle)
+      );
+    } */
   }
 
   private stopMovement() {
-    this.panMotionQuaternion = new Quaternion();
+    this.avgPanDelta.set(0, 0);
+    this.lastPanDelta.set(0, 0);
+  }
+
+  private clockAniamtionUpdate(
+    clock: THREE.Clock,
+    time: number,
+    action: (timeFrac: number) => void
+  ) {
+    if (clock.running) {
+      const elapsed = clock.getElapsedTime();
+      if (elapsed > time) clock.stop();
+      else action(elapsed / time);
+    }
   }
 }

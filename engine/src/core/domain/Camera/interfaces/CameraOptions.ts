@@ -1,1 +1,3 @@
-export default interface CameraOptions {}
+export default interface TrackballCamera {
+    
+}

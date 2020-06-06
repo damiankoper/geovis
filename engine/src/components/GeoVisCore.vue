@@ -31,6 +31,10 @@ export default class GeoVisCoreVue extends Vue {
     }
   }
 
+  destroyed() {
+    if (this.geoVisCore) this.geoVisCore.stop();
+  }
+
   @Watch("visualization")
   onVisChange(v?: Visualization) {
     if (v && this.geoVisCore) {

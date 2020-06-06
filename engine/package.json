@@ -14,11 +14,10 @@
     "storybook:serve": "vue-cli-service storybook:serve -p 6006 -c config/storybook"
   },
   "dependencies": {
-    "@types/hammerjs": "^2.0.36",
+    "@types/d3-ease": "^1.0.9",
     "@types/lodash": "^4.14.155",
     "core-js": "^3.6.5",
-    "hammer-touchemulator": "0.0.2",
-    "hammerjs": "^2.0.8",
+    "d3-ease": "^1.0.6",
     "lodash": "^4.17.15",
     "three": "^0.117.1",
     "vue": "^2.6.11",
