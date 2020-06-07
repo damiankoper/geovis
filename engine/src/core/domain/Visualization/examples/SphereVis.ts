@@ -1,6 +1,6 @@
 import Visualization from "../models/Visualization";
 import * as THREE from "three";
-import { Matrix4 } from "three";
+import { Matrix4, Box3, Vector3 } from "three";
 import image from "@/assets/textures/earthmap1k.jpg";
 //import TrackballController from "../../Camera/controllers/TrackballController";
 export default class SphereVis extends Visualization {
@@ -13,13 +13,6 @@ export default class SphereVis extends Visualization {
     const r = 6371;
 
     const sphere = new THREE.SphereGeometry(r, 100, 100);
-    sphere.vertices.forEach((v) => {
-      v.applyMatrix4(
-        new Matrix4()
-          .makeTranslation(0, 0, -r)
-          .multiply(new Matrix4().makeRotationY(-Math.PI / 2))
-      );
-    });
     const sphereMaterial = new THREE.MeshPhongMaterial();
     const texture = THREE.ImageUtils.loadTexture(image);
     sphereMaterial.map = texture;
@@ -31,12 +24,8 @@ export default class SphereVis extends Visualization {
 
     sphereMesh.matrixAutoUpdate = false;
     wireframe.matrixAutoUpdate = false;
-
-    sphereMesh.matrix.makeTranslation(0, 0, r);
-    wireframe.matrix.makeTranslation(0, 0, r);
-
     group.add(sphereMesh);
-    group.add(wireframe);
+    //group.add(wireframe);
 
     const testBoxes = [
       new THREE.BoxBufferGeometry(0.001, 0.001, 0.001),
@@ -63,11 +52,13 @@ export default class SphereVis extends Visualization {
     group.add(axesHelper);
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    group.add(ambientLight);
+    scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-    directionalLight.position.set(0, 0, 1);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
     scene.add(directionalLight);
+    directionalLight.position.set(0, 0, 1);
+
+    scene.add(new THREE.AxesHelper(9000));
   }
 
   update(): void {

@@ -51,8 +51,6 @@ export default class TrackballController {
     this.group.matrixAutoUpdate = false;
     this.setEvents();
     this.update(0);
-
-    group?.parent?.add(new THREE.AxesHelper(9000));
   }
 
   setGlobalOrbitRadius(radius: number) {
@@ -68,7 +66,6 @@ export default class TrackballController {
   }
 
   update(delta: number) {
-    // TODO: Zooming with localOrbit pan bug
     this.clockAniamtionUpdate(this.panClock, this.panBreakTime, (f) => {
       const s = 1 - d3.easeQuadOut(f);
       this.handleGlobalOrbitRotate(this.avgPanDelta.clone().multiplyScalar(s));
@@ -117,7 +114,8 @@ export default class TrackballController {
         }
 
         if (e.shiftKey) {
-          this.handleLocalOrbitRotate(this.lastPanDelta);
+          if (!this.zoomClock.running)
+            this.handleLocalOrbitRotate(this.lastPanDelta);
         } else {
           this.handleGlobalOrbitRotate(this.lastPanDelta);
         }
