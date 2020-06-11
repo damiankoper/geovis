@@ -13,8 +13,9 @@ export default class SphereVis extends Visualization {
     const r = 6371;
 
     const sphere = new THREE.SphereGeometry(r, 100, 100);
+    sphere.rotateY(-Math.PI / 2);
     const sphereMaterial = new THREE.MeshPhongMaterial();
-    const texture = THREE.ImageUtils.loadTexture(image);
+    const texture = new THREE.TextureLoader().load(image);
     sphereMaterial.map = texture;
     const sphereMesh = new THREE.Mesh(sphere, sphereMaterial);
     const material = new THREE.LineBasicMaterial({ color: 0xffffff });

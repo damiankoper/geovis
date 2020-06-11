@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { Vector3, Quaternion, Vector2, Euler, Matrix4 } from "three";
 import GeoPosition from "../../GeoPosition/interfaces/GeoPosition";
-import GeoPosMapper from "../../GeoPosition/services/GeoPosMapperService";
+import GeoPosMapper from "../../GeoPosition/services/GeoPosMapper";
 import * as d3 from "d3-ease";
 import _ from "lodash";
 import Range from "../../GeoPosition/interfaces/Range";
@@ -16,7 +16,7 @@ export default class TrackballController {
     .normalize()
     .applyEuler(this.defaultUpEuler);
   private globalOrbitSlowFactor = 0.001;
-  private globalOrbitLatBounds = new Range(-15, 15);
+  private globalOrbitLatBounds = new Range(-20, 20);
   private globalOrbitLongBounds = new Range(90, 90);
 
   private localOrbit = new Vector3(0, 0, 10000);
@@ -39,6 +39,13 @@ export default class TrackballController {
   private avgPanDelta = new Vector2();
   private lastPanDelta = new Vector2();
 
+  // private plane: THREE.PlaneHelper;
+  private plane2: THREE.PlaneHelper;
+  private plane3: THREE.PlaneHelper;
+  private globalOrbitHelper: THREE.ArrowHelper;
+  private globalOrbitUpHelper: THREE.ArrowHelper;
+  private qHelper: THREE.ArrowHelper;
+
   constructor(
     private readonly camera: THREE.Camera,
     private readonly group: THREE.Group,
@@ -47,6 +54,47 @@ export default class TrackballController {
     this.camera = camera;
     this.camera.up = this.localOrbitUp;
     this.eventSource = eventSource;
+
+    /*     this.plane = new THREE.PlaneHelper(
+      new THREE.Plane(this.globalOrbitUp),
+      15000
+    );
+ */
+    this.plane2 = new THREE.PlaneHelper(
+      new THREE.Plane(this.globalOrbitUp),
+      15000
+    );
+
+    this.plane3 = new THREE.PlaneHelper(
+      new THREE.Plane(new Vector3()),
+      15000,
+      0xff0000
+    );
+
+    this.globalOrbitHelper = new THREE.ArrowHelper(
+      this.globalOrbit,
+      new Vector3(),
+      10000
+    );
+    this.globalOrbitUpHelper = new THREE.ArrowHelper(
+      this.globalOrbitUp,
+      this.globalOrbit,
+      5000
+    );
+
+    this.qHelper = new THREE.ArrowHelper(
+      new Vector3(),
+      new Vector3(),
+      10000,
+      0xff0088
+    );
+
+    //this.group?.parent?.add(this.plane);
+    this.group?.parent?.add(this.plane2);
+    this.group?.parent?.add(this.plane3);
+    this.group?.parent?.add(this.globalOrbitHelper);
+    this.group?.parent?.add(this.globalOrbitUpHelper);
+    this.group?.parent?.add(this.qHelper);
 
     this.group.matrixAutoUpdate = false;
     this.setEvents();
@@ -62,10 +110,14 @@ export default class TrackballController {
     const rotation = GeoPosMapper.toRotationMatrix(position);
     const length = this.globalOrbit.length();
     this.globalOrbit = new Vector3(0, 0, length).applyMatrix4(rotation);
-    this.globalOrbitUp.copy(this.globalOrbit).applyEuler(this.defaultUpEuler);
+    this.globalOrbitUp.copy(
+      new Vector3(0, 0, length)
+        .applyEuler(this.defaultUpEuler)
+        .applyMatrix4(rotation)
+    );
   }
 
-  update(delta: number) {
+  update() {
     this.clockAniamtionUpdate(this.panClock, this.panBreakTime, (f) => {
       const s = 1 - d3.easeQuadOut(f);
       this.handleGlobalOrbitRotate(this.avgPanDelta.clone().multiplyScalar(s));
@@ -87,6 +139,15 @@ export default class TrackballController {
       )
     );
 
+    this.plane3.plane.normal.copy(
+      new Vector3()
+        .crossVectors(new Vector3(0, 0, 1), this.globalOrbitUp)
+        .normalize()
+    );
+
+    this.globalOrbitUpHelper.setDirection(this.globalOrbitUp.normalize());
+    this.globalOrbitUpHelper.position.copy(this.globalOrbit);
+
     this.camera.position.copy(this.localOrbit);
     this.camera.lookAt(0, 0, 0);
   }
@@ -102,7 +163,7 @@ export default class TrackballController {
       if (!e.shiftKey) this.panClock.start();
     });
     this.eventSource.addEventListener("pointermove", (e) => {
-      if (e.buttons & 1) {
+      if (e.buttons & 1 || e.buttons & 4) {
         this.lastPanDelta = new Vector2(
           e.clientX - this.lastPanPosition.x,
           e.clientY - this.lastPanPosition.y
@@ -113,7 +174,7 @@ export default class TrackballController {
           this.avgPanDelta.add(this.lastPanDelta).divideScalar(2);
         }
 
-        if (e.shiftKey) {
+        if (e.shiftKey || e.buttons & 4) {
           if (!this.zoomClock.running)
             this.handleLocalOrbitRotate(this.lastPanDelta);
         } else {
@@ -211,24 +272,34 @@ export default class TrackballController {
     this.globalOrbit.applyQuaternion(qPan);
     this.globalOrbitUp.applyQuaternion(qPan);
 
-    // Latitude
-    /*  const from = (this.globalOrbitLatBounds.from * Math.PI) / 180;
-    const to = (this.globalOrbitLatBounds.to * Math.PI) / 180;
-    let angle = this.globalOrbit
-      .clone()
-      .projectOnPlane(new Vector3(0, 1, 0))
-      .angleTo(new Vector3(0, 0, 1));
-    console.log(angle, from, to);
+    const coords = GeoPosMapper.fromOrbit(this.globalOrbit, this.globalOrbitUp);
+    console.log("Latitude", coords.latDeg(), "Longtitude", coords.longDeg());
 
-    if (!_.inRange(angle, from, to)) {
-      angle = _.clamp(angle, from, to);
-      this.globalOrbit = new Vector3(
-        0,
-        0,
-        this.globalOrbit.length()
-      ).applyQuaternion(
-        new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), -angle)
+/*     const from = (this.globalOrbitLatBounds.from * Math.PI) / 180;
+    const to = (this.globalOrbitLatBounds.to * Math.PI) / 180; */
+
+    this.globalOrbitHelper.setDirection(this.globalOrbit.normalize());
+
+    /*     if (!_.inRange(longtitude, from, to)) {
+      const longAngle = _.clamp(longtitude, from, to);
+
+      this.globalOrbit.copy(
+        new Vector3(0, 0, this.globalOrbit.length()).applyQuaternion(
+          new Quaternion().setFromAxisAngle(horizontalAxis, longAngle)
+        )
       );
+      this.globalOrbitUp.copy(
+        new Vector3(0, 0, 1).applyQuaternion(
+          new Quaternion()
+            .setFromAxisAngle(horizontalAxis, longAngle)
+            .multiply(
+              new Quaternion().setFromAxisAngle(horizontalAxis, -Math.PI / 2)
+            )
+        )
+      );
+
+      this.globalOrbit.applyQuaternion(qHorizontal);
+      this.globalOrbitUp.applyQuaternion(qHorizontal);
     } */
   }
 
