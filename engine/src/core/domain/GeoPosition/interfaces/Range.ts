@@ -1,3 +1,3 @@
-export default class Range {
-  constructor(public from: number, public to: number) {}
+export default class Range<T = number> {
+  constructor(public from: T, public to: T) {}
 }

@@ -16,8 +16,10 @@ export default class TrackballController {
     .normalize()
     .applyEuler(this.defaultUpEuler);
   private globalOrbitSlowFactor = 0.001;
-  private globalOrbitLatBounds = new Range(-20, 20);
-  private globalOrbitLongBounds = new Range(90, 90);
+  private globalOrbitBounds = new Range<GeoPosition>(
+    GeoPosition.fromDeg(-180, -90),
+    GeoPosition.fromDeg(180, 90)
+  );
 
   private localOrbit = new Vector3(0, 0, 10000);
   private localOrbitUp = this.localOrbit
@@ -78,8 +80,9 @@ export default class TrackballController {
     );
     this.globalOrbitUpHelper = new THREE.ArrowHelper(
       this.globalOrbitUp,
-      this.globalOrbit,
-      5000
+      new Vector3(),
+      5000,
+      0x8800ff
     );
 
     this.qHelper = new THREE.ArrowHelper(
@@ -117,7 +120,7 @@ export default class TrackballController {
     );
   }
 
-  update() {
+  update(delta: number) {
     this.clockAniamtionUpdate(this.panClock, this.panBreakTime, (f) => {
       const s = 1 - d3.easeQuadOut(f);
       this.handleGlobalOrbitRotate(this.avgPanDelta.clone().multiplyScalar(s));
@@ -146,7 +149,7 @@ export default class TrackballController {
     );
 
     this.globalOrbitUpHelper.setDirection(this.globalOrbitUp.normalize());
-    this.globalOrbitUpHelper.position.copy(this.globalOrbit);
+    //this.globalOrbitUpHelper.position.copy(this.globalOrbit.clone().negate());
 
     this.camera.position.copy(this.localOrbit);
     this.camera.lookAt(0, 0, 0);
@@ -273,35 +276,60 @@ export default class TrackballController {
     this.globalOrbitUp.applyQuaternion(qPan);
 
     const coords = GeoPosMapper.fromOrbit(this.globalOrbit, this.globalOrbitUp);
-    console.log("Latitude", coords.latDeg(), "Longtitude", coords.longDeg());
 
-/*     const from = (this.globalOrbitLatBounds.from * Math.PI) / 180;
-    const to = (this.globalOrbitLatBounds.to * Math.PI) / 180; */
+    const latAxis = this.globalOrbitUp.clone();
+    const longAxis = new Vector3()
+      .crossVectors(new Vector3(0, 0, 1), this.globalOrbitUp)
+      .normalize();
+
+    if (
+      !this.inCycleRange(
+        coords.lat,
+        this.globalOrbitBounds.from.lat,
+        this.globalOrbitBounds.to.lat
+      )
+    ) {
+      const angle = this.getClosest(
+        [this.globalOrbitBounds.from.lat, this.globalOrbitBounds.to.lat],
+        coords.lat
+      );
+      const q = new Quaternion().setFromAxisAngle(latAxis, coords.lat - angle);
+      this.globalOrbit.applyQuaternion(q);
+      this.globalOrbitUp.applyQuaternion(q);
+    }
+
+    if (
+      !_.inRange(
+        coords.long,
+        this.globalOrbitBounds.from.long,
+        this.globalOrbitBounds.to.long
+      )
+    ) {
+      const angle = this.getClosest(
+        [this.globalOrbitBounds.from.long, this.globalOrbitBounds.to.long],
+        coords.long
+      );
+      const q = new Quaternion().setFromAxisAngle(
+        longAxis,
+        coords.long - angle
+      );
+
+      this.globalOrbit.applyQuaternion(q);
+      this.globalOrbitUp.applyQuaternion(q);
+    }
 
     this.globalOrbitHelper.setDirection(this.globalOrbit.normalize());
-
-    /*     if (!_.inRange(longtitude, from, to)) {
-      const longAngle = _.clamp(longtitude, from, to);
-
-      this.globalOrbit.copy(
-        new Vector3(0, 0, this.globalOrbit.length()).applyQuaternion(
-          new Quaternion().setFromAxisAngle(horizontalAxis, longAngle)
-        )
-      );
-      this.globalOrbitUp.copy(
-        new Vector3(0, 0, 1).applyQuaternion(
-          new Quaternion()
-            .setFromAxisAngle(horizontalAxis, longAngle)
-            .multiply(
-              new Quaternion().setFromAxisAngle(horizontalAxis, -Math.PI / 2)
-            )
-        )
-      );
-
-      this.globalOrbit.applyQuaternion(qHorizontal);
-      this.globalOrbitUp.applyQuaternion(qHorizontal);
-    } */
   }
+
+  private inCycleRange(n: number, from: number, to: number) {
+    return from > to ? !_.inRange(n, to, from) : _.inRange(n, from, to);
+  }
+
+  private getClosest = _.curry((counts: number[], goal: number) => {
+    return counts.reduce((prev, curr) =>
+      Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev
+    );
+  });
 
   private stopMovement() {
     this.avgPanDelta.set(0, 0);
