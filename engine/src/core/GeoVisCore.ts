@@ -57,8 +57,10 @@ export default class GeoVisCore {
     this.stopRequested = true;
   }
 
+  //TODO: Handle destroy
+
   private _run() {
-    const deltaFactor = (this.clock.getDelta() * 60);
+    const deltaFactor = this.clock.getDelta() * 60;
     this.cameraController.update(deltaFactor);
 
     this.renderer.render(this.scene, this.camera);

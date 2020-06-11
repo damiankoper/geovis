@@ -10,6 +10,7 @@
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import GeoVisCore from "../core/GeoVisCore";
 import Visualization from "../core/domain/Visualization/models/Visualization";
+export { Visualization };
 
 @Component
 export default class GeoVisCoreVue extends Vue {
