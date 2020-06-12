@@ -46,11 +46,11 @@ export default interface TrackballCamera {
   getGlobalOrbitBounds(): Range<GeoPosition>;
 
   /**
-   * Sets bounds of elevation in camera's local movement,
+   * Sets bounds of in camera's local movement,
    * @param bounds
    */
-  setLocalOrbitElevationBounds(bounds: Range): TrackballCamera;
-  getLocalOrbitElevationBounds(): Range;
+  setLocalOrbitBounds(bounds: Range<GeoPosition>): TrackballCamera;
+  getLocalOrbitBounds(): Range<GeoPosition>;
 
   /**
    * Sets camera's mode.

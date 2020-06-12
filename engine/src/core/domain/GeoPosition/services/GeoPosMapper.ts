@@ -16,7 +16,7 @@ export default class GeoPosMapper {
   ): GeoPosition {
     //Latttude
     const v1Lat = orbit.clone().projectOnPlane(orbitUp).normalize();
-    const v2Lat = orbitOrigin.projectOnPlane(orbitUp).normalize();
+    const v2Lat = orbitOrigin.clone().projectOnPlane(orbitUp).normalize();
     const qLat = new THREE.Quaternion().setFromUnitVectors(v1Lat, v2Lat);
     const latitude =
       qLat.angleTo(new THREE.Quaternion()) *

@@ -6,33 +6,29 @@ import TrackballCamera from "../interfaces/TrackballCamera";
 import { TrackballMode } from "../enums/TrackballMode";
 import { EventDispatcher } from "strongly-typed-events";
 import AnimatedTransition from "../../Animation/AnimatedTransition";
+import Orbit from "../../GeoPosition/models/Orbit";
 
 /**
  * @category Camera
  */
 export default abstract class TrackballControllerBase
   implements TrackballCamera {
+  protected mode: TrackballMode = TrackballMode.Free;
   protected readonly defaultUpEuler = new THREE.Euler(-Math.PI / 2);
 
-  protected globalOrbit = new THREE.Vector3(0, 0, 6371);
-  protected globalOrbitUp = this.globalOrbit
-    .clone()
-    .normalize()
-    .applyEuler(this.defaultUpEuler);
-  protected globalOrbitSlowFactor = 1;
-  protected globalOrbitBounds = new Range<GeoPosition>(
-    GeoPosition.fromDeg(-180, -80),
-    GeoPosition.fromDeg(180, 80)
+  protected globalOrbit = new Orbit(
+    new THREE.Vector3(0, 0, 6371),
+    new THREE.Vector3(0, 0, 1)
   );
-  protected mode: TrackballMode = TrackballMode.Free;
 
-  protected localOrbit = new THREE.Vector3(0, 0, 10000);
-  protected localOrbitUp = this.localOrbit
-    .clone()
-    .applyEuler(this.defaultUpEuler)
-    .normalize();
-  protected localOrbitSlowFactor = 1;
-  protected localOrbitElevationBounds = new Range(5, 85);
+  protected localOrbit = new Orbit(
+    new THREE.Vector3(0, 0, 10000),
+    new THREE.Vector3(0, 1, 0),
+    new Range<GeoPosition>(
+      GeoPosition.fromDeg(-180, 5),
+      GeoPosition.fromDeg(180, 45)
+    )
+  );
 
   protected zoomFactor = 0.5;
   protected zoomBounds = new Range(0.001, 10000);
@@ -52,7 +48,7 @@ export default abstract class TrackballControllerBase
     protected readonly camera: THREE.Camera,
     protected readonly group: THREE.Group
   ) {
-    this.camera.up = this.localOrbitUp;
+    this.camera.up = this.localOrbit.up;
     this.group.matrixAutoUpdate = false;
   }
 
@@ -85,72 +81,62 @@ export default abstract class TrackballControllerBase
 
   /** @inheritdoc */
   getGlobalOrbitRadius() {
-    return this.globalOrbit.length();
+    return this.globalOrbit.getRadius();
   }
   /** @inheritdoc */
   setGlobalOrbitRadius(radius: number) {
-    this.globalOrbit.setLength(radius);
+    this.globalOrbit.setRadius(radius);
     return this;
   }
 
   /** @inheritdoc */
   getGlobalOrbitPosition() {
-    return GeoPosMapper.fromOrbit(this.globalOrbit, this.globalOrbitUp);
+    return this.globalOrbit.getGeoPosition();
   }
   /** @inheritdoc */
   setGlobalOrbitPosition(position: GeoPosition) {
-    const rotation = GeoPosMapper.toRotationMatrix(position);
-    const v = new THREE.Vector3(0, 0, this.globalOrbit.length());
-    this.globalOrbit = v.applyMatrix4(rotation);
-    this.globalOrbitUp.copy(
-      v.applyEuler(this.defaultUpEuler).applyMatrix4(rotation)
-    );
+    this.globalOrbit.setGeoPosition(position);
     return this;
   }
 
   /** @inheritdoc */
   getLocalOrbitRadius() {
-    return this.localOrbit.length();
+    return this.localOrbit.getRadius();
   }
   /** @inheritdoc */
   setLocalOrbitRadius(radius: number) {
-    this.localOrbit.setLength(radius);
+    this.localOrbit.setRadius(radius);
     return this;
   }
 
   /** @inheritdoc */
   setLocalOrbitPosition(position: GeoPosition) {
-    const rotation = GeoPosMapper.toRotationMatrix(position);
-    const v = new THREE.Vector3(0, 0, this.localOrbit.length());
-    this.localOrbit = v.applyMatrix4(rotation);
-    this.localOrbitUp.copy(
-      v.applyEuler(this.defaultUpEuler).applyMatrix4(rotation)
-    );
+    this.localOrbit.setGeoPosition(position);
     return this;
   }
   /** @inheritdoc */
   getLocalOrbitPosition() {
-    return GeoPosMapper.fromOrbit(this.localOrbit, this.localOrbitUp);
+    return this.localOrbit.getGeoPosition();
   }
 
   /** @inheritdoc */
   setGlobalOrbitBounds(bounds: Range<GeoPosition>) {
-    this.globalOrbitBounds = bounds;
+    this.globalOrbit.bounds = bounds;
     return this;
   }
   /** @inheritdoc */
   getGlobalOrbitBounds() {
-    return this.globalOrbitBounds;
+    return this.globalOrbit.bounds;
   }
 
   /** @inheritdoc */
-  setLocalOrbitElevationBounds(bounds: Range) {
-    this.localOrbitElevationBounds = bounds;
+  setLocalOrbitBounds(bounds: Range<GeoPosition>) {
+    this.localOrbit.bounds = bounds;
     return this;
   }
   /** @inheritdoc */
-  getLocalOrbitElevationBounds() {
-    return this.localOrbitElevationBounds;
+  getLocalOrbitBounds() {
+    return this.localOrbit.bounds;
   }
 
   /** @inheritdoc */
@@ -165,22 +151,22 @@ export default abstract class TrackballControllerBase
 
   /** @inheritdoc */
   setGlobalOrbitSlowFactor(factor: number) {
-    this.globalOrbitSlowFactor = factor;
+    this.globalOrbit.slowFactor = factor;
     return this;
   }
   /** @inheritdoc */
   getGlobalOrbitSlowFactor() {
-    return this.globalOrbitSlowFactor;
+    return this.globalOrbit.slowFactor;
   }
 
   /** @inheritdoc */
   setLocalOrbitSlowFactor(factor: number) {
-    this.localOrbitSlowFactor = factor;
+    this.localOrbit.slowFactor = factor;
     return this;
   }
   /** @inheritdoc */
   getLocalOrbitSlowFactor() {
-    return this.localOrbitSlowFactor;
+    return this.localOrbit.slowFactor;
   }
 
   /** @inheritdoc */

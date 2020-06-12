@@ -5,6 +5,7 @@ import image from "@/assets/textures/earthmap1k.jpg";
 import TrackballCamera from "../../Camera/interfaces/TrackballCamera";
 import { TrackballMode } from "../../Camera/enums/TrackballMode";
 import Range from "../../GeoPosition/models/Range";
+import GeoPosition from "../../GeoPosition/models/GeoPosition";
 
 /**
  * @category VisualizationExamples
@@ -12,8 +13,11 @@ import Range from "../../GeoPosition/models/Range";
 export default class SphereVis extends Visualization {
   setupCamera(camera: TrackballCamera): void {
     camera
-      .setMode(TrackballMode.Compass)
-      .setZoomBounds(new Range(0.001, 20000));
+      //.setMode(TrackballMode.Compass)
+      .setZoomBounds(new Range(0.001, 20000))
+      .setGlobalOrbitBounds(
+        new Range(GeoPosition.fromDeg(-180, -80), GeoPosition.fromDeg(180, 80))
+      );
   }
 
   setupScene(scene: THREE.Scene, group: THREE.Group): void {
