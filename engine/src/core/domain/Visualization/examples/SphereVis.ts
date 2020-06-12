@@ -1,15 +1,22 @@
 import Visualization from "../models/Visualization";
 import * as THREE from "three";
-import { Matrix4, Box3, Vector3 } from "three";
+import { Matrix4 } from "three";
 import image from "@/assets/textures/earthmap1k.jpg";
-//import TrackballController from "../../Camera/controllers/TrackballController";
+import TrackballCamera from "../../Camera/interfaces/TrackballCamera";
+import { TrackballMode } from "../../Camera/enums/TrackballMode";
+import Range from "../../GeoPosition/interfaces/Range";
+
+/**
+ * @category VisualizationExamples
+ */
 export default class SphereVis extends Visualization {
-  setupCamera(/* controller: TrackballController */): void {
-    console.info("setup camera");
+  setupCamera(camera: TrackballCamera): void {
+    camera
+      .setMode(TrackballMode.Compass)
+      .setZoomBounds(new Range(0.001, 20000));
   }
 
   setupScene(scene: THREE.Scene, group: THREE.Group): void {
-    console.info("setup scene");
     const r = 6371;
 
     const sphere = new THREE.SphereGeometry(r, 100, 100);
@@ -62,8 +69,8 @@ export default class SphereVis extends Visualization {
     scene.add(new THREE.AxesHelper(9000));
   }
 
-  update(): void {
-    console.info("update");
+  update(deltaFactor: number): void {
+    //
   }
 
   destroy(): void {

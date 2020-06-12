@@ -7,14 +7,13 @@ export default class GeoVisCore {
   private visualization?: Visualization;
 
   private readonly scene: THREE.Scene;
-  private group: THREE.Group;
+  private readonly group: THREE.Group;
   private readonly camera: THREE.PerspectiveCamera;
   private readonly renderer: THREE.Renderer;
   private readonly clock: THREE.Clock;
+  public readonly cameraController: TrackballController;
 
-  private cameraController: TrackballController;
-
-  private stopRequested = false;
+  private destroyRequested = false;
 
   constructor(container: HTMLElement) {
     this.container = container;
@@ -22,6 +21,7 @@ export default class GeoVisCore {
     this.scene = new THREE.Scene();
     this.group = new THREE.Group();
     this.scene.add(this.group);
+
     this.camera = new THREE.PerspectiveCamera(60, 1, 0.001, 50000);
     this.clock = new THREE.Clock();
 
@@ -36,6 +36,11 @@ export default class GeoVisCore {
       this.group,
       this.renderer.domElement
     );
+
+    // Do not allow Vue to set reactivity here and deeper
+    Object.getOwnPropertyNames(this).forEach((prop) => {
+      Object.defineProperty(this, prop, { configurable: false });
+    });
   }
 
   public setSize() {
@@ -48,23 +53,25 @@ export default class GeoVisCore {
 
   public run(visualization: Visualization) {
     this.scene.dispose();
+    if (this.visualization) this.visualization.destroy();
+
     this.visualization = visualization;
     this.visualization._setup(this.scene, this.group, this.cameraController);
     this._run();
   }
 
-  public stop() {
-    this.stopRequested = true;
+  public destroy() {
+    this.destroyRequested = true;
+    this.cameraController.destroy();
   }
-
-  //TODO: Handle destroy
 
   private _run() {
     const deltaFactor = this.clock.getDelta() * 60;
     this.cameraController.update(deltaFactor);
+    this.visualization?.update(deltaFactor);
 
     this.renderer.render(this.scene, this.camera);
-    if (this.stopRequested) this.stopRequested = false;
+    if (this.destroyRequested) this.destroyRequested = false;
     else requestAnimationFrame(() => this._run());
   }
 }

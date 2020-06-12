@@ -13,11 +13,13 @@
     "storybook:serve": "vue-cli-service storybook:serve -p 6006 -c config/storybook"
   },
   "dependencies": {
+    "@mdi/font": "^5.3.45",
     "@types/d3-ease": "^1.0.9",
     "@types/lodash": "^4.14.155",
     "core-js": "^3.6.5",
     "d3-ease": "^1.0.6",
     "lodash": "^4.17.15",
+    "strongly-typed-events": "^1.6.12",
     "three": "^0.117.1",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",

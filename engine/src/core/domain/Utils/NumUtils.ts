@@ -1,5 +1,7 @@
 import _ from "lodash";
-
+/**
+ * @category Utils
+ */
 export default class NumUtils {
   static inCycleRange(n: number, from: number, to: number) {
     return from > to ? !_.inRange(n, to, from) : _.inRange(n, from, to);

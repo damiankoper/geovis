@@ -4,7 +4,11 @@ import _ from "lodash";
 import NumUtils from "../../Utils/NumUtils";
 import { TrackballMode } from "../enums/TrackballMode";
 import TrackballControllerBase from "./TrackballControllerBase";
+import { Quaternion } from "three";
 
+/**
+ * @category Camera
+ */
 export default class TrackballController extends TrackballControllerBase {
   constructor(
     camera: THREE.Camera,
@@ -26,6 +30,7 @@ export default class TrackballController extends TrackballControllerBase {
         this.localOrbitZoomTarget,
         this.zoomEaseFn(f)
       );
+      this._onZoomChange.dispatch(this, this.localOrbit.length());
     });
 
     this.group.matrix.makeTranslation(0, 0, -this.globalOrbitRadius);
@@ -153,6 +158,8 @@ export default class TrackballController extends TrackballControllerBase {
       this.localOrbit.applyQuaternion(qCorrect);
       this.localOrbitUp.applyQuaternion(qCorrect);
     }
+    this._onLocalOrbitChange.dispatch(this, this.localOrbit);
+    this.calcAndDispatchNorth();
   }
 
   private handleGlobalOrbitRotate(delta: THREE.Vector2) {
@@ -207,9 +214,10 @@ export default class TrackballController extends TrackballControllerBase {
           new THREE.Vector3(0, 1, 0)
         )
       );
-
     this.globalOrbit.applyQuaternion(qCorrect);
     this.globalOrbitUp.applyQuaternion(qCorrect);
+    this._onGlobalOrbitChange.dispatch(this, this.globalOrbit);
+    if (this.mode === TrackballMode.Free) this.calcAndDispatchNorth();
   }
 
   private boundAxisQ(
@@ -224,11 +232,6 @@ export default class TrackballController extends TrackballControllerBase {
     } else return new THREE.Quaternion();
   }
 
-  private stopMovement() {
-    this.avgPanDelta.set(0, 0);
-    this.lastPanDelta.set(0, 0);
-  }
-
   private clockAniamtionUpdate(
     clock: THREE.Clock,
     time: number,
@@ -239,5 +242,17 @@ export default class TrackballController extends TrackballControllerBase {
       if (elapsed > time) clock.stop();
       else action(elapsed / time);
     }
+  }
+
+  private calcAndDispatchNorth() {
+    const plane = new THREE.Vector3(0, 0, 1);
+    const northQ = new Quaternion().setFromUnitVectors(
+      this.localOrbit.clone().projectOnPlane(plane).normalize(),
+      this.globalOrbitUp.clone().projectOnPlane(plane).normalize()
+    );
+    let angle =
+      new Quaternion().setFromAxisAngle(plane, 0).angleTo(northQ) + Math.PI;
+    if (northQ.z < 0) angle = 2 * Math.PI - angle;
+    this._onNorthAngleChange.dispatch(this, angle);
   }
 }

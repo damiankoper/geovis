@@ -1,7 +1,14 @@
 import GeoPosition from "../../GeoPosition/interfaces/GeoPosition";
 import Range from "../../GeoPosition/interfaces/Range";
 import { TrackballMode } from "../enums/TrackballMode";
+import * as THREE from "three";
+import { IEvent } from "strongly-typed-events";
 
+/**
+ * Events are defined and handled using `strongly-typed-events` library
+ * @external https://github.com/KeesCBakker/Strongly-Typed-Events-for-TypeScript#readme
+ * @category Camera
+ */
 export default interface TrackballCamera {
   /**
    * Sets the distance between the center of the stage and the point the camera is looking at,
@@ -112,4 +119,28 @@ export default interface TrackballCamera {
    */
   setPanBreakTime(time: number): TrackballCamera;
   getPanBreakTime(): number;
+
+  /**
+   * Stops global orbit animation
+   */
+  stopMovement(): void;
+
+  /**
+   * Fired when north direction is changed relative to user
+   * @event
+   */
+  onNorthAngleChange: IEvent<TrackballCamera, number>;
+
+  /**
+   * @event
+   * */
+  onGlobalOrbitChange: IEvent<TrackballCamera, THREE.Vector3>;
+  /**
+   * @event
+   */
+  onLocalOrbitChange: IEvent<TrackballCamera, THREE.Vector3>;
+  /**
+   * @event
+   */
+  onZoomChange: IEvent<TrackballCamera, number>;
 }

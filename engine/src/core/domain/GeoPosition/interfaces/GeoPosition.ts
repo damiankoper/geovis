@@ -1,4 +1,7 @@
 import * as THREE from "three";
+/**
+ * @category VisualizationBase
+ */
 export default class GeoPosition {
   constructor(public lat: number, public long: number) {}
 

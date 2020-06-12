@@ -1,7 +1,7 @@
 <template>
   <div class="geo-vis">
     <div class="three-container" ref="threeContainer"></div>
-    <div class="core-controls"></div>
+    <core-controls :camera="camera" v-if="camera" />
     <div class="vis-controls"></div>
   </div>
 </template>
@@ -10,12 +10,18 @@
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import GeoVisCore from "../core/GeoVisCore";
 import Visualization from "../core/domain/Visualization/models/Visualization";
-export { Visualization };
+import CoreControls from "./CoreControls.vue";
 
-@Component
+@Component({
+  components: { CoreControls },
+})
 export default class GeoVisCoreVue extends Vue {
   geoVisCore: GeoVisCore | null = null;
   @Prop() visualization!: Visualization;
+
+  get camera() {
+    return this.geoVisCore?.cameraController;
+  }
 
   mounted() {
     const container = this.$refs.threeContainer;
@@ -33,7 +39,7 @@ export default class GeoVisCoreVue extends Vue {
   }
 
   destroyed() {
-    if (this.geoVisCore) this.geoVisCore.stop();
+    if (this.geoVisCore) this.geoVisCore.destroy();
   }
 
   @Watch("visualization")

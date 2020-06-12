@@ -5,7 +5,11 @@ import * as d3 from "d3-ease";
 import Range from "../../GeoPosition/interfaces/Range";
 import TrackballCamera from "../interfaces/TrackballCamera";
 import { TrackballMode } from "../enums/TrackballMode";
+import { EventDispatcher } from "strongly-typed-events";
 
+/**
+ * @category Camera
+ */
 export default abstract class TrackballControllerBase
   implements TrackballCamera {
   protected readonly defaultUpEuler = new THREE.Euler(-Math.PI / 2);
@@ -37,11 +41,11 @@ export default abstract class TrackballControllerBase
   protected zoomEaseFn = d3.easeQuadOut;
   protected zoomBounds = new Range(0.001, 10000);
 
+  protected panBreakTime = 1;
+
   protected zoomClock = new THREE.Clock(false);
   protected localOrbitZoomFrom = this.localOrbit.clone();
   protected localOrbitZoomTarget = this.localOrbit.clone();
-
-  protected panBreakTime = 1;
   protected panClock = new THREE.Clock(false);
   protected lastPanPosition = new THREE.Vector2();
   protected avgPanDelta = new THREE.Vector2();
@@ -53,6 +57,33 @@ export default abstract class TrackballControllerBase
   ) {
     this.camera.up = this.localOrbitUp;
     this.group.matrixAutoUpdate = false;
+  }
+
+  protected _onGlobalOrbitChange = new EventDispatcher<
+    TrackballCamera,
+    THREE.Vector3
+  >();
+  get onGlobalOrbitChange() {
+    return this._onGlobalOrbitChange.asEvent();
+  }
+  protected _onLocalOrbitChange = new EventDispatcher<
+    TrackballCamera,
+    THREE.Vector3
+  >();
+  get onLocalOrbitChange() {
+    return this._onLocalOrbitChange.asEvent();
+  }
+  protected _onZoomChange = new EventDispatcher<TrackballCamera, number>();
+  get onZoomChange() {
+    return this._onZoomChange.asEvent();
+  }
+
+  protected _onNorthAngleChange = new EventDispatcher<
+    TrackballCamera,
+    number
+  >();
+  get onNorthAngleChange() {
+    return this._onNorthAngleChange.asEvent();
   }
 
   /** @inheritdoc */
@@ -214,5 +245,11 @@ export default abstract class TrackballControllerBase
   /** @inheritdoc */
   getPanBreakTime() {
     return this.panBreakTime;
+  }
+
+  /** @inheritdoc */
+  stopMovement() {
+    this.avgPanDelta.set(0, 0);
+    this.lastPanDelta.set(0, 0);
   }
 }
