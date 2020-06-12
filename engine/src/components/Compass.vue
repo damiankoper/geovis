@@ -1,11 +1,11 @@
 <template>
-  <v-btn class="compass mb-2" fab>
+  <v-btn class="compass mb-2" fab @click="$emit('click')">
     <v-img
       class="needle"
       src="@/assets/icons/needle.svg"
       :aspect-ratio="1"
       :style="{ transform: `rotate(${-angle}rad)` }"
-      width="48px"
+      :max-width="48"
     />
   </v-btn>
 </template>

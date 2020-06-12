@@ -1,5 +1,5 @@
-import GeoPosition from "../../GeoPosition/interfaces/GeoPosition";
-import Range from "../../GeoPosition/interfaces/Range";
+import GeoPosition from "../../GeoPosition/models/GeoPosition";
+import Range from "../../GeoPosition/models/Range";
 import { TrackballMode } from "../enums/TrackballMode";
 import * as THREE from "three";
 import { IEvent } from "strongly-typed-events";

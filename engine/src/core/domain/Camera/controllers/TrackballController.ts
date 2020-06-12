@@ -4,12 +4,14 @@ import _ from "lodash";
 import NumUtils from "../../Utils/NumUtils";
 import { TrackballMode } from "../enums/TrackballMode";
 import TrackballControllerBase from "./TrackballControllerBase";
-import { Quaternion } from "three";
+import { Quaternion, Vector2, Vector3 } from "three";
 
 /**
  * @category Camera
  */
 export default class TrackballController extends TrackballControllerBase {
+  private lastPanPosition = new THREE.Vector2();
+
   constructor(
     camera: THREE.Camera,
     group: THREE.Group,
@@ -20,20 +22,16 @@ export default class TrackballController extends TrackballControllerBase {
     this.update(0);
   }
   update(delta: number) {
-    this.clockAniamtionUpdate(this.panClock, this.panBreakTime, (f) => {
-      const s = 1 - this.globalOrbitEaseFn(f);
-      this.handleGlobalOrbitRotate(this.avgPanDelta.clone().multiplyScalar(s));
+    this.panAnim.update((f, from, to) => {
+      this.handleGlobalOrbitRotate(new Vector2().lerpVectors(from, to, f));
     });
-    this.clockAniamtionUpdate(this.zoomClock, this.zoomTime, (f) => {
-      this.localOrbit.lerpVectors(
-        this.localOrbitZoomFrom,
-        this.localOrbitZoomTarget,
-        this.zoomEaseFn(f)
-      );
+
+    this.zoomAnim.update((f, from, to) => {
+      this.localOrbit.lerpVectors(from, to, f);
       this._onZoomChange.dispatch(this, this.localOrbit.length());
     });
 
-    this.group.matrix.makeTranslation(0, 0, -this.globalOrbitRadius);
+    this.group.matrix.makeTranslation(0, 0, -this.globalOrbit.length());
     this.group.matrix.multiply(
       new THREE.Matrix4().lookAt(
         new THREE.Vector3(),
@@ -76,8 +74,8 @@ export default class TrackballController extends TrackballControllerBase {
 
   private onWheel(e: WheelEvent) {
     this.stopMovement();
-    this.localOrbitZoomFrom.copy(this.localOrbit);
-    this.localOrbitZoomTarget.copy(this.localOrbit);
+    this.zoomAnim.from.copy(this.localOrbit);
+    this.zoomAnim.to.copy(this.localOrbit);
     let zoomTargetLength = this.localOrbit.length();
     if (e.deltaY > 0) zoomTargetLength *= this.zoomFactor;
     else if (e.deltaY < 0) zoomTargetLength *= 1 / this.zoomFactor;
@@ -86,8 +84,8 @@ export default class TrackballController extends TrackballControllerBase {
       this.zoomBounds.from,
       this.zoomBounds.to
     );
-    this.localOrbitZoomTarget.setLength(zoomTargetLength);
-    this.zoomClock.start();
+    this.zoomAnim.to.setLength(zoomTargetLength);
+    this.zoomAnim.start();
   }
   private onPointerDown(e: PointerEvent) {
     this.eventSource.setPointerCapture(e.pointerId);
@@ -97,7 +95,7 @@ export default class TrackballController extends TrackballControllerBase {
 
   private onPointerUp(e: PointerEvent) {
     this.eventSource.releasePointerCapture(e.pointerId);
-    if (!e.shiftKey && e.button !== 1) this.panClock.start();
+    if (!e.shiftKey && e.button !== 1) this.panAnim.start();
   }
 
   private onPointerMove(e: PointerEvent) {
@@ -106,14 +104,14 @@ export default class TrackballController extends TrackballControllerBase {
         e.clientX - this.lastPanPosition.x,
         e.clientY - this.lastPanPosition.y
       );
-      if (this.avgPanDelta.lengthSq() === 0) {
-        this.avgPanDelta.copy(this.lastPanDelta);
+      if (this.panAnim.from.lengthSq() === 0) {
+        this.panAnim.from.copy(this.lastPanDelta);
       } else {
-        this.avgPanDelta.add(this.lastPanDelta).divideScalar(2);
+        this.panAnim.from.add(this.lastPanDelta).divideScalar(2);
       }
 
       if (e.shiftKey || e.buttons & 4) {
-        if (!this.zoomClock.running)
+        if (!this.zoomAnim.isRunning())
           this.handleLocalOrbitRotate(this.lastPanDelta);
       } else {
         this.handleGlobalOrbitRotate(this.lastPanDelta);
@@ -166,7 +164,7 @@ export default class TrackballController extends TrackballControllerBase {
     const localOrbitRadius = this.localOrbit.length();
     const slowFactor =
       (this.globalOrbitSlowFactor * 0.001 * localOrbitRadius) /
-      this.globalOrbitRadius;
+      this.globalOrbit.length();
 
     const horizontalAxis = new THREE.Vector3()
       .crossVectors(this.localOrbitUp, this.localOrbit)
@@ -244,7 +242,7 @@ export default class TrackballController extends TrackballControllerBase {
     }
   }
 
-  private calcAndDispatchNorth() {
+  private calcNorthAngle() {
     const plane = new THREE.Vector3(0, 0, 1);
     const northQ = new Quaternion().setFromUnitVectors(
       this.localOrbit.clone().projectOnPlane(plane).normalize(),
@@ -253,6 +251,10 @@ export default class TrackballController extends TrackballControllerBase {
     let angle =
       new Quaternion().setFromAxisAngle(plane, 0).angleTo(northQ) + Math.PI;
     if (northQ.z < 0) angle = 2 * Math.PI - angle;
-    this._onNorthAngleChange.dispatch(this, angle);
+    return angle;
+  }
+
+  private calcAndDispatchNorth() {
+    this._onNorthAngleChange.dispatch(this, this.calcNorthAngle());
   }
 }

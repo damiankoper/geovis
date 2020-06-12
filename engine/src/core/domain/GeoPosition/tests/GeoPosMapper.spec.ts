@@ -1,4 +1,4 @@
-import GeoPosition from "../interfaces/GeoPosition";
+import GeoPosition from "../models/GeoPosition";
 import GeoPosMapper from "../services/GeoPosMapper";
 import * as THREE from "three";
 

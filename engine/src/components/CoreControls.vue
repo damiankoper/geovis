@@ -19,7 +19,7 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import TrackballCamera from "../core/domain/Camera/interfaces/TrackballCamera";
 import Compass from "./Compass.vue";
-
+import _ from "lodash";
 @Component({
   components: { Compass },
 })
@@ -29,9 +29,11 @@ export default class CoreControls extends Vue {
   northAngle = 0;
 
   beforeMount() {
-    this.northAngleEvent = this.camera.onNorthAngleChange.sub((e, angle) => {
-      this.northAngle = angle;
-    });
+    this.northAngleEvent = this.camera.onNorthAngleChange.sub(
+      _.throttle((e, angle) => {
+        this.northAngle = angle;
+      }, 50)
+    );
   }
 
   destroyed() {

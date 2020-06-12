@@ -4,7 +4,7 @@ import { Matrix4 } from "three";
 import image from "@/assets/textures/earthmap1k.jpg";
 import TrackballCamera from "../../Camera/interfaces/TrackballCamera";
 import { TrackballMode } from "../../Camera/enums/TrackballMode";
-import Range from "../../GeoPosition/interfaces/Range";
+import Range from "../../GeoPosition/models/Range";
 
 /**
  * @category VisualizationExamples

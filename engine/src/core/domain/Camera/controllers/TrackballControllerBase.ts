@@ -1,11 +1,11 @@
 import * as THREE from "three";
-import GeoPosition from "../../GeoPosition/interfaces/GeoPosition";
+import GeoPosition from "../../GeoPosition/models/GeoPosition";
 import GeoPosMapper from "../../GeoPosition/services/GeoPosMapper";
-import * as d3 from "d3-ease";
-import Range from "../../GeoPosition/interfaces/Range";
+import Range from "../../GeoPosition/models/Range";
 import TrackballCamera from "../interfaces/TrackballCamera";
 import { TrackballMode } from "../enums/TrackballMode";
 import { EventDispatcher } from "strongly-typed-events";
+import AnimatedTransition from "../../Animation/AnimatedTransition";
 
 /**
  * @category Camera
@@ -14,14 +14,12 @@ export default abstract class TrackballControllerBase
   implements TrackballCamera {
   protected readonly defaultUpEuler = new THREE.Euler(-Math.PI / 2);
 
-  protected globalOrbitRadius = 6371;
-  protected globalOrbit = new THREE.Vector3(0, 0, this.globalOrbitRadius);
+  protected globalOrbit = new THREE.Vector3(0, 0, 6371);
   protected globalOrbitUp = this.globalOrbit
     .clone()
     .normalize()
     .applyEuler(this.defaultUpEuler);
   protected globalOrbitSlowFactor = 1;
-  protected globalOrbitEaseFn = d3.easeQuadOut;
   protected globalOrbitBounds = new Range<GeoPosition>(
     GeoPosition.fromDeg(-180, -80),
     GeoPosition.fromDeg(180, 80)
@@ -37,19 +35,18 @@ export default abstract class TrackballControllerBase
   protected localOrbitElevationBounds = new Range(5, 85);
 
   protected zoomFactor = 0.5;
-  protected zoomTime = 0.15;
-  protected zoomEaseFn = d3.easeQuadOut;
   protected zoomBounds = new Range(0.001, 10000);
 
-  protected panBreakTime = 1;
-
-  protected zoomClock = new THREE.Clock(false);
-  protected localOrbitZoomFrom = this.localOrbit.clone();
-  protected localOrbitZoomTarget = this.localOrbit.clone();
-  protected panClock = new THREE.Clock(false);
-  protected lastPanPosition = new THREE.Vector2();
-  protected avgPanDelta = new THREE.Vector2();
   protected lastPanDelta = new THREE.Vector2();
+
+  protected panAnim = new AnimatedTransition(
+    new Range(new THREE.Vector2(), new THREE.Vector2()),
+    1
+  );
+  protected zoomAnim = new AnimatedTransition(
+    new Range(new THREE.Vector3(), new THREE.Vector3()),
+    0.15
+  );
 
   constructor(
     protected readonly camera: THREE.Camera,
@@ -88,12 +85,11 @@ export default abstract class TrackballControllerBase
 
   /** @inheritdoc */
   getGlobalOrbitRadius() {
-    return this.globalOrbitRadius;
+    return this.globalOrbit.length();
   }
   /** @inheritdoc */
   setGlobalOrbitRadius(radius: number) {
     this.globalOrbit.setLength(radius);
-    this.globalOrbitRadius = radius;
     return this;
   }
 
@@ -189,22 +185,22 @@ export default abstract class TrackballControllerBase
 
   /** @inheritdoc */
   setGlobalOrbitEaseFn(fn: (t: number) => number) {
-    this.globalOrbitEaseFn = fn;
+    this.panAnim.easeFn = fn;
     return this;
   }
   /** @inheritdoc */
   getGlobalOrbitEaseFn() {
-    return this.globalOrbitEaseFn;
+    return this.panAnim.easeFn;
   }
 
   /** @inheritdoc */
   setZoomEaseFn(fn: (t: number) => number) {
-    this.zoomEaseFn = fn;
+    this.zoomAnim.easeFn = fn;
     return this;
   }
   /** @inheritdoc */
   getZoomEaseFn() {
-    return this.zoomEaseFn;
+    return this.zoomAnim.easeFn;
   }
 
   /** @inheritdoc */
@@ -229,27 +225,27 @@ export default abstract class TrackballControllerBase
 
   /** @inheritdoc */
   setZoomTime(time: number) {
-    this.zoomTime = time;
+    this.zoomAnim.duration = time;
     return this;
   }
   /** @inheritdoc */
   getZoomTime() {
-    return this.zoomTime;
+    return this.zoomAnim.duration;
   }
 
   /** @inheritdoc */
   setPanBreakTime(time: number) {
-    this.panBreakTime = time;
+    this.panAnim.duration = time;
     return this;
   }
   /** @inheritdoc */
   getPanBreakTime() {
-    return this.panBreakTime;
+    return this.panAnim.duration;
   }
 
   /** @inheritdoc */
   stopMovement() {
-    this.avgPanDelta.set(0, 0);
+    this.panAnim.from.set(0, 0);
     this.lastPanDelta.set(0, 0);
   }
 }

@@ -4,7 +4,7 @@ import GeoVisCore from "@/components/GeoVisCore.vue";
 import SphereVis from "@/core/domain/Visualization/examples/SphereVis";
 import Vuetify, { VApp } from "vuetify/lib";
 import Vue from "vue";
-import '@mdi/font/css/materialdesignicons.css'
+import "@mdi/font/css/materialdesignicons.css";
 
 Vue.use(Vuetify, {
   components: {
@@ -32,9 +32,10 @@ export const Basic = () => ({
   components: { GeoVisCore },
   render(h: any) {
     return (
-      <div style="width:95vw; height:95vh">
-        <geo-vis-core visualization={(this as any).vis} />
-      </div>
+      <geo-vis-core
+        style="height:99.9999vh"
+        visualization={(this as any).vis}
+      />
     );
   },
   props: {
