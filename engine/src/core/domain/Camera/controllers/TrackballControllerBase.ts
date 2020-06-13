@@ -7,6 +7,8 @@ import { TrackballMode } from "../enums/TrackballMode";
 import { EventDispatcher } from "strongly-typed-events";
 import AnimatedTransition from "../../Animation/AnimatedTransition";
 import Orbit from "../../GeoPosition/models/Orbit";
+import GlobalOrbit from "../../GeoPosition/models/GlobalOrbit";
+import LocalOrbit from "../../GeoPosition/models/LocalOrbit";
 
 /**
  * @category Camera
@@ -16,17 +18,13 @@ export default abstract class TrackballControllerBase
   protected mode: TrackballMode = TrackballMode.Free;
   protected readonly defaultUpEuler = new THREE.Euler(-Math.PI / 2);
 
-  protected globalOrbit = new Orbit(
-    new THREE.Vector3(0, 0, 6371),
-    new THREE.Vector3(0, 0, 1)
-  );
+  protected globalOrbit = new GlobalOrbit(new THREE.Vector3(0, 0, 6371));
 
-  protected localOrbit = new Orbit(
+  protected localOrbit = new LocalOrbit(
     new THREE.Vector3(0, 0, 10000),
-    new THREE.Vector3(0, 1, 0),
     new Range<GeoPosition>(
       GeoPosition.fromDeg(-180, 5),
-      GeoPosition.fromDeg(180, 45)
+      GeoPosition.fromDeg(180, 85)
     )
   );
 

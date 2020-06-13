@@ -6,10 +6,9 @@ import { TrackballMode } from "../../Camera/enums/TrackballMode";
 import NumUtils from "../../Utils/NumUtils";
 import { Vector3 } from "three";
 
-export default class Orbit {
+export default abstract class Orbit {
   constructor(
     public v: THREE.Vector3,
-    public calcOrigin: THREE.Vector3,
     public bounds: Range<GeoPosition> = new Range<GeoPosition>(
       GeoPosition.fromDeg(-180, -90),
       GeoPosition.fromDeg(180, 90)
@@ -26,8 +25,28 @@ export default class Orbit {
     return new THREE.Vector3(0, 1, 0).applyQuaternion(q);
   }
 
+  protected abstract getLongPlane(): THREE.Vector3;
+  protected abstract getLongV(): THREE.Vector3;
+  protected abstract getLongVP(): THREE.Vector3;
+  protected abstract getLatPlane(): THREE.Vector3;
+  protected abstract getLatOrigin(): THREE.Vector3;
+
   getGeoPosition() {
-    return GeoPosMapper.fromOrbit(this.v, this.up, this.calcOrigin);
+    //Latitude
+    const latPlane = this.getLatPlane();
+    const v1Lat = this.v.clone().projectOnPlane(latPlane).normalize();
+    const v2Lat = this.getLatOrigin().projectOnPlane(latPlane).normalize();
+    const qLat = new THREE.Quaternion().setFromUnitVectors(v1Lat, v2Lat);
+    const dot = new Vector3(qLat.x, qLat.y, qLat.z).dot(latPlane);
+    const latitude = qLat.angleTo(new THREE.Quaternion()) * Math.sign(dot);
+    // Longitude
+    const longPlane = this.getLongPlane();
+    const v1Long = this.getLongV().projectOnPlane(longPlane).normalize();
+    const v2Long = this.getLongV();
+    const qLong = new THREE.Quaternion().setFromUnitVectors(v1Long, v2Long);
+    const longitude =
+      new THREE.Quaternion().angleTo(qLong) * Math.sign(longPlane.dot(v2Long));
+    return new GeoPosition(latitude, longitude);
   }
 
   setGeoPosition(position: GeoPosition) {
@@ -48,17 +67,24 @@ export default class Orbit {
   }
 
   clone() {
-    return new Orbit(this.v.clone(), this.up.clone(), this.bounds);
+    return new Orbit(this.v.clone(), this.bounds);
   }
 
   correctToBounds(mode: TrackballMode) {
     const qCorrect = new THREE.Quaternion();
 
     const coords = this.getGeoPosition();
-    const latAxis = this.up.clone();
-    const longAxis = new THREE.Vector3(0, 0, 1).cross(this.up).normalize();
-
+    const latAxis = this.getLatPlane();
+    const longAxis = this.getLongVP().cross(this.getLongV()).normalize();
     const b = this.bounds;
+
+    const longFlip = this.getLongPlane().dot(this.getLongVP());
+    if (longFlip < 0) {
+      const lontFlipCorrect = Math.PI / 2 - coords.long;
+      this.applyQuaternion(
+        new THREE.Quaternion().setFromAxisAngle(longAxis, lontFlipCorrect)
+      );
+    }
 
     qCorrect.multiply(
       this.boundAxisQ(coords.lat, b.from.lat, b.to.lat, latAxis)
@@ -75,12 +101,11 @@ export default class Orbit {
         )
       );
     }
-    console.log(coords, b);
 
     this.applyQuaternion(qCorrect);
   }
 
-  private boundAxisQ(
+  protected boundAxisQ(
     angle: number,
     from: number,
     to: number,

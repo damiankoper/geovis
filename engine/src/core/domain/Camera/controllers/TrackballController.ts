@@ -139,6 +139,7 @@ export default class TrackballController extends TrackballControllerBase {
     );
     this.localOrbit.applyQuaternion(panMotionQuaternion);
     this.localOrbit.correctToBounds(TrackballMode.Free);
+
     this._onLocalOrbitChange.dispatch(this, this.localOrbit.v);
     this.calcAndDispatchNorth();
   }
@@ -153,36 +154,31 @@ export default class TrackballController extends TrackballControllerBase {
       .crossVectors(this.localOrbit.up, this.localOrbit.v)
       .normalize();
     const verticalAxis = this.localOrbit.up.clone().normalize();
-    // Vertical pan
     const qVertical = new THREE.Quaternion().setFromAxisAngle(
       horizontalAxis,
       delta.y * slowFactor
     );
-    // Horizontal pan
     const qHorizontal = new THREE.Quaternion().setFromAxisAngle(
       verticalAxis,
       delta.x * slowFactor
     );
-    const qPan = qHorizontal.clone().multiply(qVertical);
-    if (delta.length() <= 2) {
-      this.stopMovement();
-    }
-
+    const qPan = qHorizontal.multiply(qVertical);
     this.globalOrbit.applyQuaternion(qPan);
     this.globalOrbit.correctToBounds(this.mode);
 
     this._onGlobalOrbitChange.dispatch(this, this.globalOrbit.v);
     if (this.mode === TrackballMode.Free) this.calcAndDispatchNorth();
+    if (delta.length() <= 2) {
+      this.stopMovement();
+    }
   }
 
   private calcNorthAngle() {
     const plane = new THREE.Vector3(0, 0, 1);
-    const northQ = new Quaternion().setFromUnitVectors(
-      this.localOrbit.v.clone().projectOnPlane(plane).normalize(),
-      this.globalOrbit.up.clone().projectOnPlane(plane).normalize()
-    );
-    let angle =
-      new Quaternion().setFromAxisAngle(plane, 0).angleTo(northQ) + Math.PI;
+    const v1 = this.localOrbit.up.clone().projectOnPlane(plane).normalize();
+    const v2 = this.globalOrbit.up.clone().projectOnPlane(plane).normalize();
+    const northQ = new Quaternion().setFromUnitVectors(v1, v2);
+    let angle = new Quaternion().angleTo(northQ);
     if (northQ.z < 0) angle = 2 * Math.PI - angle;
     return angle;
   }

@@ -16,7 +16,7 @@ export default class SphereVis extends Visualization {
       //.setMode(TrackballMode.Compass)
       .setZoomBounds(new Range(0.001, 20000))
       .setGlobalOrbitBounds(
-        new Range(GeoPosition.fromDeg(-180, -80), GeoPosition.fromDeg(180, 80))
+        new Range(GeoPosition.fromDeg(-180, -85), GeoPosition.fromDeg(180, 85))
       );
   }
 
