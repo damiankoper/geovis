@@ -30,6 +30,14 @@ export default abstract class Orbit {
   protected abstract getLongVP(): THREE.Vector3;
   protected abstract getLatPlane(): THREE.Vector3;
   protected abstract getLatOrigin(): THREE.Vector3;
+  abstract clone(): Orbit;
+
+  copy(orbit: Orbit) {
+    this.v.copy(orbit.v);
+    this.up.copy(orbit.up);
+    this.bounds = orbit.bounds;
+    this.slowFactor = orbit.slowFactor;
+  }
 
   getGeoPosition() {
     //Latitude
@@ -64,10 +72,6 @@ export default abstract class Orbit {
   setRadius(radius: number) {
     this.v.setLength(radius);
     return this;
-  }
-
-  clone() {
-    return new Orbit(this.v.clone(), this.bounds);
   }
 
   correctToBounds(mode: TrackballMode) {

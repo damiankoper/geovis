@@ -17,4 +17,12 @@ export default class GlobalOrbit extends Orbit {
   protected getLatOrigin() {
     return new THREE.Vector3(0, 0, 1);
   }
+  clone() {
+    return new GlobalOrbit(
+      this.v.clone(),
+      this.bounds,
+      this.slowFactor,
+      this.up.clone()
+    );
+  }
 }

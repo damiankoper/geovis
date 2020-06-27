@@ -1,19 +1,20 @@
 import * as d3 from "d3-ease";
 import * as THREE from "three";
-import Range from "../GeoPosition/models/Range";
-export default class AnimatedTransition<T, O = T> {
+interface Clonable<T> {
+  clone(): T;
+}
+export default class AnimatedTransition<T extends Clonable<T>> {
   private clock = new THREE.Clock(false);
-  public fromObject?: O;
   public from: T;
   public to: T;
 
   constructor(
-    range: Range<T>,
+    rangeEl: T,
     public duration: number = 0,
-    public easeFn: (t: number) => number = d3.easeQuadOut
+    public easeFn: (t: number) => number = d3.easeCubicOut
   ) {
-    this.from = range.from;
-    this.to = range.to;
+    this.from = rangeEl.clone();
+    this.to = rangeEl.clone();
   }
 
   public start() {
@@ -28,17 +29,11 @@ export default class AnimatedTransition<T, O = T> {
     return this.clock.running;
   }
 
-  public update(actionFn: (f: number, from: T, to: T, fromObject?: O) => void) {
+  public update(actionFn: (f: number, from: T, to: T) => void) {
     if (this.clock.running) {
       const elapsed = this.clock.getElapsedTime();
       if (elapsed > this.duration) this.clock.stop();
-      else
-        actionFn(
-          this.easeFn(elapsed / this.duration),
-          this.from,
-          this.to,
-          this.fromObject
-        );
+      else actionFn(this.easeFn(elapsed / this.duration), this.from, this.to);
     }
   }
 }
