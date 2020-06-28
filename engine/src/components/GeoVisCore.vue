@@ -8,9 +8,10 @@
       v-if="camera"
     >
       <component
+        :vis="visualization"
         class="vis-controls"
         :is="visualization.getControls()"
-      ></component>
+      />
     </core-controls>
   </div>
 </template>

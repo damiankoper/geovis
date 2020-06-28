@@ -14,7 +14,7 @@
               :class="{ 'mr-n3': !visControls, 'mr-3': visControls }"
               @click="visControls = !visControls"
               fab
-              small
+              x-small
             >
               <v-icon v-if="!visControls">mdi-menu</v-icon>
               <v-icon v-else>mdi-close</v-icon>

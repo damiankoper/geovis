@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import TrackballCamera from "../../Camera/interfaces/TrackballCamera";
+import { VueConstructor } from "vue/types/umd";
 
 /**
  * Base class for every visualization.
@@ -41,7 +42,7 @@ export default abstract class Visualization {
     this.parents.push(visualization);
   }
 
-  abstract getControls(): Vue | null;
+  abstract getControls(): Vue | VueConstructor<Vue> | null;
 
   /** @ignore */
   public _setup(

@@ -1,16 +1,27 @@
 import Visualization from "../models/Visualization";
 import * as THREE from "three";
 import { Matrix4 } from "three";
-import image from "@/assets/textures/earthmap1k.jpg";
 import TrackballCamera from "../../Camera/interfaces/TrackballCamera";
 import Range from "../../GeoPosition/models/Range";
 import GeoPosition from "../../GeoPosition/models/GeoPosition";
 import Vue from "vue";
+import earthMap from "@/assets/textures/8k_earth_daymap.jpg";
+import earthNormalMap from "@/assets/textures/8k_earth_normal_map.jpg";
+import earthSpecularMap from "@/assets/textures/8k_earth_specular_map.jpg";
+import StarsVis from "./StarsVis";
+import SphereVisControls from "./SphereVisControls.vue";
 /**
  * @category VisualizationExamples
  */
 export default class SphereVis extends Visualization {
+  camera?: TrackballCamera;
+  constructor() {
+    super();
+    this.addParent(new StarsVis());
+  }
+
   setupCamera(camera: TrackballCamera): void {
+    this.camera = camera;
     camera
       //.setMode(TrackballMode.Compass)
       .setZoomBounds(new Range(0.001, 20000))
@@ -25,8 +36,12 @@ export default class SphereVis extends Visualization {
     const sphere = new THREE.SphereGeometry(r, 100, 100);
     sphere.rotateY(-Math.PI / 2);
     const sphereMaterial = new THREE.MeshPhongMaterial();
-    const texture = new THREE.TextureLoader().load(image);
-    sphereMaterial.map = texture;
+    sphereMaterial.map = new THREE.TextureLoader().load(earthMap);
+    sphereMaterial.specularMap = new THREE.TextureLoader().load(
+      earthSpecularMap
+    );
+    sphereMaterial.normalMap = new THREE.TextureLoader().load(earthNormalMap);
+    sphereMaterial.shininess = 100;
     const sphereMesh = new THREE.Mesh(sphere, sphereMaterial);
     const material = new THREE.LineBasicMaterial({ color: 0xffffff });
     const wireframe = new THREE.LineSegments(sphereMesh.geometry, material);
@@ -62,10 +77,10 @@ export default class SphereVis extends Visualization {
     const axesHelper = new THREE.AxesHelper(1.25 * r);
     group.add(axesHelper);
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
     scene.add(directionalLight);
     directionalLight.position.set(0, 0, 1);
 
@@ -81,6 +96,6 @@ export default class SphereVis extends Visualization {
   }
 
   getControls() {
-    return new Vue();
+    return SphereVisControls;
   }
 }
