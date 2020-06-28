@@ -1,8 +1,8 @@
 import GeoPosition from "../../GeoPosition/models/GeoPosition";
 import Range from "../../GeoPosition/models/Range";
 import { TrackballMode } from "../enums/TrackballMode";
-import * as THREE from "three";
 import { IEvent } from "strongly-typed-events";
+import Orbit from "../../GeoPosition/models/Orbit";
 
 /**
  * Events are defined and handled using `strongly-typed-events` library
@@ -215,13 +215,13 @@ export default interface TrackballCamera {
    * Fired when global orbit changes
    * @event
    * */
-  onGlobalOrbitChange: IEvent<TrackballCamera, THREE.Vector3>;
+  onGlobalOrbitChange: IEvent<TrackballCamera, Orbit>;
 
   /**
    * Fired when local orbit changes
    * @event
    */
-  onLocalOrbitChange: IEvent<TrackballCamera, THREE.Vector3>;
+  onLocalOrbitChange: IEvent<TrackballCamera, Orbit>;
 
   /**
    * Fired when zoom changes

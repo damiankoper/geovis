@@ -41,6 +41,8 @@ export default abstract class Visualization {
     this.parents.push(visualization);
   }
 
+  abstract getControls(): Vue | null;
+
   /** @ignore */
   public _setup(
     scene: THREE.Scene,

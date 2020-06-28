@@ -8,6 +8,7 @@ import LocalOrbit from "../../GeoPosition/models/LocalOrbit";
 import AnimatedTransition from "../../Animation/AnimatedTransition";
 import Range from "../../GeoPosition/models/Range";
 import { EventDispatcher } from "strongly-typed-events";
+import Orbit from "../../GeoPosition/models/Orbit";
 
 /**
  * @category Camera
@@ -19,8 +20,8 @@ export default class TrackballController implements TrackballCamera {
   private localOrbit = new LocalOrbit(
     new THREE.Vector3(0, 0, 10000),
     new Range<GeoPosition>(
-      GeoPosition.fromDeg(-180, 5),
-      GeoPosition.fromDeg(180, 85)
+      GeoPosition.fromDeg(5, -180),
+      GeoPosition.fromDeg(85, 180)
     )
   );
 
@@ -35,19 +36,13 @@ export default class TrackballController implements TrackballCamera {
     0.3
   );
 
-  private _onGlobalOrbitChange = new EventDispatcher<
-    TrackballCamera,
-    THREE.Vector3
-  >();
+  private _onGlobalOrbitChange = new EventDispatcher<TrackballCamera, Orbit>();
   /** @inheritdoc */
   get onGlobalOrbitChange() {
     return this._onGlobalOrbitChange.asEvent();
   }
 
-  private _onLocalOrbitChange = new EventDispatcher<
-    TrackballCamera,
-    THREE.Vector3
-  >();
+  private _onLocalOrbitChange = new EventDispatcher<TrackballCamera, Orbit>();
   /** @inheritdoc */
   get onLocalOrbitChange() {
     return this._onLocalOrbitChange.asEvent();
@@ -91,8 +86,8 @@ export default class TrackballController implements TrackballCamera {
       const plane = new THREE.Vector3(0, 0, 1);
       const q = new THREE.Quaternion().slerp(
         new THREE.Quaternion().setFromUnitVectors(
-          from.v.clone().projectOnPlane(plane).normalize(),
-          to.v.clone().projectOnPlane(plane).normalize()
+          from.up.clone().projectOnPlane(plane).normalize(),
+          to.up.clone().projectOnPlane(plane).normalize()
         ),
         f
       );
@@ -218,7 +213,7 @@ export default class TrackballController implements TrackballCamera {
     this.localOrbit.applyQuaternion(panMotionQuaternion);
     this.localOrbit.correctToBounds(TrackballMode.Free);
 
-    this._onLocalOrbitChange.dispatch(this, this.localOrbit.v);
+    this._onLocalOrbitChange.dispatch(this, this.localOrbit);
     this.calcAndDispatchNorth();
   }
 
@@ -244,7 +239,7 @@ export default class TrackballController implements TrackballCamera {
     this.globalOrbit.applyQuaternion(qPan);
     this.globalOrbit.correctToBounds(this.mode);
 
-    this._onGlobalOrbitChange.dispatch(this, this.globalOrbit.v);
+    this._onGlobalOrbitChange.dispatch(this, this.globalOrbit);
     if (this.mode === TrackballMode.Free) this.calcAndDispatchNorth();
   }
 
@@ -265,6 +260,8 @@ export default class TrackballController implements TrackballCamera {
 
   /** @inheritdoc */
   rotateNorth() {
+    console.log("xd");
+
     this.localOrbitAnim.from = this.localOrbit.clone();
     this.localOrbitAnim.to = this.localOrbit
       .clone()

@@ -1,8 +1,17 @@
 <template>
   <div class="geo-vis">
     <div class="three-container" ref="threeContainer"></div>
-    <core-controls :camera="camera" v-if="camera" />
-    <div class="vis-controls"></div>
+    <core-controls
+      class="core-controls"
+      :camera="camera"
+      :hasVisControls="visualization.getControls() != null"
+      v-if="camera"
+    >
+      <component
+        class="vis-controls"
+        :is="visualization.getControls()"
+      ></component>
+    </core-controls>
   </div>
 </template>
 
@@ -61,6 +70,12 @@ export default class GeoVisCoreVue extends Vue {
     overflow: hidden;
     width: 100%;
     height: 100%;
+  }
+  .core-controls {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    user-select: none;
   }
 }
 </style>

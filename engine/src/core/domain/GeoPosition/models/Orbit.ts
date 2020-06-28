@@ -10,8 +10,8 @@ export default abstract class Orbit {
   constructor(
     public v: THREE.Vector3,
     public bounds: Range<GeoPosition> = new Range<GeoPosition>(
-      GeoPosition.fromDeg(-180, -90),
-      GeoPosition.fromDeg(180, 90)
+      GeoPosition.fromDeg(-90, -180),
+      GeoPosition.fromDeg(90, 180)
     ),
     public slowFactor: number = 1,
     public up: THREE.Vector3 = Orbit.calcUp(v)
@@ -25,11 +25,11 @@ export default abstract class Orbit {
     return new THREE.Vector3(0, 1, 0).applyQuaternion(q);
   }
 
-  protected abstract getLongPlane(): THREE.Vector3;
-  protected abstract getLongV(): THREE.Vector3;
-  protected abstract getLongVP(): THREE.Vector3;
   protected abstract getLatPlane(): THREE.Vector3;
-  protected abstract getLatOrigin(): THREE.Vector3;
+  protected abstract getLatV(): THREE.Vector3;
+  protected abstract getLatVP(): THREE.Vector3;
+  protected abstract getLongPlane(): THREE.Vector3;
+  protected abstract getLongOrigin(): THREE.Vector3;
   abstract clone(): Orbit;
 
   copy(orbit: Orbit) {
@@ -40,20 +40,20 @@ export default abstract class Orbit {
   }
 
   getGeoPosition() {
-    //Latitude
-    const latPlane = this.getLatPlane();
-    const v1Lat = this.v.clone().projectOnPlane(latPlane).normalize();
-    const v2Lat = this.getLatOrigin().projectOnPlane(latPlane).normalize();
-    const qLat = new THREE.Quaternion().setFromUnitVectors(v1Lat, v2Lat);
-    const dot = new Vector3(qLat.x, qLat.y, qLat.z).dot(latPlane);
-    const latitude = qLat.angleTo(new THREE.Quaternion()) * Math.sign(dot);
-    // Longitude
+    //Longitude
     const longPlane = this.getLongPlane();
-    const v1Long = this.getLongV().projectOnPlane(longPlane).normalize();
-    const v2Long = this.getLongV();
+    const v1Long = this.v.clone().projectOnPlane(longPlane).normalize();
+    const v2Long = this.getLongOrigin().projectOnPlane(longPlane).normalize();
     const qLong = new THREE.Quaternion().setFromUnitVectors(v1Long, v2Long);
-    const longitude =
-      new THREE.Quaternion().angleTo(qLong) * Math.sign(longPlane.dot(v2Long));
+    const dot = new Vector3(qLong.x, qLong.y, qLong.z).dot(longPlane);
+    const longitude = qLong.angleTo(new THREE.Quaternion()) * Math.sign(dot);
+    // Latitude
+    const latPlane = this.getLatPlane();
+    const v1Lat = this.getLatV().projectOnPlane(latPlane).normalize();
+    const v2Lat = this.getLatV();
+    const qLat = new THREE.Quaternion().setFromUnitVectors(v1Lat, v2Lat);
+    const latitude =
+      new THREE.Quaternion().angleTo(qLat) * Math.sign(latPlane.dot(v2Lat));
     return new GeoPosition(latitude, longitude);
   }
 
@@ -78,29 +78,31 @@ export default abstract class Orbit {
     const qCorrect = new THREE.Quaternion();
 
     const coords = this.getGeoPosition();
-    const latAxis = this.getLatPlane();
-    const longAxis = this.getLongVP().cross(this.getLongV()).normalize();
+    console.log(coords);
+
+    const latAxis = this.getLatVP().cross(this.getLatV()).normalize();
+    const longAxis = this.getLongPlane();
     const b = this.bounds;
 
-    const longFlip = this.getLongPlane().dot(this.getLongVP());
-    if (longFlip < 0) {
-      const lontFlipCorrect = Math.PI / 2 - coords.long;
+    const latFlip = this.getLatPlane().dot(this.getLatVP());
+    if (latFlip < 0) {
+      const latFlipCorrect = Math.PI / 2 - coords.lat;
       this.applyQuaternion(
-        new THREE.Quaternion().setFromAxisAngle(longAxis, lontFlipCorrect)
+        new THREE.Quaternion().setFromAxisAngle(latAxis, latFlipCorrect)
       );
     }
 
     qCorrect.multiply(
-      this.boundAxisQ(coords.lat, b.from.lat, b.to.lat, latAxis)
+      this.boundAxisQ(coords.long, b.from.long, b.to.long, longAxis)
     );
     qCorrect.multiply(
-      this.boundAxisQ(coords.long, b.from.long, b.to.long, longAxis)
+      this.boundAxisQ(coords.lat, b.from.lat, b.to.lat, latAxis)
     );
 
     if (mode === TrackballMode.Compass) {
       qCorrect.multiply(
         new THREE.Quaternion().setFromUnitVectors(
-          new THREE.Vector3(0, 1, 0).projectOnPlane(longAxis).normalize(),
+          new THREE.Vector3(0, 1, 0).projectOnPlane(latAxis).normalize(),
           new THREE.Vector3(0, 1, 0)
         )
       );

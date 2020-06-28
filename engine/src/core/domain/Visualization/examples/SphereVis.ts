@@ -5,7 +5,7 @@ import image from "@/assets/textures/earthmap1k.jpg";
 import TrackballCamera from "../../Camera/interfaces/TrackballCamera";
 import Range from "../../GeoPosition/models/Range";
 import GeoPosition from "../../GeoPosition/models/GeoPosition";
-
+import Vue from "vue";
 /**
  * @category VisualizationExamples
  */
@@ -15,7 +15,7 @@ export default class SphereVis extends Visualization {
       //.setMode(TrackballMode.Compass)
       .setZoomBounds(new Range(0.001, 20000))
       .setGlobalOrbitBounds(
-        new Range(GeoPosition.fromDeg(-180, -85), GeoPosition.fromDeg(180, 85))
+        new Range(GeoPosition.fromDeg(-85, -180), GeoPosition.fromDeg(85, 180))
       );
   }
 
@@ -78,5 +78,9 @@ export default class SphereVis extends Visualization {
 
   destroy(): void {
     console.info("destroy");
+  }
+
+  getControls() {
+    return new Vue();
   }
 }
