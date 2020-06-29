@@ -13,7 +13,7 @@ export default class StarsVis extends Visualization {
   }
 
   setupScene(scene: THREE.Scene, group: THREE.Group): void {
-    const sphere = new THREE.SphereGeometry(40000, 100, 100);
+    const sphere = new THREE.SphereGeometry(40000, 10, 10);
     const sphereMaterial = new THREE.MeshBasicMaterial();
     sphereMaterial.side = THREE.BackSide;
     sphereMaterial.map = new THREE.TextureLoader().load(starsMap);

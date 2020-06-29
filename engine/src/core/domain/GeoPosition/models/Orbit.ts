@@ -7,6 +7,8 @@ import NumUtils from "../../Utils/NumUtils";
 import { Vector3 } from "three";
 
 export default abstract class Orbit {
+  protected compassNorth = new THREE.Vector3(0, 1, 0);
+
   constructor(
     public v: THREE.Vector3,
     public bounds: Range<GeoPosition> = new Range<GeoPosition>(
@@ -76,13 +78,9 @@ export default abstract class Orbit {
 
   correctToBounds(mode: TrackballMode) {
     const qCorrect = new THREE.Quaternion();
-
     const coords = this.getGeoPosition();
-    console.log(coords);
-
     const latAxis = this.getLatVP().cross(this.getLatV()).normalize();
     const longAxis = this.getLongPlane();
-    const b = this.bounds;
 
     const latFlip = this.getLatPlane().dot(this.getLatVP());
     if (latFlip < 0) {
@@ -92,6 +90,7 @@ export default abstract class Orbit {
       );
     }
 
+    const b = this.bounds;
     qCorrect.multiply(
       this.boundAxisQ(coords.long, b.from.long, b.to.long, longAxis)
     );
@@ -102,13 +101,16 @@ export default abstract class Orbit {
     if (mode === TrackballMode.Compass) {
       qCorrect.multiply(
         new THREE.Quaternion().setFromUnitVectors(
-          new THREE.Vector3(0, 1, 0).projectOnPlane(latAxis).normalize(),
-          new THREE.Vector3(0, 1, 0)
+          this.compassNorth.clone().projectOnPlane(latAxis).normalize(),
+          this.compassNorth
         )
       );
     }
-
     this.applyQuaternion(qCorrect);
+  }
+
+  latchCompassNorth(plane: THREE.Vector3) {
+    this.compassNorth.copy(this.up).projectOnPlane(plane).normalize();
   }
 
   protected boundAxisQ(

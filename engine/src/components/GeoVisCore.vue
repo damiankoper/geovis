@@ -6,6 +6,7 @@
       :camera="camera"
       :hasVisControls="visualization.getControls() != null"
       v-if="camera"
+      :visTitle="'TODO: Title from vis metadata'"
     >
       <component
         :vis="visualization"

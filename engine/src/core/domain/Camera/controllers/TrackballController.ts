@@ -134,7 +134,10 @@ export default class TrackballController implements TrackballCamera {
       this.onPointerMove.bind(this)
     );
     this.eventSource.addEventListener("wheel", this.onWheel.bind(this));
+    // this.eventSource.addEventListener("keypress", this.onKeyPress.bind(this));
   }
+
+  //private onKeyPress(e: KeyboardEvent) {}
 
   private onWheel(e: WheelEvent) {
     let factor = 1;
@@ -346,6 +349,7 @@ export default class TrackballController implements TrackballCamera {
   /** @inheritdoc */
   setMode(mode: TrackballMode) {
     this.mode = mode;
+    this.globalOrbit.latchCompassNorth(this.localOrbit.v);
     return this;
   }
   /** @inheritdoc */

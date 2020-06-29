@@ -1,11 +1,15 @@
 <template>
   <v-container>
-    <v-checkbox
-      hide-details
-      v-model="compassMode"
-      class="ma-0"
-      label="Compass mode"
-    />
+    <v-row>
+      <v-col>
+        <v-checkbox
+          hide-details
+          v-model="compassMode"
+          class="ma-0"
+          label="Compass mode"
+        />
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -18,7 +22,8 @@ import { TrackballMode } from "../../Camera/enums/TrackballMode";
 @Component
 export default class SphereVisControls extends Vue {
   @Prop() vis!: SphereVis;
-  compassMode = false;
+  compassMode = this.vis.camera?.getMode() == TrackballMode.Compass;
+
   @Watch("compassMode")
   onCompassModeChange(v: boolean) {
     this.vis.camera?.setMode(v ? TrackballMode.Compass : TrackballMode.Free);

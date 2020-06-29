@@ -4,7 +4,7 @@ import TrackballController from "./domain/Camera/controllers/TrackballController
 
 export default class GeoVisCore {
   private readonly container: HTMLElement;
-  private visualization?: Visualization;
+  private visualization: Visualization | null = null;
 
   private readonly scene: THREE.Scene;
   private readonly group: THREE.Group;
@@ -38,9 +38,7 @@ export default class GeoVisCore {
     );
 
     // Do not allow Vue to set reactivity here and deeper
-    Object.getOwnPropertyNames(this).forEach((prop) => {
-      Object.defineProperty(this, prop, { configurable: false });
-    });
+    Object.seal(this);
   }
 
   public setSize() {

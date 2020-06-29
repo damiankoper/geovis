@@ -2,28 +2,24 @@
   <v-container fluid>
     <v-row align="end" class="mx-0">
       <v-col v-if="hasVisControls" cols="auto" class="pr-0">
+        <v-btn @click="visControls = true" fab x-small v-if="!visControls">
+          <v-icon>mdi-menu</v-icon>
+        </v-btn>
         <v-sheet
           color="rgba(255,255,255,0.7)"
           rounded
           :elevation="4"
-          class="pa-1"
+          v-if="visControls"
         >
-          <v-toolbar dense color="transparent" elevation="0">
-            <v-btn
-              class="ml-n3"
-              :class="{ 'mr-n3': !visControls, 'mr-3': visControls }"
-              @click="visControls = !visControls"
-              fab
-              x-small
-            >
-              <v-icon v-if="!visControls">mdi-menu</v-icon>
-              <v-icon v-else>mdi-close</v-icon>
+          <v-toolbar color="transparent" elevation="0">
+            <v-btn @click="visControls = false" icon>
+              <v-icon>mdi-close</v-icon>
             </v-btn>
-            <v-toolbar-title v-if="visControls">
-              Visualization controls
+            <v-toolbar-title>
+              {{ visTitle }}
             </v-toolbar-title>
           </v-toolbar>
-          <slot v-if="visControls" />
+          <slot />
         </v-sheet>
       </v-col>
       <v-spacer />
@@ -72,6 +68,7 @@ import GeoPosition from "../core/domain/GeoPosition/models/GeoPosition";
 export default class CoreControls extends Vue {
   @Prop() camera!: TrackballCamera;
   @Prop({ default: false }) hasVisControls!: boolean;
+  @Prop({ default: "Visualization controls" }) visTitle!: string;
 
   visControls = false;
 

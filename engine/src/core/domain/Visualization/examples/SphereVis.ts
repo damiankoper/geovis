@@ -4,7 +4,6 @@ import { Matrix4 } from "three";
 import TrackballCamera from "../../Camera/interfaces/TrackballCamera";
 import Range from "../../GeoPosition/models/Range";
 import GeoPosition from "../../GeoPosition/models/GeoPosition";
-import Vue from "vue";
 import earthMap from "@/assets/textures/8k_earth_daymap.jpg";
 import earthNormalMap from "@/assets/textures/8k_earth_normal_map.jpg";
 import earthSpecularMap from "@/assets/textures/8k_earth_specular_map.jpg";

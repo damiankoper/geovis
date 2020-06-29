@@ -29,14 +29,14 @@ Struktura danych definiująca renderowany obraz, zwana dalej będzie sceną.
           długości i szerokości geograficznej oraz wysokości nad poziomem morza.
     \item Twórca do definicji sceny może wykorzystać interfejs tworzenia obiektów dostarczony przez aplikację
           lub załadować obiekty, materiały i tekstury z zewnętrznego źródła.
-    \item Twórca może zagnieżdząć sceny predefiniowane w silniku, oraz sceny wcześniej stworzonych przez siebie.
+    \item Twórca może zagnieżdżać sceny predefiniowane w silniku, oraz sceny wcześniej stworzonych przez siebie.
     \item Twórca może parametryzować sceny w celu określonej ich modyfikacji w procesie zagnieżdżania.
     \item Twórca może określić parametry początkowe obserwatora, dynamikę i zakres jego ruchów:
           \begin{enumerate}
               \item położenie,
               \item prędkość i przyspieszenie ruchu,
-              \item ograniczeni przybliżenia,
-              \item ograniczeni pozycji.
+              \item ograniczenie przybliżenia,
+              \item ograniczenie pozycji.
           \end{enumerate}
     \item Twórca może zdefiniować wygląd i funkcjonalność panelu kontrolnego.
           Panel ten służyć będzie do zmiany parametrów wizualizacji i obsługiwany będzie przez odbiorcę.
@@ -47,7 +47,7 @@ Struktura danych definiująca renderowany obraz, zwana dalej będzie sceną.
 \subsection{Wymagania niefunkcjonalne}
 
 \begin{enumerate}
-    \item Silnik powinna definiować i w sposób jasny przekazywać potencjalnemu twórcy akceptowalną strukturę danych, plików i katalogów, określającą jedną wizualizację.
+    \item Silnik powinien definiować i w sposób jasny przekazywać potencjalnemu twórcy akceptowalną strukturę danych, plików i katalogów, określającą jedną wizualizację.
     \item Włączenie zdefiniowanej wizualizacji do ich zbioru w aplikacji powinno ustanowione być tylko w jednym miejscu poprzez prosty interfejs.
     \item Dane wizualizacji muszą być ładowane asynchronicznie. Dane źródłowe definiujące scenę mogą być przetwarzane po stronie odbiorcy lub być przetworzone wcześniej i pobrane.
 \end{enumerate}
@@ -59,13 +59,13 @@ Struktura danych definiująca renderowany obraz, zwana dalej będzie sceną.
     \item Odbiorca może zobaczyć dane dostępnych wizualizacji.
     \item Odbiorca może wyświetlić wybraną wizualizację.
     \item Odbiorca może poruszać się po wizualizacji, zmieniając położenia kamery, używając myszki lub klawiatury.
-    \item Odbiorca może wyświetlić lub ukryć przyciski sterowania kamerą.
+    \item Odbiorca może zobaczyć orientację kamery relatywnie do kierunku północnego i ją zresetować.
     \item Odbiorca może wyświetlić lub ukryć panel sterujący wizualizacją dostarczony przez twórcę.
     \item Odbiorca może ustawić poziom szczegółowości grafiki. Ustawienia te przekazywane są twórcy i mogą, ale nie muszą, być respektowane.
 \end{enumerate}
 \subsection{Wymagania niefunkcjonalne}
 \begin{enumerate}
-    \item Każda akcja użytkownika może zostać wykonana używając myszki lub równolegle klawiatury.
+    \item Każda akcja użytkownika związana ze sterowaniem kamerą może zostać wykonana używając myszki lub równolegle klawiatury.
 \end{enumerate}
 
 \section{Aplikacja}
