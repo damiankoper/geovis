@@ -14,6 +14,7 @@ import Orbit from "../../GeoPosition/models/Orbit";
  * @category Camera
  */
 export default class TrackballController implements TrackballCamera {
+  private pointerCaptured = false;
   private lastPanPosition = new THREE.Vector2();
   private mode: TrackballMode = TrackballMode.Free;
   private globalOrbit = new GlobalOrbit(new THREE.Vector3(0, 0, 6371));
@@ -134,10 +135,7 @@ export default class TrackballController implements TrackballCamera {
       this.onPointerMove.bind(this)
     );
     this.eventSource.addEventListener("wheel", this.onWheel.bind(this));
-    // this.eventSource.addEventListener("keypress", this.onKeyPress.bind(this));
   }
-
-  //private onKeyPress(e: KeyboardEvent) {}
 
   private onWheel(e: WheelEvent) {
     let factor = 1;
@@ -164,17 +162,19 @@ export default class TrackballController implements TrackballCamera {
     this.eventSource.setPointerCapture(e.pointerId);
     this.lastPanPosition.set(e.clientX, e.clientY);
     this.stopMovement();
+    this.pointerCaptured = true;
   }
 
   private onPointerUp(e: PointerEvent) {
     this.eventSource.releasePointerCapture(e.pointerId);
-    if (!e.shiftKey && e.button !== 1)
+    if (!e.shiftKey && e.button !== 1 && this.pointerCaptured)
       if (this.panAnim.from.manhattanLength() <= 2) this.stopMovement();
       else this.panAnim.start();
+    this.pointerCaptured = false;
   }
 
   private onPointerMove(e: PointerEvent) {
-    if (e.buttons & 1 || e.buttons & 4) {
+    if ((e.buttons & 1 || e.buttons & 4) && this.pointerCaptured) {
       this.lastPanDelta = new THREE.Vector2(
         e.clientX - this.lastPanPosition.x,
         e.clientY - this.lastPanPosition.y
@@ -263,8 +263,6 @@ export default class TrackballController implements TrackballCamera {
 
   /** @inheritdoc */
   rotateNorth() {
-    console.log("xd");
-
     this.localOrbitAnim.from = this.localOrbit.clone();
     this.localOrbitAnim.to = this.localOrbit
       .clone()

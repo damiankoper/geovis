@@ -78,6 +78,7 @@ export default class GeoVisCoreVue extends Vue {
     right: 0;
     bottom: 0;
     user-select: none;
+    pointer-events: none;
   }
 }
 </style>

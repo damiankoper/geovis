@@ -2,7 +2,13 @@
   <v-container fluid>
     <v-row align="end" class="mx-0">
       <v-col v-if="hasVisControls" cols="auto" class="pr-0">
-        <v-btn @click="visControls = true" fab x-small v-if="!visControls">
+        <v-btn
+          @click="visControls = true"
+          fab
+          x-small
+          v-if="!visControls"
+          class="clickable"
+        >
           <v-icon>mdi-menu</v-icon>
         </v-btn>
         <v-sheet
@@ -10,6 +16,7 @@
           rounded
           :elevation="4"
           v-if="visControls"
+          class="clickable"
         >
           <v-toolbar color="transparent" elevation="0">
             <v-btn @click="visControls = false" icon>
@@ -39,7 +46,7 @@
           color="rgba(255,255,255,0.7)"
           rounded
           :elevation="4"
-          class="pa-2 d-flex flex-column align-center"
+          class="pa-2 d-flex flex-column align-center clickable"
         >
           <compass
             :angle="northAngle"
@@ -86,7 +93,7 @@ export default class CoreControls extends Vue {
     this.globalOrbitChange = this.camera.onGlobalOrbitChange.sub(
       _.throttle((e, orbit) => {
         this.globalOrbitPosition = orbit.getGeoPosition();
-      }, 1000 / 15)
+      }, 1000 / 100)
     );
   }
 
@@ -129,4 +136,8 @@ export default class CoreControls extends Vue {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.clickable {
+  pointer-events: all;
+}
+</style>
