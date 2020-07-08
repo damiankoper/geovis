@@ -17,11 +17,11 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
-import SphereVis from "./SphereVis";
-import { TrackballMode } from "../../Camera/enums/TrackballMode";
+import OsmTilesVis from "./OsmTilesVis";
+import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
 @Component
-export default class SphereVisControls extends Vue {
-  @Prop() vis!: SphereVis;
+export default class OsmTilesVisControls extends Vue {
+  @Prop() vis!: OsmTilesVis;
   compassMode = this.vis.camera?.getMode() == TrackballMode.Compass;
 
   @Watch("compassMode")

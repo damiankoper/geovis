@@ -1,6 +1,6 @@
-import Visualization from "../models/Visualization";
+import Visualization from "../../models/Visualization";
 import * as THREE from "three";
-import TrackballCamera from "../../Camera/interfaces/TrackballCamera";
+import TrackballCamera from "@/core/domain/Camera/interfaces/TrackballCamera";
 import Vue from "vue";
 import starsMap from "@/assets/textures/4k_stars.jpg";
 

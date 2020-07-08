@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import GeoVisCore from "@/components/GeoVisCore.vue";
-import SphereVis from "@/core/domain/Visualization/examples/SphereVis/SphereVis";
+import OsmTilesVis from "@/core/domain/Visualization/examples/OsmTilesVis/OsmTilesVis";
 import Vuetify, { VApp } from "vuetify/lib";
 import Vue from "vue";
 import "@mdi/font/css/materialdesignicons.css";
@@ -12,7 +12,7 @@ Vue.use(Vuetify, {
   },
 });
 export default {
-  title: "SphereVis",
+  title: "OsmTilesVis",
   component: GeoVisCore,
   decorators: [
     () => ({
@@ -39,6 +39,6 @@ export const Basic = () => ({
     );
   },
   props: {
-    vis: { default: new SphereVis() },
+    vis: { default: new OsmTilesVis() },
   },
 });

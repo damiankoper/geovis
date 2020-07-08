@@ -11,6 +11,11 @@ import Orbit from "../../GeoPosition/models/Orbit";
  */
 export default interface TrackballCamera {
   /**
+   * Get global orbit object,
+   */
+  getGlobalOrbit(): Orbit;
+
+  /**
    * Set the distance between the center of the stage and the point the camera is looking at,
    * @param radius
    */
