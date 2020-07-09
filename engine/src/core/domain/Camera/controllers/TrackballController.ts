@@ -139,8 +139,8 @@ export default class TrackballController implements TrackballCamera {
 
   private onWheel(e: WheelEvent) {
     let factor = 1;
-    if (e.deltaY > 0) factor = this.zoomFactor;
-    else if (e.deltaY < 0) factor = 1 / this.zoomFactor;
+    if (e.deltaY < 0) factor = this.zoomFactor;
+    else if (e.deltaY > 0) factor = 1 / this.zoomFactor;
     this.zoom(factor);
   }
 
@@ -167,9 +167,9 @@ export default class TrackballController implements TrackballCamera {
 
   private onPointerUp(e: PointerEvent) {
     this.eventSource.releasePointerCapture(e.pointerId);
-    if (!e.shiftKey && e.button !== 1 && this.pointerCaptured)
-      if (this.panAnim.from.manhattanLength() <= 2) this.stopMovement();
-      else this.panAnim.start();
+    if (!e.shiftKey && e.button !== 1)
+      if (this.lastPanDelta.manhattanLength() <= 2) this.stopMovement();
+      else if (this.pointerCaptured) this.panAnim.start();
     this.pointerCaptured = false;
   }
 

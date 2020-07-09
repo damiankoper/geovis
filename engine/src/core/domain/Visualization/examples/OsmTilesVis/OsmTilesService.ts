@@ -6,7 +6,9 @@ import {
   MeshPhongMaterial,
   Quaternion,
   Vector3,
+  Vector2,
 } from "three";
+import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
 class TileTreeNode {
   static thetaShift = THREE.MathUtils.degToRad(90 - 85.0511);
   static thetaBound = THREE.MathUtils.degToRad(85.0511);
@@ -85,52 +87,50 @@ class TileTreeNode {
       2
     );
   }
-  calcDeep(camera: TrackballCamera, group: THREE.Group) {
-    if (this.x == 0 && this.y == 0)
-      if (this.isCenterVisibleInCamera(camera) && this.zoom < 4) {
-        this.generateChildren();
-        this.children.forEach((c) => c.calcDeep(camera, group));
-        if (this.mesh) group.remove(this.mesh);
-      } else {
-        if (!this.material) {
-          this.material = new THREE.MeshPhongMaterial();
-          //if (this.zoom == 2 && this.x == 2 && this.y == 1)
-          this.material.map = new THREE.TextureLoader().load(this.tileUrl);
-          this.material.shininess = 5;
-        }
-        if (!this.mesh) {
-          this.mesh = new THREE.Mesh(this.geometry, this.material);
-          this.mesh.matrixAutoUpdate = false;
-        }
-        group.add(this.mesh);
+
+  calcDeep(camera: TrackballCamera, group: THREE.Group, desiredZoom: number) {
+    const visibleInCamera = this.isVisibleInCamera(camera);
+    // Clean if zoomed out
+    if (this.zoom > desiredZoom || !visibleInCamera) {
+      if (this.mesh) group.remove(this.mesh);
+    }
+    // If zoomed in and visible
+    else if (this.zoom + 1 < desiredZoom && visibleInCamera) {
+      if (this.mesh) group.remove(this.mesh);
+      this.generateChildren();
+    } else if (visibleInCamera) {
+      if (!this.material) {
+        this.material = new THREE.MeshPhongMaterial({
+          color: new THREE.Color("white"),
+        });
+        new THREE.TextureLoader().load(this.tileUrl, (texture) => {
+          if (this.material) {
+            this.material.map = texture;
+            this.material.needsUpdate = true;
+          }
+        });
+        this.material.shininess = 5;
       }
+      if (!this.mesh) {
+        this.mesh = new THREE.Mesh(this.geometry, this.material);
+        this.mesh.matrixAutoUpdate = false;
+      }
+      group.add(this.mesh);
+    }
+
+    this.children.forEach((c) => c.calcDeep(camera, group, desiredZoom));
   }
 
-  isCenterVisibleInCamera(camera: TrackballCamera) {
+  isVisibleInCamera(camera: TrackballCamera) {
+    const pos = camera.getGlobalOrbitPosition();
     const R = camera.getGlobalOrbitRadius();
     const RE = R + camera.getLocalOrbitRadius();
     const angle = new THREE.Quaternion()
       .setFromUnitVectors(
         camera
           .getGlobalOrbit()
-          .v.clone()
-          .normalize()
-          .applyQuaternion(
-            new Quaternion().setFromAxisAngle(
-              new Vector3()
-                .crossVectors(
-                  camera.getGlobalOrbit().up,
-                  camera.getGlobalOrbit().v
-                )
-                .normalize(),
-              -this.latCenter
-            )
-          )
-          .applyQuaternion(
-            new Quaternion().setFromAxisAngle(
-              camera.getGlobalOrbit().up,
-              this.longCenter
-            )
+          .getVectorPointingAt(
+            new GeoPosition(this.latCenter, this.longCenter)
           ),
         new THREE.Vector3(0, 0, 1)
       )
@@ -141,7 +141,15 @@ class TileTreeNode {
     const Y = Math.asin(sinY);
     const B = Math.PI - Y - angle;
 
-    return B >= Math.PI / 2;
+    const tileX = OsmTilesService.long2tile(pos.long, this.zoom);
+    const tileY = OsmTilesService.lat2tile(pos.lat, this.zoom);
+
+    return (
+      new THREE.Vector2(
+        Math.abs(tileX - this.x),
+        Math.abs(tileY - this.y)
+      ).length() <= 3 || B > (Math.PI / 2) * 1.1
+    );
   }
 
   generateChildren() {

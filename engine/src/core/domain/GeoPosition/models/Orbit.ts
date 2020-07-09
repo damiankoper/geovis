@@ -125,6 +125,21 @@ export default abstract class Orbit {
     } else return new THREE.Quaternion();
   }
 
+  getVectorPointingAt(pos: GeoPosition) {
+    return this.v
+      .clone()
+      .normalize()
+      .applyQuaternion(
+        new THREE.Quaternion().setFromAxisAngle(
+          new Vector3().crossVectors(this.v, this.up).normalize(),
+          pos.lat
+        )
+      )
+      .applyQuaternion(
+        new THREE.Quaternion().setFromAxisAngle(this.up, pos.long)
+      );
+  }
+
   applyQuaternion(q: THREE.Quaternion) {
     this.v.applyQuaternion(q);
     this.up.applyQuaternion(q);

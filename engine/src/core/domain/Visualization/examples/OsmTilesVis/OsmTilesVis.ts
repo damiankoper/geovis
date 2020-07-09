@@ -7,10 +7,7 @@ import StarsVis from "@/core/domain/Visualization/examples/StarsVis/StarsVis";
 import OsmTilesVisControls from "./OsmTilesVisControls.vue";
 import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
 import { OsmTilesService } from "./OsmTilesService";
-import { Quaternion, Mesh, Vector3 } from "three";
 import _ from "lodash";
-import SphereVis from "../SphereVis/SphereVis";
-import GeoPosMapper from "@/core/domain/GeoPosition/services/GeoPosMapper";
 /**
  * @category VisualizationExamples
  */
@@ -41,8 +38,10 @@ export default class OsmTilesVis extends Visualization {
 
     if (this.camera) {
       this.sphereGroup.rotateY(-Math.PI / 2);
-      this.camera.onGlobalOrbitChange.sub(this.calcTiles.bind(this));
-      this.camera.onZoomChange.sub(this.calcTiles.bind(this));
+      this.camera.onGlobalOrbitChange.sub(
+        _.throttle(this.calcTiles.bind(this), 500)
+      );
+      this.camera.onZoomChange.sub(_.debounce(this.calcTiles.bind(this), 500));
       this.calcTiles(this.camera);
     }
     console.log(this.osmTilesService.tileTreeRoot);
@@ -56,7 +55,15 @@ export default class OsmTilesVis extends Visualization {
   }
 
   private calcTiles(camera: TrackballCamera) {
-    this.osmTilesService.tileTreeRoot.calcDeep(camera, this.sphereGroup);
+    console.log("Tiles recalculated");
+    const R = camera.getLocalOrbitRadius();
+    const desiredZoom =
+      Math.max(Math.floor(-Math.log2(R) + Math.log2(10000)), 0) + 4;
+    this.osmTilesService.tileTreeRoot.calcDeep(
+      camera,
+      this.sphereGroup,
+      desiredZoom
+    );
   }
 
   update(deltaFactor: number): void {
