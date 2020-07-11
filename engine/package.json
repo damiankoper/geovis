@@ -19,6 +19,7 @@
     "core-js": "^3.6.5",
     "d3-ease": "^1.0.6",
     "lodash": "^4.17.15",
+    "perf-marks": "^1.8.1",
     "strongly-typed-events": "^1.6.12",
     "three": "^0.118.1",
     "vue": "^2.6.11",

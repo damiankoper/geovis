@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { TrackballCamera } from "@/GeoVisEngine";
 import {
-  SphereGeometry,
+  SphereBufferGeometry,
   Mesh,
   MeshPhongMaterial,
   Quaternion,
@@ -9,11 +9,12 @@ import {
   Vector2,
 } from "three";
 import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
+import { forEach } from "lodash";
 class TileTreeNode {
   static thetaShift = THREE.MathUtils.degToRad(90 - 85.0511);
   static thetaBound = THREE.MathUtils.degToRad(85.0511);
 
-  geometry: SphereGeometry;
+  geometry: SphereBufferGeometry;
 
   mesh?: Mesh;
   material?: MeshPhongMaterial;
@@ -23,12 +24,14 @@ class TileTreeNode {
   constructor(
     public readonly x: number,
     public readonly y: number,
-    public readonly zoom: number
+    public readonly zoom: number,
+    public readonly parent?: TileTreeNode
   ) {
-    this.geometry = new SphereGeometry(
+    const d = Math.floor((-Math.tanh(zoom / 4) + 1) * 30 + 1);
+    this.geometry = new SphereBufferGeometry(
       6371,
-      5,
-      5,
+      d,
+      d,
       this.phiStart,
       this.phiLength,
       this.thetaStart,
@@ -37,6 +40,7 @@ class TileTreeNode {
   }
 
   get tileUrl() {
+    //return `http://localhost:3001/${this.zoom}/${this.x}/${this.y}.png`;
     return `https://tile.openstreetmap.org/${this.zoom}/${this.x}/${this.y}.png`;
   }
   get isLeaf() {
@@ -88,82 +92,113 @@ class TileTreeNode {
     );
   }
 
-  calcDeep(camera: TrackballCamera, group: THREE.Group, desiredZoom: number) {
-    const visibleInCamera = this.isVisibleInCamera(camera);
-    // Clean if zoomed out
-    if (this.zoom > desiredZoom || !visibleInCamera) {
-      if (this.mesh) group.remove(this.mesh);
-    }
-    // If zoomed in and visible
-    else if (this.zoom + 1 < desiredZoom && visibleInCamera) {
-      if (this.mesh) group.remove(this.mesh);
-      this.generateChildren();
-    } else if (visibleInCamera) {
-      if (!this.material) {
-        this.material = new THREE.MeshPhongMaterial({
-          color: new THREE.Color("white"),
-        });
-        new THREE.TextureLoader().load(this.tileUrl, (texture) => {
-          if (this.material) {
-            this.material.map = texture;
-            this.material.needsUpdate = true;
-          }
-        });
-        this.material.shininess = 5;
+  calcDeep(
+    camera: TrackballCamera,
+    group: THREE.Group,
+    desiredZoom: number
+  ): boolean {
+    this.hideTile();
+    if (this.zoom < desiredZoom) {
+      if (this.isVisibleByTileDistance(camera, 4)) {
+        this.generateChildren();
       }
-      if (!this.mesh) {
-        this.mesh = new THREE.Mesh(this.geometry, this.material);
-        this.mesh.matrixAutoUpdate = false;
-      }
-      group.add(this.mesh);
     }
 
-    this.children.forEach((c) => c.calcDeep(camera, group, desiredZoom));
+    if (this.zoom === desiredZoom) {
+      if (this.isVisibleByTileDistance(camera, 4)) {
+        this.showTile(group);
+        return true;
+      }
+    } else {
+      const showChild = this.children.map((c) =>
+        c.calcDeep(camera, group, desiredZoom)
+      );
+      showChild.forEach((showChild, i) => {
+        if (!showChild) {
+          this.children[i].showTile(group);
+        }
+      });
+      if (showChild.some((t) => t)) return true;
+    }
+    return false;
   }
 
-  isVisibleInCamera(camera: TrackballCamera) {
+  hideSubtree() {
+    this.children.forEach((c) => {
+      c.hideTile();
+      c.hideSubtree();
+    });
+  }
+
+  showTile(group: THREE.Group) {
+    OsmTilesService.visibleTiles++;
+    if (!this.material) {
+      /** TODO: material color and transition */
+      this.material = new THREE.MeshPhongMaterial({
+        shininess: 5,
+        color: new THREE.Color(0xffffff),
+      });
+      this.material.map = new THREE.TextureLoader().load(this.tileUrl);
+    }
+    if (!this.mesh) {
+      this.mesh = new THREE.Mesh(this.geometry, this.material);
+      this.mesh.matrixAutoUpdate = false;
+      group.add(this.mesh);
+    }
+    this.mesh.visible = true;
+    this.hideSubtree();
+  }
+
+  hideTile() {
+    if (this.mesh) this.mesh.visible = false;
+  }
+
+  isVisibleByTileDistance(camera: TrackballCamera, manhattanDistance: number) {
     const pos = camera.getGlobalOrbitPosition();
-    const R = camera.getGlobalOrbitRadius();
-    const RE = R + camera.getLocalOrbitRadius();
-    const angle = new THREE.Quaternion()
-      .setFromUnitVectors(
-        camera
-          .getGlobalOrbit()
-          .getVectorPointingAt(
-            new GeoPosition(this.latCenter, this.longCenter)
-          ),
-        new THREE.Vector3(0, 0, 1)
-      )
-      .angleTo(new THREE.Quaternion());
-
-    const distance = Math.sqrt(R ** 2 + RE ** 2 - 2 * R * RE * Math.cos(angle));
-    const sinY = (R * Math.sin(angle)) / distance;
-    const Y = Math.asin(sinY);
-    const B = Math.PI - Y - angle;
-
     const tileX = OsmTilesService.long2tile(pos.long, this.zoom);
     const tileY = OsmTilesService.lat2tile(pos.lat, this.zoom);
+    const tiles = 2 ** this.zoom;
 
-    return (
-      new THREE.Vector2(
-        Math.abs(tileX - this.x),
-        Math.abs(tileY - this.y)
-      ).length() <= 3 || B > (Math.PI / 2) * 1.1
+    let x = Math.abs(tileX - this.x);
+    let y = Math.abs(tileY - this.y);
+
+    if (x > tiles / 2) x = tiles - x;
+    if (y > tiles / 2) y = tiles - y;
+
+    return new THREE.Vector2(x, y).manhattanLength() <= manhattanDistance;
+  }
+
+  isVisibleByAngle(camera: TrackballCamera, angle: number) {
+    const R = camera.getGlobalOrbitRadius();
+    const RE = R + camera.getLocalOrbitRadius();
+    const calcAngle = camera
+      .getGlobalOrbit()
+      .getVectorPointingAt(new GeoPosition(this.latCenter, this.longCenter))
+      .angleTo(new THREE.Vector3(0, 0, 1));
+
+    const distance = Math.sqrt(
+      R ** 2 + RE ** 2 - 2 * R * RE * Math.cos(calcAngle)
     );
+    const sinY = (R * Math.sin(calcAngle)) / distance;
+    const Y = Math.asin(sinY);
+    const B = Math.PI - Y - calcAngle;
+    return B < angle;
   }
 
   generateChildren() {
     if (this.isLeaf)
       this.children.push(
-        new TileTreeNode(this.x * 2, this.y * 2, this.zoom + 1),
-        new TileTreeNode(this.x * 2 + 1, this.y * 2, this.zoom + 1),
-        new TileTreeNode(this.x * 2, this.y * 2 + 1, this.zoom + 1),
-        new TileTreeNode(this.x * 2 + 1, this.y * 2 + 1, this.zoom + 1)
+        new TileTreeNode(this.x * 2, this.y * 2, this.zoom + 1, this),
+        new TileTreeNode(this.x * 2 + 1, this.y * 2, this.zoom + 1, this),
+        new TileTreeNode(this.x * 2, this.y * 2 + 1, this.zoom + 1, this),
+        new TileTreeNode(this.x * 2 + 1, this.y * 2 + 1, this.zoom + 1, this)
       );
   }
 }
 
 export class OsmTilesService {
+  static visibleTiles = 0;
+
   public tileTreeRoot = new TileTreeNode(0, 0, 0);
 
   static tile2lat(y: number, z: number) {

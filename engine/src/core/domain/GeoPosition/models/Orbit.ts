@@ -5,7 +5,7 @@ import GeoPosMapper from "../services/GeoPosMapper";
 import { TrackballMode } from "../../Camera/enums/TrackballMode";
 import NumUtils from "../../Utils/NumUtils";
 import { Vector3 } from "three";
-
+import _ from "lodash";
 export default abstract class Orbit {
   protected compassNorth = new THREE.Vector3(0, 1, 0);
 
@@ -41,7 +41,17 @@ export default abstract class Orbit {
     this.slowFactor = orbit.slowFactor;
   }
 
-  getGeoPosition() {
+  getGeoPosition = _.memoize(this._getGeoPosition.bind(this), () => {
+    return (
+      String(this.v.x) +
+      String(this.v.y) +
+      String(this.v.z) +
+      String(this.up.x) +
+      String(this.up.y) +
+      String(this.up.z)
+    );
+  });
+  private _getGeoPosition() {
     //Longitude
     const longPlane = this.getLongPlane();
     const v1Long = this.v.clone().projectOnPlane(longPlane).normalize();
