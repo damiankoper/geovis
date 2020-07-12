@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import Visualization from "./domain/Visualization/models/Visualization";
 import TrackballController from "./domain/Camera/controllers/TrackballController";
+import TWEEN from "@tweenjs/tween.js";
 
 export default class GeoVisCore {
   private readonly container: HTMLElement;
@@ -64,12 +65,17 @@ export default class GeoVisCore {
   }
 
   private _run() {
-    const deltaFactor = this.clock.getDelta() * 60;
-    this.cameraController.update(deltaFactor);
-    this.visualization?.update(deltaFactor);
-
-    this.renderer.render(this.scene, this.camera);
     if (this.destroyRequested) this.destroyRequested = false;
     else requestAnimationFrame(() => this._run());
+
+    const deltaS = this.clock.getDelta();
+    const elapsedS = this.clock.getElapsedTime();
+    const deltaFactor = deltaS * 60; // Target -> 60 FPS
+
+    this.cameraController.update(deltaFactor);
+    this.visualization?.update(deltaFactor);
+    TWEEN.update(TWEEN.now());
+
+    this.renderer.render(this.scene, this.camera);
   }
 }

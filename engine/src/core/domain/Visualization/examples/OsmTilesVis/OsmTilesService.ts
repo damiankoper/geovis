@@ -1,23 +1,24 @@
 import * as THREE from "three";
 import { TrackballCamera } from "@/GeoVisEngine";
-import {
-  SphereBufferGeometry,
-  Mesh,
-  MeshPhongMaterial,
-  Quaternion,
-  Vector3,
-  Vector2,
-} from "three";
+import { SphereBufferGeometry, Mesh } from "three";
 import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
-import { forEach } from "lodash";
+import TWEEN from "@tweenjs/tween.js";
 class TileTreeNode {
   static thetaShift = THREE.MathUtils.degToRad(90 - 85.0511);
   static thetaBound = THREE.MathUtils.degToRad(85.0511);
 
   geometry: SphereBufferGeometry;
+  material = new THREE.MeshPhongMaterial({
+    shininess: 5,
+    transparent: true,
+    opacity: 0,
+    //depthFunc: THREE.NeverDepth.
+    depthWrite: false,
+  });
 
   mesh?: Mesh;
-  material?: MeshPhongMaterial;
+  visible = false;
+  tween?: any;
 
   public readonly children: TileTreeNode[] = [];
 
@@ -39,9 +40,14 @@ class TileTreeNode {
     );
   }
 
+  /**
+   * todo:
+   * url from outside -> function
+   * radius from outside
+   */
   get tileUrl() {
-    //return `http://localhost:3001/${this.zoom}/${this.x}/${this.y}.png`;
-    return `https://tile.openstreetmap.org/${this.zoom}/${this.x}/${this.y}.png`;
+    return `http://localhost:3001/${this.zoom}/${this.x}/${this.y}.png`;
+    //return `https://tile.openstreetmap.org/${this.zoom}/${this.x}/${this.y}.png`;
   }
   get isLeaf() {
     return this.children.length === 0;
@@ -97,6 +103,7 @@ class TileTreeNode {
     group: THREE.Group,
     desiredZoom: number
   ): boolean {
+    let propagateUpper = false;
     this.hideTile();
     if (this.zoom < desiredZoom) {
       if (this.isVisibleByTileDistance(camera, 4)) {
@@ -107,20 +114,83 @@ class TileTreeNode {
     if (this.zoom === desiredZoom) {
       if (this.isVisibleByTileDistance(camera, 4)) {
         this.showTile(group);
-        return true;
+        propagateUpper = true;
       }
     } else {
-      const showChild = this.children.map((c) =>
+      const showDeeper = this.children.map((c) =>
         c.calcDeep(camera, group, desiredZoom)
       );
-      showChild.forEach((showChild, i) => {
-        if (!showChild) {
-          this.children[i].showTile(group);
+      showDeeper.forEach((showDeeper, i) => {
+        if (!showDeeper) this.children[i].showTile(group);
+      });
+      if (showDeeper.some((t) => t)) propagateUpper = true;
+    }
+
+    if (!this.parent) {
+      this.calcAnimDeep();
+    }
+
+    return propagateUpper;
+  }
+
+  calcAnimDeep(deep = true) {
+    const visible = this.visible;
+    const opacity = visible ? 1 : 0;
+
+    const onEnd = () => {
+      if (this.mesh) this.mesh.visible = visible;
+      this.material.opacity = opacity;
+      this.material.needsUpdate = true;
+    };
+
+    if (this.tween) this.tween.stop();
+    if (
+      (this.visible && !this.mesh?.visible && this.material.map) ||
+      (!this.visible && this.mesh?.visible)
+    ) {
+      this.tween = new TWEEN.Tween({ opacity: this.material.opacity })
+        .to({ opacity })
+        .onStart(() => {
+          if (this.mesh) this.mesh.visible = true;
+        })
+        .onUpdate((data) => {
+          this.material.opacity = data.opacity;
+          this.material.needsUpdate = true;
+        })
+        .onStop(onEnd)
+        .onComplete(onEnd)
+        .duration(150)
+        .start(TWEEN.now());
+    }
+    if (deep) this.children.forEach((c) => c.calcAnimDeep());
+  }
+
+  showTile(group: THREE.Group) {
+    if (!this.material.map) {
+      new THREE.TextureLoader().load(this.tileUrl, (texture) => {
+        if (this.material) {
+          this.material.map = texture;
+          this.material.color.setHex(0xffffff);
+          this.material.needsUpdate = true;
+          this.calcAnimDeep(false);
         }
       });
-      if (showChild.some((t) => t)) return true;
     }
-    return false;
+    if (!this.mesh) {
+      this.mesh = new THREE.Mesh(this.geometry, this.material);
+      this.mesh.matrixAutoUpdate = false;
+      this.mesh.visible = false;
+      this.mesh.renderOrder = this.zoom;
+      this.mesh;
+      group.add(this.mesh);
+    }
+
+    this.visible = true;
+    this.hideSubtree();
+  }
+
+  hideTile() {
+    if (this.mesh) this.visible = false;
   }
 
   hideSubtree() {
@@ -128,29 +198,6 @@ class TileTreeNode {
       c.hideTile();
       c.hideSubtree();
     });
-  }
-
-  showTile(group: THREE.Group) {
-    OsmTilesService.visibleTiles++;
-    if (!this.material) {
-      /** TODO: material color and transition */
-      this.material = new THREE.MeshPhongMaterial({
-        shininess: 5,
-        color: new THREE.Color(0xffffff),
-      });
-      this.material.map = new THREE.TextureLoader().load(this.tileUrl);
-    }
-    if (!this.mesh) {
-      this.mesh = new THREE.Mesh(this.geometry, this.material);
-      this.mesh.matrixAutoUpdate = false;
-      group.add(this.mesh);
-    }
-    this.mesh.visible = true;
-    this.hideSubtree();
-  }
-
-  hideTile() {
-    if (this.mesh) this.mesh.visible = false;
   }
 
   isVisibleByTileDistance(camera: TrackballCamera, manhattanDistance: number) {
@@ -197,8 +244,6 @@ class TileTreeNode {
 }
 
 export class OsmTilesService {
-  static visibleTiles = 0;
-
   public tileTreeRoot = new TileTreeNode(0, 0, 0);
 
   static tile2lat(y: number, z: number) {

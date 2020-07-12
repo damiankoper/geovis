@@ -41,27 +41,47 @@ export default class OsmTilesVis extends Visualization {
     if (this.camera) {
       this.sphereGroup.rotateY(-Math.PI / 2);
       this.camera.onGlobalOrbitChange.sub(
-        _.throttle(this.calcTiles.bind(this), 500)
+        _.throttle(this.calcTiles.bind(this), 300)
       );
-      this.camera.onZoomChange.sub(_.debounce(this.calcTiles.bind(this), 300));
+      this.camera.onZoomChange.sub(_.debounce(this.calcTiles.bind(this), 150));
       this.calcTiles(this.camera);
     }
-    console.log(this.osmTilesService.tileTreeRoot);
-
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
     scene.add(ambientLight);
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
     scene.add(directionalLight);
     directionalLight.position.set(0, 0, 1);
+
+    const testBoxes = [
+      new THREE.BoxBufferGeometry(0.001, 0.001, 0.001),
+      new THREE.BoxBufferGeometry(0.01, 0.01, 0.01),
+      new THREE.BoxBufferGeometry(0.1, 0.1, 0.1),
+      new THREE.BoxBufferGeometry(1, 1, 1),
+      new THREE.BoxBufferGeometry(10, 10, 10),
+      new THREE.BoxBufferGeometry(100, 100, 100),
+    ];
+
+    const boxGroup = new THREE.Group();
+    boxGroup.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 6371, 0));
+    boxGroup.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
+
+    const boxMaterial = new THREE.MeshPhongMaterial({ color: 0x5500ff });
+    testBoxes.forEach((box, i) => {
+      box.applyMatrix4(
+        new THREE.Matrix4().makeTranslation(0, 0, -(10 ** (i - 3)))
+      );
+      const boxMesh = new THREE.Mesh(box, boxMaterial);
+      boxGroup.add(boxMesh);
+    });
+    group.add(boxGroup);
   }
 
   private calcTiles(camera: TrackballCamera) {
-    console.log("Tiles recalculated");
     const R = camera.getLocalOrbitRadius();
-    OsmTilesService.visibleTiles = 0;
     const desiredZoom =
       Math.max(Math.floor(-Math.log2(R) + Math.log2(10000)), 0) + 3;
+
     PerfMarks.start("TilesCalc");
     this.osmTilesService.tileTreeRoot.calcDeep(
       camera,
@@ -69,7 +89,6 @@ export default class OsmTilesVis extends Visualization {
       desiredZoom
     );
     PerfMarks.end("TilesCalc");
-    console.log("VisibleTiles", OsmTilesService.visibleTiles);
   }
 
   update(deltaFactor: number): void {
