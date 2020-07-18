@@ -20,7 +20,26 @@ export default class OsmTilesVis extends Visualization {
   constructor() {
     super();
     this.addParent(new StarsVis());
-    this.osmTilesService = new OsmTilesService();
+    this.osmTilesService = new OsmTilesService([
+      {
+        tileUrl: (x, y, z) =>
+          `https://tile.openstreetmap.org/${z}/${x}/${y}.png`,
+        visible: true,
+        filter: "brightness(30%)",
+      },
+      {
+        tileUrl: (x, y, z) =>
+          `https://tilecache.rainviewer.com/v2/coverage/0/256/${z}/${x}/${y}.png`,
+        visible: true,
+        filter: "opacity(10%)",
+      },
+      {
+        tileUrl: (x, y, z) =>
+          `https://tilecache.rainviewer.com/v2/radar/1595017800/256/${z}/${x}/${y}/4/1_1.png`,
+        visible: true,
+        filter: "opacity(60%)",
+      },
+    ]);
     Object.seal(this);
   }
 
