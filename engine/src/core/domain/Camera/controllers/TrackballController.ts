@@ -9,6 +9,8 @@ import AnimatedTransition from "../../Animation/AnimatedTransition";
 import Range from "../../GeoPosition/models/Range";
 import { EventDispatcher } from "strongly-typed-events";
 import Orbit from "../../GeoPosition/models/Orbit";
+import * as PerfMarks from "perf-marks";
+import { Matrix4, Vector3 } from "three";
 
 /**
  * @category Camera
@@ -25,10 +27,8 @@ export default class TrackballController implements TrackballCamera {
       GeoPosition.fromDeg(85, 180)
     )
   );
-
   private zoomFactor = 0.5;
   private zoomBounds = new Range(0.001, 10000);
-
   private lastPanDelta = new THREE.Vector2();
   private panAnim = new AnimatedTransition(new THREE.Vector2(), 1);
   private zoomAnim = new AnimatedTransition(new THREE.Vector3(), 0.15);
@@ -37,41 +37,19 @@ export default class TrackballController implements TrackballCamera {
     0.3
   );
 
-  private _onGlobalOrbitChange = new EventDispatcher<TrackballCamera, Orbit>();
-  /** @inheritdoc */
-  get onGlobalOrbitChange() {
-    return this._onGlobalOrbitChange.asEvent();
-  }
-
-  private _onLocalOrbitChange = new EventDispatcher<TrackballCamera, Orbit>();
-  /** @inheritdoc */
-  get onLocalOrbitChange() {
-    return this._onLocalOrbitChange.asEvent();
-  }
-
-  private _onZoomChange = new EventDispatcher<TrackballCamera, number>();
-  /** @inheritdoc */
-  get onZoomChange() {
-    return this._onZoomChange.asEvent();
-  }
-
-  private _onNorthAngleChange = new EventDispatcher<TrackballCamera, number>();
-  /** @inheritdoc */
-  get onNorthAngleChange() {
-    return this._onNorthAngleChange.asEvent();
-  }
-
   constructor(
     private readonly camera: THREE.Camera,
     private readonly group: THREE.Group,
     private readonly eventSource: HTMLCanvasElement
   ) {
-    this.camera.up = this.localOrbit.up;
     this.group.matrixAutoUpdate = false;
+    this.camera.matrixAutoUpdate = false;
+    this.setGroupTransformMatrix();
+    this.setCameraTransformMatrix();
     this.setEvents();
-    this.update(0);
   }
-  update(delta: number) {
+
+  update() {
     this.panAnim.update((f, from, to) => {
       this.handleGlobalOrbitRotate(
         new THREE.Vector2().lerpVectors(from, to, f)
@@ -80,6 +58,7 @@ export default class TrackballController implements TrackballCamera {
 
     this.zoomAnim.update((f, from, to) => {
       this.localOrbit.v.lerpVectors(from, to, f);
+      this.setCameraTransformMatrix();
       this._onZoomChange.dispatch(this, this.localOrbit.getRadius());
     });
 
@@ -93,19 +72,17 @@ export default class TrackballController implements TrackballCamera {
         f
       );
       this.localOrbit.copy(from.clone().applyQuaternion(q));
+      this.setCameraTransformMatrix();
       this.calcAndDispatchNorth();
     });
+  }
 
-    this.group.matrix.makeTranslation(0, 0, -this.globalOrbit.getRadius());
-    this.group.matrix.multiply(
-      new THREE.Matrix4().lookAt(
-        new THREE.Vector3(),
-        this.globalOrbit.v.clone().negate(),
-        this.globalOrbit.up
-      )
+  private setCameraTransformMatrix() {
+    const pos = this.localOrbit.v;
+    this.camera.matrixWorld.makeTranslation(pos.x, pos.y, pos.z);
+    this.camera.matrixWorld.multiply(
+      new Matrix4().lookAt(pos, new Vector3(), this.localOrbit.up)
     );
-    this.camera.position.copy(this.localOrbit.v);
-    this.camera.lookAt(0, 0, 0);
   }
 
   destroy() {
@@ -218,6 +195,7 @@ export default class TrackballController implements TrackballCamera {
 
     this._onLocalOrbitChange.dispatch(this, this.localOrbit);
     this.calcAndDispatchNorth();
+    this.setCameraTransformMatrix();
   }
 
   private handleGlobalOrbitRotate(delta: THREE.Vector2) {
@@ -244,10 +222,23 @@ export default class TrackballController implements TrackballCamera {
 
     this._onGlobalOrbitChange.dispatch(this, this.globalOrbit);
     if (this.mode === TrackballMode.Free) this.calcAndDispatchNorth();
+
+    this.setGroupTransformMatrix();
   }
 
   private calcAndDispatchNorth() {
     this._onNorthAngleChange.dispatch(this, this.getNorthAngle());
+  }
+
+  private setGroupTransformMatrix() {
+    this.group.matrix.makeTranslation(0, 0, -this.globalOrbit.getRadius());
+    this.group.matrix.multiply(
+      new THREE.Matrix4().lookAt(
+        new THREE.Vector3(),
+        this.globalOrbit.v.clone().negate(),
+        this.globalOrbit.up
+      )
+    );
   }
 
   /** @inheritdoc */
@@ -296,6 +287,7 @@ export default class TrackballController implements TrackballCamera {
   /** @inheritdoc */
   setGlobalOrbitRadius(radius: number) {
     this.globalOrbit.setRadius(radius);
+    this.setGroupTransformMatrix();
     return this;
   }
 
@@ -306,6 +298,7 @@ export default class TrackballController implements TrackballCamera {
   /** @inheritdoc */
   setGlobalOrbitPosition(position: GeoPosition) {
     this.globalOrbit.setGeoPosition(position);
+    this.setGroupTransformMatrix();
     return this;
   }
 
@@ -316,12 +309,14 @@ export default class TrackballController implements TrackballCamera {
   /** @inheritdoc */
   setLocalOrbitRadius(radius: number) {
     this.localOrbit.setRadius(radius);
+    this.setCameraTransformMatrix();
     return this;
   }
 
   /** @inheritdoc */
   setLocalOrbitPosition(position: GeoPosition) {
     this.localOrbit.setGeoPosition(position);
+    this.setCameraTransformMatrix();
     return this;
   }
   /** @inheritdoc */
@@ -457,5 +452,31 @@ export default class TrackballController implements TrackballCamera {
     this.panAnim.from.set(0, 0);
     this.lastPanDelta.set(0, 0);
     this.localOrbitAnim.stop();
+  }
+
+  /** EVENTS */
+
+  private _onGlobalOrbitChange = new EventDispatcher<TrackballCamera, Orbit>();
+  /** @inheritdoc */
+  get onGlobalOrbitChange() {
+    return this._onGlobalOrbitChange.asEvent();
+  }
+
+  private _onLocalOrbitChange = new EventDispatcher<TrackballCamera, Orbit>();
+  /** @inheritdoc */
+  get onLocalOrbitChange() {
+    return this._onLocalOrbitChange.asEvent();
+  }
+
+  private _onZoomChange = new EventDispatcher<TrackballCamera, number>();
+  /** @inheritdoc */
+  get onZoomChange() {
+    return this._onZoomChange.asEvent();
+  }
+
+  private _onNorthAngleChange = new EventDispatcher<TrackballCamera, number>();
+  /** @inheritdoc */
+  get onNorthAngleChange() {
+    return this._onNorthAngleChange.asEvent();
   }
 }

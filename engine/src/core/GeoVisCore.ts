@@ -69,10 +69,9 @@ export default class GeoVisCore {
     else requestAnimationFrame(() => this._run());
 
     const deltaS = this.clock.getDelta();
-    const elapsedS = this.clock.getElapsedTime();
     const deltaFactor = deltaS * 60; // Target -> 60 FPS
 
-    this.cameraController.update(deltaFactor);
+    this.cameraController.update();
     this.visualization?.update(deltaFactor);
     TWEEN.update(TWEEN.now());
 

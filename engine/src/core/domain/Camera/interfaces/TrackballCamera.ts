@@ -147,7 +147,7 @@ export default interface TrackballCamera {
 
   /**
    * Set min and max zoom.
-   * @param bounds Defaults to `[10000; 0.001]`
+   * @param bounds Defaults to `[0.001, 10000]`
    */
   setZoomBounds(bounds: Range): TrackballCamera;
   /**
