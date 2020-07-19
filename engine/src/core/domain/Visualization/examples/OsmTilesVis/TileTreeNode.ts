@@ -2,14 +2,11 @@ import * as THREE from "three";
 import { TrackballCamera } from "@/GeoVisEngine";
 import { SphereBufferGeometry, Mesh, CanvasTexture } from "three";
 import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
-import * as PerfMarks from "perf-marks";
 import { TilesService } from "./TilesService";
+import * as PerfMarks from "perf-marks";
 export class TileTreeNode {
   canvas: HTMLCanvasElement = this.service.createCanvas();
-  canvasCtx: CanvasRenderingContext2D | null = this.canvas.getContext("2d", {
-    alpha: false,
-  });
-  tilesDrawn = false;
+  canvasCtx = this.canvas.getContext("2d");
   tilesDrawRequested = false;
 
   material = new THREE.MeshPhongMaterial({
@@ -26,8 +23,9 @@ export class TileTreeNode {
   position: GeoPosition;
   positionCenter: GeoPosition;
 
-  get tilesDistance() {
-    return this.zoom < 2 ? 2 : this.zoom < 3 ? 3 : 4;
+  getTilesDistance(desiredZoom: number) {
+    if (this.zoom === desiredZoom) return 4;
+    return 2;
   }
 
   constructor(
@@ -35,7 +33,8 @@ export class TileTreeNode {
     public readonly x: number,
     public readonly y: number,
     public readonly zoom: number,
-    public readonly parent?: TileTreeNode
+    public readonly parent?: TileTreeNode,
+    public readonly key = `${x}${y}${zoom}`
   ) {
     const lat = this.service.tile2lat(this.y, this.zoom);
     const latNext = this.service.tile2lat(this.y + 1, this.zoom);
@@ -48,39 +47,18 @@ export class TileTreeNode {
       (lat + latNext) / 2,
       (long + longNext) / 2
     );
+
+    this.service.canvasDrawnHandlerMap.set(
+      this.key,
+      this.onCanvasDraw.bind(this)
+    );
   }
 
-  drawCanvas() {
-    PerfMarks.start("DrawCanvas");
-    this.tilesDrawRequested = true;
-    const promises = this.service.layers.map((layerConfig) => {
-      return new Promise<any>((resolve, reject) => {
-        const img = new Image();
-        img.src = layerConfig.tileUrl(this.x, this.y, this.zoom);
-        img.crossOrigin = "*";
-        img.onload = () => resolve({ img, layerConfig });
-      });
-    });
-    return promises
-      .reduce(
-        (p1, p2) =>
-          p1.then(() =>
-            p2.then(({ img, layerConfig }) => {
-              if (this.canvasCtx && this.material.map) {
-                this.canvasCtx.filter = layerConfig.filter || "none";
-                this.canvasCtx.drawImage(img, 0, 0);
-                this.canvasCtx.filter = "none";
-                this.material.map.needsUpdate = true;
-              }
-            })
-          ),
-        Promise.resolve()
-      )
-      .then(() => {
-        this.tilesDrawn = true;
-        PerfMarks.end("DrawCanvas");
-      })
-      .catch(() => undefined);
+  private onCanvasDraw(message: MessageEvent) {
+    PerfMarks.start("onCanvasDraw");
+    this.canvasCtx?.drawImage(message.data.image, 0, 0);
+    if (this.material.map) this.material.map.needsUpdate = true;
+    PerfMarks.end("onCanvasDraw");
   }
 
   calcDeep(
@@ -88,11 +66,10 @@ export class TileTreeNode {
     group: THREE.Group,
     desiredZoom: number
   ): boolean {
-    TileTreeNode.tiles++;
     let propagateUpper = false;
     const visibleByTileDistance = this.isVisibleByTileDistance(
       camera,
-      this.tilesDistance
+      this.getTilesDistance(desiredZoom)
     );
     this.hideTile();
     if (this.zoom < desiredZoom) {
@@ -123,8 +100,9 @@ export class TileTreeNode {
   }
 
   showTile(group: THREE.Group) {
-    if (!this.tilesDrawn && !this.tilesDrawRequested) {
-      this.drawCanvas();
+    if (!this.tilesDrawRequested) {
+      this.tilesDrawRequested = true;
+      this.service.requestCanvasDraw(this);
     }
 
     if (!this.mesh) {
@@ -157,7 +135,10 @@ export class TileTreeNode {
   ) {
     this.children.forEach((c) => c.destroyDangling(camera, group, desiredZoom));
     if (
-      !this.isVisibleByTileDistance(camera, this.tilesDistance + 2) ||
+      !this.isVisibleByTileDistance(
+        camera,
+        this.getTilesDistance(desiredZoom) + 2
+      ) ||
       this.zoom > desiredZoom
     ) {
       this.children.forEach((c) => c.destroy(group));
@@ -170,6 +151,7 @@ export class TileTreeNode {
     this.geometry.dispose();
     this.material.map?.dispose();
     this.material.dispose();
+    this.service.canvasDrawnHandlerMap.delete(this.key);
   }
 
   isVisibleByTileDistance(camera: TrackballCamera, manhattanDistance: number) {
@@ -198,10 +180,9 @@ export class TileTreeNode {
             this.zoom + 1,
             this
           );
-
+          const tileSize = this.service.tileSize;
+          const tileSizeDv = tileSize / 2;
           if (tile.canvasCtx) {
-            const tileSize = this.service.tileSize;
-            const tileSizeDv = tileSize / 2;
             tile.canvasCtx.drawImage(
               this.canvas,
               tileSizeDv * x,
@@ -213,8 +194,8 @@ export class TileTreeNode {
               tileSize,
               tileSize
             );
+            this.children.push(tile);
           }
-          this.children.push(tile);
         }
       }
   }

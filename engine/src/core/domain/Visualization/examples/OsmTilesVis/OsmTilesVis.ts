@@ -27,7 +27,7 @@ export default class OsmTilesVis extends Visualization {
           tileUrl: (x, y, z) =>
             `https://tile.openstreetmap.org/${z}/${x}/${y}.png`,
           visible: true,
-          filter: "brightness(75%)",
+          filter: "brightness(50%)",
         },
         {
           tileUrl: (x, y, z) =>
@@ -37,7 +37,7 @@ export default class OsmTilesVis extends Visualization {
         },
         {
           tileUrl: (x, y, z) =>
-            `https://tilecache.rainviewer.com/v2/radar/1595103600/256/${z}/${x}/${y}/4/1_1.png`,
+            `https://tilecache.rainviewer.com/v2/radar/1595180400/256/${z}/${x}/${y}/4/1_1.png`,
           visible: true,
           filter: "opacity(60%)",
         },
@@ -52,7 +52,7 @@ export default class OsmTilesVis extends Visualization {
     camera
       .setMode(TrackballMode.Compass)
       .setGlobalOrbitRadius(1000)
-      .setZoomBounds(new Range(0.5, this.maxZoom))
+      .setZoomBounds(new Range(0.1, this.maxZoom))
       .setGlobalOrbitBounds(
         new Range(GeoPosition.fromDeg(-85, -180), GeoPosition.fromDeg(85, 180))
       )

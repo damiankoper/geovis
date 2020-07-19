@@ -3,27 +3,57 @@ import { SphereBufferGeometry, TextureLoader, NearestFilter } from "three";
 import { TileTreeNode } from "./TileTreeNode";
 import { TileLayerConfig } from "./TileLayerConfig";
 import TilePainterWorker from "worker-loader!./TilePainter.worker";
-
+import { PaintTileLayersMessageData } from "./TilePainter.worker";
+import _ from "lodash";
+import bgTile from "@/assets/textures/tile_bg.png";
 export class TilesService {
   public thetaShift = THREE.MathUtils.degToRad(90 - 85.0511);
   public thetaBound = THREE.MathUtils.degToRad(85.0511);
   public geometryMap = new Map<number, Map<number, SphereBufferGeometry>>();
+  public bgTile = new THREE.ImageLoader().load(bgTile);
   public tileSize = 256;
 
-  public tileTreeRoot = new TileTreeNode(this, 0, 0, 0);
-
   public tilePainter = new TilePainterWorker();
+  public canvasDrawnHandlerMap = new Map<
+    string,
+    (message: MessageEvent) => void
+  >();
+
+  public tileTreeRoot = new TileTreeNode(this, 0, 0, 0);
 
   constructor(
     public readonly layers: TileLayerConfig[] = [],
     public readonly r: number = 6371
-  ) {}
+  ) {
+    this.tilePainter.onmessage = (message) => {
+      const handler = this.canvasDrawnHandlerMap.get(message.data.tileKey);
+      if (handler) {
+        handler(message);
+      }
+    };
+  }
 
   createCanvas() {
     const canvas = document.createElement("canvas");
     canvas.width = this.tileSize;
     canvas.height = this.tileSize;
+    const ctx = canvas.getContext("2d");
+    if (ctx) ctx.drawImage(this.bgTile, 0, 0);
     return canvas;
+  }
+
+  requestCanvasDraw(tile: TileTreeNode) {
+    const data: PaintTileLayersMessageData = {
+      layers: this.layers.map((layer) => {
+        const l = _.cloneDeep(layer);
+        if (typeof l.tileUrl === "function")
+          l.tileUrl = l.tileUrl(tile.x, tile.y, tile.zoom);
+        return l;
+      }),
+      name: "paintTileLayers",
+      tileKey: tile.key,
+    };
+    this.tilePainter.postMessage(data);
   }
 
   phiStart(x: number, zoom: number) {

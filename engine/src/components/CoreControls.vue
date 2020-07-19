@@ -88,12 +88,12 @@ export default class CoreControls extends Vue {
     this.northAngleEvent = this.camera.onNorthAngleChange.sub(
       _.throttle((e, angle) => {
         this.northAngle = angle;
-      }, 1000 / 30)
+      }, 1000 / 7)
     );
     this.globalOrbitChange = this.camera.onGlobalOrbitChange.sub(
       _.throttle((e, orbit) => {
         this.globalOrbitPosition = orbit.getGeoPosition();
-      }, 1000 / 100)
+      }, 1000 / 7)
     );
   }
 
