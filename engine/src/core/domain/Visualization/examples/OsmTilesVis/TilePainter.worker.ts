@@ -1,5 +1,7 @@
 import { TileLayerConfig } from "./TileLayerConfig";
 import * as THREE from "three";
+import PQueue from "p-queue";
+import delay from "delay";
 interface TileKey {
   tileKey: string;
 }
@@ -7,6 +9,7 @@ interface TileKey {
 export interface PaintTileLayersMessageData extends TileKey {
   name: "paintTileLayers";
   layers: TileLayerConfig[];
+  priority: number;
 }
 
 class TilePainter {
@@ -15,6 +18,8 @@ class TilePainter {
   offscreen = new OffscreenCanvas(256, 256);
   loader = new THREE.FileLoader();
   tileCache = new Map<string, Blob>();
+
+  queue = new PQueue({ concurrency: navigator.hardwareConcurrency * 2 });
 
   constructor() {
     this.ctx.onmessage = this.onMessage.bind(this);
@@ -25,7 +30,10 @@ class TilePainter {
     switch (event.data.name) {
       case "paintTileLayers": {
         const data = event.data as PaintTileLayersMessageData;
-        await this.paintTileLayers(data);
+
+        this.queue.add(() => this.paintTileLayers(data), {
+          priority: data.priority,
+        });
         break;
       }
       default:

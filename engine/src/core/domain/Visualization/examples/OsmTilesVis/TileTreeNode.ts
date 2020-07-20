@@ -24,7 +24,12 @@ export class TileTreeNode {
   positionCenter: GeoPosition;
 
   getTilesDistance(desiredZoom: number) {
-    if (this.zoom === desiredZoom) return 4;
+    if (this.zoom > desiredZoom - 3) return 4;
+
+    if (this.zoom === 1) return 2;
+    if (this.zoom === 2) return 3;
+    if (this.zoom === 4) return 4;
+
     return 2;
   }
 
@@ -80,14 +85,14 @@ export class TileTreeNode {
 
     if (this.zoom === desiredZoom) {
       if (visibleByTileDistance) {
-        this.showTile(group);
+        this.showTile(camera, group);
         propagateUpper = true;
       }
     } else {
       this.children
         .map((c) => c.calcDeep(camera, group, desiredZoom))
         .forEach((showDeeper, i) => {
-          if (!showDeeper) this.children[i].showTile(group);
+          if (!showDeeper) this.children[i].showTile(camera, group);
           else propagateUpper = true;
         });
     }
@@ -99,21 +104,23 @@ export class TileTreeNode {
     return propagateUpper;
   }
 
-  showTile(group: THREE.Group) {
-    if (!this.tilesDrawRequested) {
-      this.tilesDrawRequested = true;
-      this.service.requestCanvasDraw(this);
-    }
+  showTile(camera: TrackballCamera, group: THREE.Group) {
+    if (this.isVisibleByAngle(camera, (Math.PI / 2) * 0.8)) {
+      if (!this.tilesDrawRequested) {
+        this.tilesDrawRequested = true;
+        this.service.requestCanvasDraw(this, this.tileDistance(camera));
+      }
 
-    if (!this.mesh) {
-      this.mesh = new THREE.Mesh(this.geometry, this.material);
-      this.mesh.matrixAutoUpdate = false;
-      this.mesh.rotateY(this.service.phiStart(this.x, this.zoom));
-      this.mesh.updateMatrix();
-      this.mesh.renderOrder = this.zoom;
-      group.add(this.mesh);
+      if (!this.mesh) {
+        this.mesh = new THREE.Mesh(this.geometry, this.material);
+        this.mesh.matrixAutoUpdate = false;
+        this.mesh.rotateY(this.service.phiStart(this.x, this.zoom));
+        this.mesh.updateMatrix();
+        this.mesh.renderOrder = this.zoom;
+        group.add(this.mesh);
+      }
     }
-    this.mesh.visible = true;
+    if (this.mesh) this.mesh.visible = true;
     this.hideSubtree();
   }
 
@@ -155,6 +162,10 @@ export class TileTreeNode {
   }
 
   isVisibleByTileDistance(camera: TrackballCamera, manhattanDistance: number) {
+    return this.tileDistance(camera) <= manhattanDistance;
+  }
+
+  tileDistance(camera: TrackballCamera) {
     const pos = camera.getGlobalOrbitPosition();
     const tileX = this.service.long2tile(pos.long, this.zoom);
     const tileY = this.service.lat2tile(pos.lat, this.zoom);
@@ -166,7 +177,24 @@ export class TileTreeNode {
     if (x > tiles / 2) x = tiles - x;
     if (y > tiles / 2) y = tiles - y;
 
-    return new THREE.Vector2(x, y).manhattanLength() <= manhattanDistance;
+    return new THREE.Vector2(x, y).manhattanLength();
+  }
+
+  isVisibleByAngle(camera: TrackballCamera, angle: number) {
+    const R = camera.getGlobalOrbitRadius();
+    const RE = R + camera.getLocalOrbitRadius();
+    const calcAngle = camera
+      .getGlobalOrbit()
+      .getVectorPointingAt(this.positionCenter)
+      .angleTo(new THREE.Vector3(0, 0, 1));
+
+    const distance = Math.sqrt(
+      R ** 2 + RE ** 2 - 2 * R * RE * Math.cos(calcAngle)
+    );
+    const sinY = (R * Math.sin(calcAngle)) / distance;
+    const Y = Math.asin(sinY);
+    const B = Math.PI - Y - calcAngle;
+    return B >= angle;
   }
 
   generateChildren() {
@@ -194,8 +222,8 @@ export class TileTreeNode {
               tileSize,
               tileSize
             );
-            this.children.push(tile);
           }
+          this.children.push(tile);
         }
       }
   }

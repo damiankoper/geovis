@@ -5,7 +5,11 @@ import OsmTilesVis from "@/core/domain/Visualization/examples/OsmTilesVis/OsmTil
 import Vuetify, { VApp } from "vuetify/lib";
 import Vue from "vue";
 import "@mdi/font/css/materialdesignicons.css";
-
+import addons from "@storybook/addons";
+addons.setConfig({
+  showPanel: false,
+  panelPosition: "right",
+});
 Vue.use(Vuetify, {
   components: {
     VApp,
@@ -14,6 +18,7 @@ Vue.use(Vuetify, {
 export default {
   title: "OsmTilesVis",
   component: GeoVisCore,
+  options: { showPanel: false },
   decorators: [
     () => ({
       vuetify: new Vuetify({}),

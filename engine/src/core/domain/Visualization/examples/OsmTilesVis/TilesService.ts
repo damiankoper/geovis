@@ -42,7 +42,7 @@ export class TilesService {
     return canvas;
   }
 
-  requestCanvasDraw(tile: TileTreeNode) {
+  requestCanvasDraw(tile: TileTreeNode, tileDistance: number) {
     const data: PaintTileLayersMessageData = {
       layers: this.layers.map((layer) => {
         const l = _.cloneDeep(layer);
@@ -52,7 +52,9 @@ export class TilesService {
       }),
       name: "paintTileLayers",
       tileKey: tile.key,
+      priority: tile.zoom - tileDistance,
     };
+
     this.tilePainter.postMessage(data);
   }
 
