@@ -37,7 +37,7 @@ export default class OsmTilesVis extends Visualization {
         },
         {
           tileUrl: (x, y, z) =>
-            `https://tilecache.rainviewer.com/v2/radar/1595180400/256/${z}/${x}/${y}/4/1_1.png`,
+            `https://tilecache.rainviewer.com/v2/radar/1595672400/256/${z}/${x}/${y}/4/1_1.png`,
           visible: true,
           filter: "opacity(60%)",
         },

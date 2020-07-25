@@ -125,6 +125,12 @@ export class TileTreeNode {
   }
 
   hideTile() {
+    /*     if (this.mesh?.visible) {
+      this.service.tilePainter.postMessage({
+        name: "abortTile",
+        tileKey: this.key,
+      });
+    } */
     if (this.mesh) this.mesh.visible = false;
   }
 
@@ -155,6 +161,10 @@ export class TileTreeNode {
 
   destroy(group: THREE.Group) {
     if (this.mesh) group.remove(this.mesh);
+    this.service.tilePainter.postMessage({
+      name: "abortTile",
+      tileKey: this.key,
+    });
     this.geometry.dispose();
     this.material.map?.dispose();
     this.material.dispose();

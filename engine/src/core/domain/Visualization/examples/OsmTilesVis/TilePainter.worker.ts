@@ -12,12 +12,17 @@ export interface PaintTileLayersMessageData extends TileKey {
   priority: number;
 }
 
+export interface AbortTileMessageData extends TileKey {
+  name: "abortTile";
+}
+
 class TilePainter {
   // eslint-disable-next-line
   ctx: Worker = self as any;
   offscreen = new OffscreenCanvas(256, 256);
   loader = new THREE.FileLoader();
   tileCache = new Map<string, Blob>();
+  abortControllers = new Map<string, AbortController>();
 
   queue = new PQueue({ concurrency: navigator.hardwareConcurrency * 2 });
 
@@ -30,46 +35,56 @@ class TilePainter {
     switch (event.data.name) {
       case "paintTileLayers": {
         const data = event.data as PaintTileLayersMessageData;
-
         this.queue.add(() => this.paintTileLayers(data), {
           priority: data.priority,
         });
         break;
       }
+      case "abortTile":
+        const data = event.data as AbortTileMessageData;
+        this.abortControllers.get(data.tileKey)?.abort();
+        break;
       default:
         console.warn("Unknown message name");
     }
   }
 
   async paintTileLayers(data: PaintTileLayersMessageData) {
+    let abortController =
+      this.abortControllers.get(data.tileKey) || new AbortController();
+    this.abortControllers.set(data.tileKey, abortController);
+
     const cacheBlob = this.tileCache.get(data.tileKey);
     if (cacheBlob) {
       const image = await createImageBitmap(cacheBlob);
       this.ctx.postMessage({ tileKey: data.tileKey, image }, [image]);
     } else {
-      const images = [];
-      for (const layer in data.layers) {
-        const url = data.layers[layer].tileUrl as string;
-        images.push(await this.createBitmap(url));
-      }
+      try {
+        const images = await Promise.all(
+          data.layers.map((layer) => {
+            const url = layer.tileUrl as string;
+            return this.createBitmap(url, abortController.signal);
+          })
+        );
 
-      const ctx = this.offscreen.getContext("2d", { alpha: false });
-      if (ctx)
-        for (let i = 0; i < data.layers.length; i++) {
-          ctx.filter = data.layers[i].filter || "none";
-          ctx.drawImage(images[i], 0, 0);
-        }
+        const ctx = this.offscreen.getContext("2d", { alpha: false });
+        if (ctx)
+          for (let i = 0; i < data.layers.length; i++) {
+            ctx.filter = data.layers[i].filter || "none";
+            ctx.drawImage(images[i], 0, 0);
+          }
 
-      this.offscreen
-        .convertToBlob()
-        .then((blob) => this.tileCache.set(data.tileKey, blob));
-      const image = this.offscreen.transferToImageBitmap();
-      this.ctx.postMessage({ tileKey: data.tileKey, image }, [image]);
+        this.offscreen
+          .convertToBlob()
+          .then((blob) => this.tileCache.set(data.tileKey, blob));
+        const image = this.offscreen.transferToImageBitmap();
+        this.ctx.postMessage({ tileKey: data.tileKey, image }, [image]);
+      } catch (e) {}
     }
   }
 
-  async createBitmap(url: string) {
-    const imgData = await fetch(url).then((r) => r.blob());
+  async createBitmap(url: string, signal: AbortSignal) {
+    const imgData = await fetch(url, { signal }).then((r) => r.blob());
     return createImageBitmap(imgData);
   }
 }

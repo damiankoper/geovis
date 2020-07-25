@@ -1,7 +1,7 @@
 import Vue, { VNode } from "vue";
 
 declare global {
-   /*   namespace JSX {
+  /*   namespace JSX {
     // tslint:disable no-empty-interface
     interface Element extends VNode {}
     // tslint:disable no-empty-interface
@@ -9,7 +9,6 @@ declare global {
     interface IntrinsicElements {
       [elem: string]: any;
     } */
-  }
 
   interface Window {
     ResizeObserver: ResizeObserver;
