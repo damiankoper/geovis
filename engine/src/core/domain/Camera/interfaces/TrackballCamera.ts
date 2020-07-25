@@ -16,6 +16,11 @@ export default interface TrackballCamera {
   getGlobalOrbit(): Orbit;
 
   /**
+   * Get local orbit object,
+   */
+  getLocalOrbit(): Orbit;
+
+  /**
    * Set the distance between the center of the stage and the point the camera is looking at,
    * @param radius
    */

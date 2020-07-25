@@ -7,8 +7,10 @@ import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
 import earthMap from "@/assets/textures/8k_earth_daymap.jpg";
 import earthNormalMap from "@/assets/textures/8k_earth_normal_map.jpg";
 import earthSpecularMap from "@/assets/textures/8k_earth_specular_map.jpg";
+import earthCloudsMap from "@/assets/textures/8k_earth_clouds.jpg";
 import StarsVis from "@/core/domain/Visualization/examples/StarsVis/StarsVis";
 import SphereVisControls from "./SphereVisControls.vue";
+import AtmosphereVis from "../AtmosphereVis/AtmosphereVis";
 /**
  * @category VisualizationExamples
  */
@@ -17,13 +19,14 @@ export default class SphereVis extends Visualization {
   constructor() {
     super();
     this.addParent(new StarsVis());
+    this.addParent(new AtmosphereVis());
   }
 
   setupCamera(camera: TrackballCamera): void {
     this.camera = camera;
     camera
       //.setMode(TrackballMode.Compass)
-      .setZoomBounds(new Range(0.001, 20000))
+      .setZoomBounds(new Range(1000, 20000))
       .setGlobalOrbitBounds(
         new Range(GeoPosition.fromDeg(-85, -180), GeoPosition.fromDeg(85, 180))
       );
@@ -45,6 +48,18 @@ export default class SphereVis extends Visualization {
 
     sphereMesh.matrixAutoUpdate = false;
     group.add(sphereMesh);
+
+    const sphereClouds = new THREE.SphereGeometry(r + 4, 100, 100);
+    sphereClouds.rotateY(-Math.PI / 2);
+    const sphereCloudsMaterial = new THREE.MeshPhongMaterial({
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+    });
+    sphereCloudsMaterial.map = new THREE.TextureLoader().load(earthCloudsMap);
+    const sphereCloudMesh = new THREE.Mesh(sphereClouds, sphereCloudsMaterial);
+
+    sphereCloudMesh.matrixAutoUpdate = false;
+    group.add(sphereCloudMesh);
 
     const testBoxes = [
       new THREE.BoxBufferGeometry(0.001, 0.001, 0.001),

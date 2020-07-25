@@ -279,6 +279,10 @@ export default class TrackballController implements TrackballCamera {
   getGlobalOrbit() {
     return this.globalOrbit;
   }
+  /** @inheritdoc */
+  getLocalOrbit() {
+    return this.localOrbit;
+  }
 
   /** @inheritdoc */
   getGlobalOrbitRadius() {

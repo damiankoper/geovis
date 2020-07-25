@@ -40,17 +40,18 @@ class TilePainter {
         });
         break;
       }
-      case "abortTile":
+      case "abortTile": {
         const data = event.data as AbortTileMessageData;
         this.abortControllers.get(data.tileKey)?.abort();
         break;
+      }
       default:
         console.warn("Unknown message name");
     }
   }
 
   async paintTileLayers(data: PaintTileLayersMessageData) {
-    let abortController =
+    const abortController =
       this.abortControllers.get(data.tileKey) || new AbortController();
     this.abortControllers.set(data.tileKey, abortController);
 
@@ -79,7 +80,9 @@ class TilePainter {
           .then((blob) => this.tileCache.set(data.tileKey, blob));
         const image = this.offscreen.transferToImageBitmap();
         this.ctx.postMessage({ tileKey: data.tileKey, image }, [image]);
-      } catch (e) {}
+      } catch (e) {
+        ///
+      }
     }
   }
 
