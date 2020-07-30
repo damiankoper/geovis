@@ -7,7 +7,7 @@ import { VueConstructor } from "vue/types/umd";
  * @category VisualizationBase
  */
 export default abstract class Visualization {
-  private parents: Visualization[] = [];
+  public parents: Visualization[] = [];
 
   /**
    * @param scene Root container. Good to set static lights in.

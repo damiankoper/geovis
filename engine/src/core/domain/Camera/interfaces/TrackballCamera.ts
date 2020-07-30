@@ -16,9 +16,19 @@ export default interface TrackballCamera {
   getGlobalOrbit(): Orbit;
 
   /**
+   * Refresh transform matrix
+   */
+  refreshGlobalOrbit(): void;
+
+  /**
    * Get local orbit object,
    */
   getLocalOrbit(): Orbit;
+
+  /**
+   * Refresh transform matrix - camera position
+   */
+  refreshLocalOrbit(): void;
 
   /**
    * Set the distance between the center of the stage and the point the camera is looking at,

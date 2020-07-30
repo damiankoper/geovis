@@ -1,10 +1,8 @@
 #define M_PI 3.1415926535897932384626433832795
 
 uniform vec3 viewVector;
-uniform float start;
 uniform float stop;
 uniform float fadeOut;
-uniform float light;
 uniform float power;
 varying float intensity;
 
@@ -23,29 +21,17 @@ void main() {
 
   intensity = 0.;
 
-  float start = M_PI * start;
   float stop = M_PI * stop;
-  float fadeOut = M_PI * fadeOut;
   float dotP = dot(vNormal, vNormalView);
   float angle = acos(dotP);
 
-  if (angle > start && angle < start + fadeOut) {
-    float g = (start - angle + fadeOut) / fadeOut;
-    intensity = easeInOut(g);
-  } else if (angle <= start && angle >= stop) {
-    intensity = 1.;
-  } else if (angle < stop && angle > stop - fadeOut) {
-    float g = (-stop + angle + fadeOut) / fadeOut;
-    intensity = easeInOut(g);
-  }
+  float g = 1. - ((stop - angle) / stop);
+  intensity = mix(g, easeInOut(g), fadeOut);
 
   float lightIntensity = 1.;
 #if NUM_DIR_LIGHTS > 0
   float dotL = dot(vNormal, directionalLights[0].direction);
-  float angleL = acos(dotL);
-  float light = M_PI * light;
-
-  lightIntensity = cos(angleL - light);
+  lightIntensity = dotL;
 #endif
 
   intensity = pow(max(0., min(1., intensity)), power) * lightIntensity;

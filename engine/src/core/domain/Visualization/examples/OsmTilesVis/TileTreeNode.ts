@@ -125,12 +125,6 @@ export class TileTreeNode {
   }
 
   hideTile() {
-    /*     if (this.mesh?.visible) {
-      this.service.tilePainter.postMessage({
-        name: "abortTile",
-        tileKey: this.key,
-      });
-    } */
     if (this.mesh) this.mesh.visible = false;
   }
 
