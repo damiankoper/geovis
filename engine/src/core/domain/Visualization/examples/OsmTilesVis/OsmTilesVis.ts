@@ -9,6 +9,7 @@ import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
 import { TilesService } from "./TilesService";
 import * as PerfMarks from "perf-marks";
 import _ from "lodash";
+import AtmosphereVis from "../AtmosphereVis/AtmosphereVis";
 /**
  * @category VisualizationExamples
  */
@@ -21,15 +22,16 @@ export default class OsmTilesVis extends Visualization {
   constructor() {
     super();
     this.addParent(new StarsVis());
+    this.addParent(new AtmosphereVis(1000, 80));
     this.osmTilesService = new TilesService(
       [
         {
           tileUrl: (x, y, z) =>
             `https://tile.openstreetmap.org/${z}/${x}/${y}.png`,
           visible: true,
-          filter: "brightness(50%)",
+          filter: "brightness(100%)",
         },
-        {
+        /* {
           tileUrl: (x, y, z) =>
             `https://tilecache.rainviewer.com/v2/coverage/0/256/${z}/${x}/${y}.png`,
           visible: true,
@@ -37,11 +39,11 @@ export default class OsmTilesVis extends Visualization {
         },
         {
           tileUrl: (x, y, z) =>
-            //  `https://tilecache.rainviewer.com/v2/radar/1595672400/256/${z}/${x}/${y}/4/1_1.png`,
-            `https://weather.openportguide.de/tiles/actual/wind_stream/0h/${z}/${x}/${y}.png`,
+            `https://tilecache.rainviewer.com/v2/radar/1595672400/256/${z}/${x}/${y}/4/1_1.png`,
+            //`https://weather.openportguide.de/tiles/actual/wind_stream/0h/${z}/${x}/${y}.png`,
           visible: true,
           filter: "opacity(60%)",
-        },
+        }, */
       ],
       1000
     );
@@ -63,6 +65,7 @@ export default class OsmTilesVis extends Visualization {
 
   setupScene(scene: THREE.Scene, group: THREE.Group): void {
     this.group = group;
+    this.group.renderOrder = 50;
     this.group.add(this.sphereGroup);
 
     if (this.camera) {
@@ -78,7 +81,7 @@ export default class OsmTilesVis extends Visualization {
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
     scene.add(directionalLight);
-    directionalLight.position.set(0, 0, 1);
+    directionalLight.position.set(0, 0, 10000);
   }
 
   private calcTiles(camera: TrackballCamera) {

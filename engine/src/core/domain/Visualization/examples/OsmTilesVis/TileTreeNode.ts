@@ -11,7 +11,6 @@ export class TileTreeNode {
 
   material = new THREE.MeshPhongMaterial({
     shininess: 5,
-    depthWrite: false,
     map: new CanvasTexture(this.canvas),
   });
 
@@ -215,7 +214,7 @@ export class TileTreeNode {
           const tileSize = this.service.tileSize;
           const tileSizeDv = tileSize / 2;
           if (tile.canvasCtx) {
-            tile.canvasCtx.drawImage(
+            /*  tile.canvasCtx.drawImage(
               this.canvas,
               tileSizeDv * x,
               tileSizeDv * y,
@@ -225,7 +224,7 @@ export class TileTreeNode {
               0,
               tileSize,
               tileSize
-            );
+            ); */
           }
           this.children.push(tile);
         }

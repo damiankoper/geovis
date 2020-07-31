@@ -44,10 +44,9 @@ export default class SphereVis extends Visualization {
   }
 
   setupScene(scene: THREE.Scene, group: THREE.Group): void {
-    group.renderOrder = 50;
     const r = 6371;
 
-    const sphere = new THREE.SphereGeometry(r, 100, 100);
+    const sphere = new THREE.SphereGeometry(r, 200, 200);
     sphere.rotateY(-Math.PI / 2);
     const sphereMaterial = new THREE.MeshPhongMaterial({
       map: new THREE.TextureLoader().load(earthMap),
@@ -93,7 +92,6 @@ export default class SphereVis extends Visualization {
     };
 
     this.mesh = new THREE.Mesh(sphere, sphereMaterial);
-
     this.mesh.renderOrder = 11;
     group.add(this.mesh);
 
@@ -102,8 +100,8 @@ export default class SphereVis extends Visualization {
     const sphereCloudsMaterial = new THREE.MeshPhongMaterial({
       transparent: true,
       blending: THREE.AdditiveBlending,
+      map: new THREE.TextureLoader().load(earthCloudsMap),
     });
-    sphereCloudsMaterial.map = new THREE.TextureLoader().load(earthCloudsMap);
     this.cloudMesh = new THREE.Mesh(sphereClouds, sphereCloudsMaterial);
     this.cloudMesh.renderOrder = 10;
     group.add(this.cloudMesh);
@@ -113,25 +111,30 @@ export default class SphereVis extends Visualization {
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     group.add(directionalLight);
-    directionalLight.position.set(0, 0, 10000);
+    directionalLight.position.set(
+      0,
+      0,
+      10000
+    ) /*
+      .applyAxisAngle(new Vector3(1, 0, 0), THREE.MathUtils.degToRad(23.4393)) */;
     group.add(directionalLight.target);
   }
 
   update(deltaFactor: number): void {
-    console.log(deltaFactor);
+    /*    console.log(deltaFactor);
 
     const q1 = new Quaternion().setFromAxisAngle(
       new Vector3(0, 1, 0),
-      0.009 * deltaFactor
+      -0.009 * deltaFactor
     );
-    const q2 = new Quaternion().setFromAxisAngle(
+        const q2 = new Quaternion().setFromAxisAngle(
       new Vector3(0, 1, 0),
-      -0.01 * deltaFactor
+      0.01 * deltaFactor
     );
     this.mesh?.applyQuaternion(q1);
     this.cloudMesh?.applyQuaternion(q1);
-    this.camera?.getGlobalOrbit().applyQuaternion(q2);
-    this.camera?.refreshGlobalOrbit();
+    //this.camera?.getGlobalOrbit().applyQuaternion(q2);
+    this.camera?.refreshGlobalOrbit(); */
   }
 
   destroy(): void {

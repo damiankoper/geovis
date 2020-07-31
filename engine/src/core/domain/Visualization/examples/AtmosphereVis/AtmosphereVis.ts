@@ -5,6 +5,7 @@ import Vue from "vue";
 import vertexShader from "./atm.vs";
 import vertexGroundShader from "./atmGround.vs";
 import fragmentShader from "./atm.fs";
+import fragmentGroundShader from "./atmGround.fs";
 import { Vector3, MeshBasicMaterial, Quaternion } from "three";
 import * as d3 from "d3-ease";
 /**
@@ -33,7 +34,7 @@ export default class AtmosphereVis extends Visualization {
 
   public atmosphereGroundMaterial = new THREE.ShaderMaterial({
     vertexShader: vertexGroundShader,
-    fragmentShader: fragmentShader,
+    fragmentShader: fragmentGroundShader,
     uniforms: {
       start: { value: 1 },
       stop: { value: 0.6 },
