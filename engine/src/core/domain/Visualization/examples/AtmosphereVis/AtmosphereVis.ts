@@ -60,7 +60,7 @@ export default class AtmosphereVis extends Visualization {
     this.atmoSphereGround = new THREE.SphereBufferGeometry(G, 601, 601);
     Object.seal(this);
   }
-
+  //xddd
   setupCamera(camera: TrackballCamera): void {
     this.camera = camera;
     camera.setGlobalOrbitRadius(this.G).setLocalOrbitRadius(this.GT);
@@ -83,10 +83,7 @@ export default class AtmosphereVis extends Visualization {
     const globalOrbit = this.camera?.getGlobalOrbit();
     const localOrbit = this.camera?.getLocalOrbit();
     if (globalOrbit && localOrbit) {
-      const GL = new Vector3().addVectors(
-        localOrbit.v,
-        new Vector3(0, 0, this.G)
-      );
+      const GL = new Vector3(0, 0, this.G).add(localOrbit.v);
       const GLNormalized = GL.clone().normalize();
       this.atmosphereMaterial.uniforms.viewVector.value = GLNormalized;
       this.atmosphereGroundMaterial.uniforms.viewVector.value = GLNormalized;

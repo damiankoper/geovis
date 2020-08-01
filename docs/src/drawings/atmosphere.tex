@@ -2,8 +2,8 @@
 \setlength{\gRadius}{3cm}
 \newlength{\atmThickness}
 \setlength{\atmThickness}{1cm}
-\begin{tikzpicture}[scale=1.5]
 
+\begin{tikzpicture}[scale=1.5]
     \coordinate (G) at (65:\gRadius);
     \coordinate (GT) at (65:\gRadius+\atmThickness);
     \coordinate (camera) at (90:\gRadius + \atmThickness + 1cm);
@@ -14,13 +14,17 @@
 
     \draw[thick] circle (\gRadius);
     \draw[thick,dashed] circle (\gRadius+\atmThickness);
-    \draw[red, fill=red] (0,5cm) circle (5pt);
+    \draw[fill] (camera) circle (1pt) node[above,right] {$C$};
     \draw[->] (center) -- (camera) node[midway,above,sloped] {\tiny$\vec G + \vec L$};
     \draw[->] (center) -- (G) node[midway,above,sloped] {\tiny$\vec G$};
     \draw[->] (G) -- (GT) node[midway,above,sloped] {\tiny$\vec T$};
     \draw[->] (G) -- (camera) node[midway,above,sloped] {\tiny$\vec L$};
     \draw[dashed] (camera) -- (atmTangent);
     \draw[dashed] (camera) -- (gTangent);
+
+    \draw[fill] (gTangent) circle (1pt) node[above,left] {$C_g$};
+    \draw[fill] (atmTangent) circle (1pt) node[above,left] {$C_{gt}$};
+    \draw[fill] (atmBackTangent) circle (1pt) node[above,left] {$C_{gtb}$};
 
     \draw[->] (center) -- (atmTangent) node[midway,below,sloped] {\tiny$\vec G + \vec T$ };
     \draw pic["$\alpha$",draw=blue,thick,blue, ->, angle eccentricity=1.2, angle radius = 1.3cm]  {angle=camera--center--atmTangent};

@@ -22,6 +22,9 @@ export default class EarthVis extends Visualization {
   camera: TrackballCamera | null = null;
   mesh: Mesh | null = null;
   cloudMesh: Mesh | null = null;
+  private nightMap: THREE.Texture = new THREE.TextureLoader().load(
+    earthNightMap
+  );
   private sphere = new THREE.SphereGeometry(this.r, 100, 100).rotateY(
     -Math.PI / 2
   );
@@ -31,7 +34,7 @@ export default class EarthVis extends Visualization {
     normalMap: new THREE.TextureLoader().load(earthNormalMap),
     shininess: 100,
   });
-  private sphereClouds = new THREE.SphereGeometry(this.r + 4, 50, 50).rotateY(
+  private sphereClouds = new THREE.SphereGeometry(this.r + 4, 100, 100).rotateY(
     -Math.PI / 2
   );
   private sphereCloudsMaterial = new THREE.MeshPhongMaterial({
@@ -39,13 +42,13 @@ export default class EarthVis extends Visualization {
     blending: THREE.AdditiveBlending,
     map: new THREE.TextureLoader().load(earthCloudsMap),
   });
-  private nightMap = new THREE.TextureLoader().load(earthNightMap);
+  private directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 
   constructor() {
     super();
     this.addParent(new StarsVis());
     this.addParent(new AtmosphereVis());
-    this.sphereMaterial.onBeforeCompile = this.modifyShader;
+    this.sphereMaterial.onBeforeCompile = this.modifyShader.bind(this);
     Object.seal(this);
   }
 
@@ -74,17 +77,15 @@ export default class EarthVis extends Visualization {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.01);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    group.add(directionalLight);
-    directionalLight.position
-      .set(0, 0, this.r * 4)
-      .applyAxisAngle(new Vector3(1, 0, 0), this.getSunDeclination())
-      .applyAxisAngle(new Vector3(0, 1, 0), this.getHourAngle());
-    group.add(directionalLight.target);
+    group.add(this.directionalLight);
+    group.add(this.directionalLight.target);
   }
 
   update(deltaFactor: number): void {
-    //
+    this.directionalLight.position
+      .set(0, 0, 10000)
+      .applyAxisAngle(new Vector3(1, 0, 0), this.getSunDeclination())
+      .applyAxisAngle(new Vector3(0, -1, 0), this.getHourAngle());
   }
 
   destroy(): void {
@@ -120,7 +121,7 @@ export default class EarthVis extends Visualization {
     const EOT = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
     const TC = 4 * (timeLong - LSTM) + EOT;
     const LST =
-      moment().diff(moment().startOf("day"), "minutes") / 60 + TC / 60;
+      moment.utc().diff(moment.utc().startOf("day"), "minutes") / 60 + TC / 60;
     const HRA = 15 * (LST - 12);
     return THREE.MathUtils.degToRad(HRA);
   }

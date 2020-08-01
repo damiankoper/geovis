@@ -1,6 +1,6 @@
 INFO: latexindent version 3.7.1, 2019-09-07, a script to indent .tex files
       latexindent lives here: /usr/share/texlive/texmf-dist/scripts/latexindent/
-      Sat Aug  1 17:07:10 2020
+      Sat Aug  1 21:16:02 2020
       Filename: /home/damian_koper/Documents/GitHub/geovis/docs/src/drawings/__latexindent_temp.tex
 INFO: Processing switches:
       -y|--yaml: YAML settings specified via command line
