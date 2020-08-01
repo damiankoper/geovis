@@ -77,6 +77,26 @@
 		%%{—}{{{\textemdash} }}1
 %%}%{\ \ }{{\ }}1}
 
+% \usepackage{physics}
+% \usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{quotes,babel,calc,patterns,angles}
+% \usepackage{mathdots}
+% \usepackage{yhmath}
+% \usepackage{cancel}
+% \usepackage{color}
+% \usepackage{siunitx}
+% \usepackage{array}
+% \usepackage{multirow}
+% \usepackage{amssymb}
+% \usepackage{gensymb}
+% \usepackage{tabularx}
+% \usepackage{booktabs}
+% \usetikzlibrary{patterns}
+% \usetikzlibrary{shadows.blur}
+% \usetikzlibrary{shapes}
+
+
 
 \newcommand{\listingcaption}[1]% added to handle captions of listings in two columns 
 {%
@@ -366,7 +386,7 @@ Listing \thelstlisting: #1\hfill%\hfill%
 %\pdftrue \fi
 \ifpdf
  \usepackage[pdftex,bookmarks,breaklinks,unicode]{hyperref}
- \usepackage[pdftex]{graphicx}
+% \usepackage[pdftex]{graphicx}
  \DeclareGraphicsExtensions{.pdf,.jpg,.mps,.png}
 \pdfcompresslevel=9
 \pdfoutput=1
@@ -648,7 +668,7 @@ SPECJALNOŚĆ: & \@specjalnosc\\
 \chapterstyle{noNumbered}  % Below there are declarations of various lists. Please comment out those which are too short (the list should contain at least 5 items)
 \pagestyle{outer}
 \mbox{}\pdfbookmark[0]{Table of contents}{spisTresci.1}
-\tableofcontents* 
+\tableofcontents*
 
 \newpage
 \mbox{}\pdfbookmark[0]{List of figures}{spisRysunkow.1}

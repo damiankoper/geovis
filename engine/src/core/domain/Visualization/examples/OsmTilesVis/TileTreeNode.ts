@@ -1,24 +1,23 @@
 import * as THREE from "three";
 import { TrackballCamera } from "@/GeoVisEngine";
-import { SphereBufferGeometry, Mesh, CanvasTexture } from "three";
 import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
 import { TilesService } from "./TilesService";
 import * as PerfMarks from "perf-marks";
 export class TileTreeNode {
   canvas: HTMLCanvasElement = this.service.createCanvas();
-  canvasCtx = this.canvas.getContext("2d");
+  canvasCtx = this.canvas.getContext("bitmaprenderer");
   tilesDrawRequested = false;
 
   material = new THREE.MeshPhongMaterial({
     shininess: 5,
-    map: new CanvasTexture(this.canvas),
+    map: new THREE.CanvasTexture(this.canvas),
   });
 
-  mesh?: Mesh;
+  mesh: THREE.Mesh | null = null;
 
   public readonly children: TileTreeNode[] = [];
 
-  geometry: SphereBufferGeometry;
+  geometry: THREE.SphereBufferGeometry;
   position: GeoPosition;
   positionCenter: GeoPosition;
 
@@ -56,11 +55,12 @@ export class TileTreeNode {
       this.key,
       this.onCanvasDraw.bind(this)
     );
+    Object.seal(this);
   }
 
   private onCanvasDraw(message: MessageEvent) {
     PerfMarks.start("onCanvasDraw");
-    this.canvasCtx?.drawImage(message.data.image, 0, 0);
+    this.canvasCtx?.transferFromImageBitmap(message.data.image);
     if (this.material.map) this.material.map.needsUpdate = true;
     PerfMarks.end("onCanvasDraw");
   }
@@ -113,8 +113,9 @@ export class TileTreeNode {
       if (!this.mesh) {
         this.mesh = new THREE.Mesh(this.geometry, this.material);
         this.mesh.matrixAutoUpdate = false;
-        this.mesh.rotateY(this.service.phiStart(this.x, this.zoom));
-        this.mesh.updateMatrix();
+        this.mesh.matrix = new THREE.Matrix4().makeRotationY(
+          this.service.phiStart(this.x, this.zoom)
+        );
         this.mesh.renderOrder = this.zoom;
         group.add(this.mesh);
       }

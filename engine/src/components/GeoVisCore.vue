@@ -50,6 +50,8 @@ export default class GeoVisCoreVue extends Vue {
   }
 
   destroyed() {
+    console.log("Vue destroyed");
+
     if (this.geoVisCore) this.geoVisCore.destroy();
   }
 

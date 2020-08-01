@@ -19,6 +19,7 @@
     "d3-ease": "^1.0.6",
     "delay": "^4.4.0",
     "lodash": "^4.17.15",
+    "moment": "^2.27.0",
     "p-queue": "^6.6.0",
     "perf-marks": "^1.8.1",
     "strongly-typed-events": "^1.6.12",

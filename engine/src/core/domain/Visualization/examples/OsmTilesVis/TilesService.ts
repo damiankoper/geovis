@@ -31,14 +31,17 @@ export class TilesService {
         handler(message);
       }
     };
+    Object.seal(this);
   }
 
   createCanvas() {
     const canvas = document.createElement("canvas");
     canvas.width = this.tileSize;
     canvas.height = this.tileSize;
-    const ctx = canvas.getContext("2d");
-    if (ctx) ctx.drawImage(this.bgTile, 0, 0);
+    createImageBitmap(this.bgTile).then((bitmap) => {
+      const ctx = canvas.getContext("bitmaprenderer");
+      if (ctx) ctx.transferFromImageBitmap(bitmap);
+    });
     return canvas;
   }
 

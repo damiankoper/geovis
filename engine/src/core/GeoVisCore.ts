@@ -38,7 +38,7 @@ export default class GeoVisCore {
       this.renderer.domElement
     );
 
-    // Do not allow Vue to set reactivity here and deeper
+    //   Do not allow Vue to set reactivity here and deeper
     Object.seal(this);
   }
 
@@ -52,7 +52,7 @@ export default class GeoVisCore {
 
   public run(visualization: Visualization) {
     this.scene.dispose();
-    if (this.visualization) this.visualization.destroy();
+    if (this.visualization) this.visualization._destroy();
 
     this.visualization = visualization;
     this.visualization._setup(this.scene, this.group, this.cameraController);
@@ -62,6 +62,8 @@ export default class GeoVisCore {
   public destroy() {
     this.destroyRequested = true;
     this.cameraController.destroy();
+    this.visualization?._destroy();
+    this.scene.dispose();
   }
 
   private _run() {

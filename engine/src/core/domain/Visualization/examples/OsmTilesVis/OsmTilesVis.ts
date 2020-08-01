@@ -18,11 +18,11 @@ export default class OsmTilesVis extends Visualization {
   group: THREE.Group | null = null;
   sphereGroup = new THREE.Group();
   osmTilesService: TilesService;
-  maxZoom = 2000;
+  maxZoom = 200;
   constructor() {
     super();
     this.addParent(new StarsVis());
-    this.addParent(new AtmosphereVis(1000, 80));
+    this.addParent(new AtmosphereVis(100, 8));
     this.osmTilesService = new TilesService(
       [
         {
@@ -45,7 +45,7 @@ export default class OsmTilesVis extends Visualization {
           filter: "opacity(60%)",
         }, */
       ],
-      1000
+      100
     );
     Object.seal(this);
   }
@@ -54,7 +54,7 @@ export default class OsmTilesVis extends Visualization {
     this.camera = camera;
     camera
       .setMode(TrackballMode.Compass)
-      .setGlobalOrbitRadius(1000)
+      .setGlobalOrbitRadius(100)
       .setZoomBounds(new Range(0.1, this.maxZoom))
       .setGlobalOrbitBounds(
         new Range(GeoPosition.fromDeg(-85, -180), GeoPosition.fromDeg(85, 180))

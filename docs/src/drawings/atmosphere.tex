@@ -1,0 +1,39 @@
+\newlength{\gRadius}
+\setlength{\gRadius}{3cm}
+\newlength{\atmThickness}
+\setlength{\atmThickness}{1cm}
+\begin{tikzpicture}[scale=1.5]
+
+    \coordinate (G) at (65:\gRadius);
+    \coordinate (GT) at (65:\gRadius+\atmThickness);
+    \coordinate (camera) at (90:\gRadius + \atmThickness + 1cm);
+    \coordinate (center) at (90:0);
+    \coordinate (atmTangent) at (126.869897646:\gRadius + \atmThickness);
+    \coordinate (gTangent) at (143.130102354:\gRadius);
+    \coordinate (atmBackTangent) at (184.539722109:\gRadius + \atmThickness);
+
+    \draw[thick] circle (\gRadius);
+    \draw[thick,dashed] circle (\gRadius+\atmThickness);
+    \draw[red, fill=red] (0,5cm) circle (5pt);
+    \draw[->] (center) -- (camera) node[midway,above,sloped] {\tiny$\vec G + \vec L$};
+    \draw[->] (center) -- (G) node[midway,above,sloped] {\tiny$\vec G$};
+    \draw[->] (G) -- (GT) node[midway,above,sloped] {\tiny$\vec T$};
+    \draw[->] (G) -- (camera) node[midway,above,sloped] {\tiny$\vec L$};
+    \draw[dashed] (camera) -- (atmTangent);
+    \draw[dashed] (camera) -- (gTangent);
+
+    \draw[->] (center) -- (atmTangent) node[midway,below,sloped] {\tiny$\vec G + \vec T$ };
+    \draw pic["$\alpha$",draw=blue,thick,blue, ->, angle eccentricity=1.2, angle radius = 1.3cm]  {angle=camera--center--atmTangent};
+    \draw pic["$\cdot$",draw, -, angle eccentricity=0.5, angle radius = 0.4cm]  {angle=center--atmTangent--camera};
+
+    \draw[->] (center) -- (gTangent) node[midway,below,sloped] {\tiny$\vec G$ };
+    \draw pic["$\beta$",draw=orange,thick,orange, ->, angle eccentricity=1.2, angle radius = 1.8cm]  {angle=camera--center--gTangent};
+    \draw pic["$\cdot$",draw, -, angle eccentricity=0.5, angle radius = 0.4cm]  {angle=center--gTangent--camera};
+
+    \draw[dashed] (gTangent) -- (atmBackTangent);
+    \draw pic["$\cdot$",draw, -, angle eccentricity=0.5, angle radius = 0.4cm]  {angle=atmBackTangent--gTangent--center};
+    \draw pic["$\gamma$",draw=red,thick,red, ->, angle eccentricity=1.2, angle radius = 1cm]  {angle=gTangent--center--atmBackTangent};
+    \draw[->] (center) -- (atmBackTangent) node[midway,below,sloped] {\tiny$\vec G + \vec T$ };
+
+\end{tikzpicture}
+

@@ -12,7 +12,7 @@ import * as d3 from "d3-ease";
  * @category VisualizationExamples
  */
 export default class AtmosphereVis extends Visualization {
-  private camera?: TrackballCamera;
+  private camera: TrackballCamera | null = null;
   public atmosphereMaterial = new THREE.ShaderMaterial({
     vertexShader: vertexShader,
     fragmentShader: fragmentShader,
@@ -36,10 +36,8 @@ export default class AtmosphereVis extends Visualization {
     vertexShader: vertexGroundShader,
     fragmentShader: fragmentGroundShader,
     uniforms: {
-      start: { value: 1 },
       stop: { value: 0.6 },
       fadeOut: { value: 0 },
-      light: { value: 0 },
       power: { value: 1 },
       glowColor: { value: new THREE.Color(0x87ceeb) },
       viewVector: { value: new Vector3(0, 0, 1) },
@@ -50,37 +48,34 @@ export default class AtmosphereVis extends Visualization {
     transparent: true,
     side: THREE.FrontSide,
   });
-
+  private atmoSphere: THREE.SphereBufferGeometry;
+  private atmoSphereGround: THREE.SphereBufferGeometry;
   constructor(
-    private readonly surfaceRadius: number = 6371,
-    private readonly thickness: number = 480
+    private G: number = 6371,
+    private T: number = 480,
+    private GT = G + T
   ) {
     super();
+    this.atmoSphere = new THREE.SphereBufferGeometry(GT, 300, 300);
+    this.atmoSphereGround = new THREE.SphereBufferGeometry(G, 601, 601);
+    Object.seal(this);
   }
 
   setupCamera(camera: TrackballCamera): void {
     this.camera = camera;
-    camera
-      .setGlobalOrbitRadius(this.surfaceRadius)
-      .setLocalOrbitRadius(this.surfaceRadius + this.thickness);
+    camera.setGlobalOrbitRadius(this.G).setLocalOrbitRadius(this.GT);
   }
 
   setupScene(scene: THREE.Scene, group: THREE.Group): void {
-    const sphere = new THREE.SphereGeometry(
-      this.surfaceRadius + this.thickness,
-      300,
-      300
-    );
-    const sphereMesh = new THREE.Mesh(sphere, this.atmosphereMaterial);
-    sphereMesh.translateZ(-this.surfaceRadius);
+    const sphereMesh = new THREE.Mesh(this.atmoSphere, this.atmosphereMaterial);
+    sphereMesh.translateZ(-this.G);
     scene.add(sphereMesh);
 
-    const sphereGround = new THREE.SphereGeometry(this.surfaceRadius, 300, 300);
     const sphereMeshGround = new THREE.Mesh(
-      sphereGround,
+      this.atmoSphereGround,
       this.atmosphereGroundMaterial
     );
-    sphereMeshGround.translateZ(-this.surfaceRadius);
+    sphereMeshGround.translateZ(-this.G);
     scene.add(sphereMeshGround);
   }
 
@@ -88,35 +83,22 @@ export default class AtmosphereVis extends Visualization {
     const globalOrbit = this.camera?.getGlobalOrbit();
     const localOrbit = this.camera?.getLocalOrbit();
     if (globalOrbit && localOrbit) {
-      const camFromCenter = new Vector3().addVectors(
+      const GL = new Vector3().addVectors(
         localOrbit.v,
-        new Vector3(0, 0, this.surfaceRadius)
+        new Vector3(0, 0, this.G)
       );
-      const camFromCenterNormalized = camFromCenter.clone().normalize();
-      this.atmosphereMaterial.uniforms.viewVector.value = camFromCenterNormalized;
-      this.atmosphereGroundMaterial.uniforms.viewVector.value = camFromCenterNormalized;
+      const GLNormalized = GL.clone().normalize();
+      this.atmosphereMaterial.uniforms.viewVector.value = GLNormalized;
+      this.atmosphereGroundMaterial.uniforms.viewVector.value = GLNormalized;
 
-      const beta = Math.acos(this.surfaceRadius / camFromCenter.length());
-      const delta = Math.acos(
-        this.surfaceRadius / (this.surfaceRadius + this.thickness)
-      );
+      const alpha = Math.acos(this.GT / GL.length()) || 0;
+      const beta = Math.acos(this.G / GL.length());
+      const gamma = Math.acos(this.G / this.GT);
 
-      const gamma = Math.acos(
-        this.surfaceRadius / (this.surfaceRadius + this.thickness)
-      );
+      const underAtmFrac = 1 - Math.min(GL.length() - this.G, this.T) / this.T;
 
-      const alpha =
-        Math.acos(
-          (this.surfaceRadius + this.thickness) / camFromCenter.length()
-        ) || 0;
-      const stop = (beta + delta) / Math.PI;
-      let fadeOut = (beta + delta - alpha) / Math.PI;
-
-      const underAtmFrac =
-        1 -
-        Math.min(camFromCenter.length() - this.surfaceRadius, this.thickness) /
-          this.thickness;
-
+      let fadeOut = (beta + gamma - alpha) / Math.PI;
+      const stop = (beta + gamma) / Math.PI;
       if (alpha === 0) {
         fadeOut += 30 * stop * d3.easeExpIn(underAtmFrac);
       }
@@ -124,14 +106,18 @@ export default class AtmosphereVis extends Visualization {
       this.atmosphereMaterial.uniforms.stop.value = stop;
       this.atmosphereMaterial.uniforms.fadeOut.value = fadeOut;
       this.atmosphereMaterial.uniforms.light.value = gamma / Math.PI;
+
       this.atmosphereGroundMaterial.uniforms.stop.value = beta / Math.PI;
       this.atmosphereGroundMaterial.uniforms.fadeOut.value = 1 - underAtmFrac;
-      this.atmosphereGroundMaterial.uniforms.light.value = gamma / Math.PI;
     }
   }
 
   destroy(): void {
-    //
+    console.log("distroyed 3");
+    this.atmoSphereGround.dispose();
+    this.atmoSphere.dispose();
+    this.atmosphereMaterial.dispose();
+    this.atmosphereGroundMaterial.dispose();
   }
 
   getControls() {

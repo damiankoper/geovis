@@ -8,23 +8,27 @@ import starsMap from "@/assets/textures/4k_stars.jpg";
  * @category VisualizationExamples
  */
 export default class StarsVis extends Visualization {
+  private stars = new THREE.SphereGeometry(40000, 10, 10);
+  private starsMaterial = new THREE.MeshBasicMaterial({
+    side: THREE.BackSide,
+    map: new THREE.TextureLoader().load(starsMap),
+    depthWrite: false,
+  });
+
+  constructor() {
+    super();
+    Object.seal(this);
+  }
+
   setupCamera(camera: TrackballCamera): void {
     ///
   }
 
   setupScene(scene: THREE.Scene, group: THREE.Group): void {
-    const sphere = new THREE.SphereGeometry(40000, 10, 10);
-
-    const sphereMaterial = new THREE.MeshBasicMaterial();
-    sphereMaterial.side = THREE.BackSide;
-    sphereMaterial.map = new THREE.TextureLoader().load(starsMap);
-    sphereMaterial.depthWrite = false;
-
-    const sphereMesh = new THREE.Mesh(sphere, sphereMaterial);
-    sphereMesh.renderOrder = 0;
-    sphereMesh.matrixAutoUpdate = false;
-
-    group.add(sphereMesh);
+    const starsMesh = new THREE.Mesh(this.stars, this.starsMaterial);
+    starsMesh.renderOrder = 0;
+    starsMesh.matrixAutoUpdate = false;
+    group.add(starsMesh);
   }
 
   update(deltaFactor: number): void {
@@ -32,7 +36,10 @@ export default class StarsVis extends Visualization {
   }
 
   destroy(): void {
-    //
+    console.log("distroyed 2");
+    this.stars.dispose();
+    this.starsMaterial.map?.dispose();
+    this.starsMaterial.dispose();
   }
 
   getControls() {
