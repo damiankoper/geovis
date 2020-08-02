@@ -25,7 +25,7 @@ export default class EarthVis extends Visualization {
   private nightMap: THREE.Texture = new THREE.TextureLoader().load(
     earthNightMap
   );
-  private sphere = new THREE.SphereGeometry(this.r, 100, 100).rotateY(
+  private sphere = new THREE.SphereGeometry(this.r, 200, 100).rotateY(
     -Math.PI / 2
   );
   private sphereMaterial = new THREE.MeshPhongMaterial({
@@ -34,7 +34,7 @@ export default class EarthVis extends Visualization {
     normalMap: new THREE.TextureLoader().load(earthNormalMap),
     shininess: 100,
   });
-  private sphereClouds = new THREE.SphereGeometry(this.r + 4, 100, 100).rotateY(
+  private sphereClouds = new THREE.SphereGeometry(this.r + 4, 200, 100).rotateY(
     -Math.PI / 2
   );
   private sphereCloudsMaterial = new THREE.MeshPhongMaterial({
@@ -64,14 +64,12 @@ export default class EarthVis extends Visualization {
 
   setupScene(scene: THREE.Scene, group: THREE.Group): void {
     this.mesh = new THREE.Mesh(this.sphere, this.sphereMaterial);
-    this.mesh.renderOrder = 11;
     group.add(this.mesh);
 
     this.cloudMesh = new THREE.Mesh(
       this.sphereClouds,
       this.sphereCloudsMaterial
     );
-    this.cloudMesh.renderOrder = 10;
     group.add(this.cloudMesh);
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.01);

@@ -3,6 +3,9 @@ varying vec3 vNormal;
 
 varying vec3 vViewPosition;
 
+#include <common>
+#include <logdepthbuf_pars_vertex>
+
 void main() {
 
 #include <beginnormal_vertex>
@@ -13,7 +16,7 @@ void main() {
 #include <begin_vertex>
 #include <project_vertex>
 
-  vViewPosition = normalMatrix * viewVector;
+#include <logdepthbuf_vertex>
 
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  vViewPosition = normalMatrix * viewVector;
 }

@@ -7,7 +7,7 @@ export default class GeoVisCore {
   private readonly container: HTMLElement;
   private visualization: Visualization | null = null;
 
-  private readonly scene: THREE.Scene;
+  private scene: THREE.Scene;
   private readonly group: THREE.Group;
   private readonly camera: THREE.PerspectiveCamera;
   private readonly renderer: THREE.Renderer;
@@ -21,7 +21,6 @@ export default class GeoVisCore {
 
     this.scene = new THREE.Scene();
     this.group = new THREE.Group();
-    this.scene.add(this.group);
 
     this.camera = new THREE.PerspectiveCamera(60, 1, 0.001, 50000);
     this.clock = new THREE.Clock();
@@ -52,6 +51,8 @@ export default class GeoVisCore {
 
   public run(visualization: Visualization) {
     this.scene.dispose();
+    this.scene = new THREE.Scene();
+    this.scene.add(this.group);
     if (this.visualization) this.visualization._destroy();
 
     this.visualization = visualization;

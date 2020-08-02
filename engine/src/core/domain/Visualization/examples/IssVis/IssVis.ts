@@ -12,17 +12,12 @@ export default class IssVis extends Visualization {
   readonly r = 6371;
   private camera: TrackballCamera | null = null;
   private issMesh: THREE.Mesh | null = null;
+  private orbit: THREE.Line | null = null;
   orbitTransformMatrix = new THREE.Matrix4()
-    .makeRotationY(THREE.MathUtils.degToRad(-121.6846))
+    .makeRotationY(THREE.MathUtils.degToRad(-90))
     .multiply(
       new THREE.Matrix4().makeRotationX(THREE.MathUtils.degToRad(51.64))
     );
-
-  private go = new ArrowHelper(
-    new THREE.Vector3(0, 0, 1),
-    new THREE.Vector3(0, 0, -this.r),
-    9000
-  );
 
   constructor() {
     super();
@@ -44,27 +39,27 @@ export default class IssVis extends Visualization {
       false,
       0
     );
-
     const orbitGeometry = new THREE.BufferGeometry().setFromPoints(
       orbitCurve.getPoints(100)
     );
     const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
 
     // Create the final object to add to the scene
-    const orbit = new THREE.Line(orbitGeometry, material);
-    orbit.matrixAutoUpdate = false;
-    orbit.matrix = this.orbitTransformMatrix;
+    this.orbit = new THREE.Line(orbitGeometry, material);
+    this.orbit.matrixAutoUpdate = false;
+    this.orbit.matrix = this.orbitTransformMatrix;
 
-    group.add(orbit);
+    group.add(this.orbit);
 
     const issGrometry = new THREE.SphereGeometry(100, 30, 30).rotateX(
       Math.PI / 2
     );
-    this.issMesh = new THREE.Mesh(issGrometry, new THREE.MeshBasicMaterial());
+    this.issMesh = new THREE.Mesh(
+      issGrometry,
+      new THREE.MeshBasicMaterial({ color: 0xffffff })
+    );
     this.issMesh.matrixAutoUpdate = false;
-
-    scene.add(this.go);
-
+    this.issMesh.renderOrder = 51;
     group.add(this.issMesh);
   }
 
@@ -89,14 +84,23 @@ export default class IssVis extends Visualization {
 
   update() {
     this.updateIssThrottled();
-    if (this.camera) {
-      this.go.setDirection(this.camera.getGlobalOrbit().v.clone().normalize());
-    }
   }
   destroy() {
     //
   }
   getControls(): Vue {
     return new Vue();
+  }
+  // Source: https://www.pveducation.org/pvcdrom/properties-of-sunlight/solar-time
+  getHourAngle(fromTimezone = 0, longitude = 0) {
+    const LSTM = 15 * fromTimezone;
+    const timeLong = longitude;
+    const B = (360 / 365) * (moment().dayOfYear() - 81);
+    const EOT = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
+    const TC = 4 * (timeLong - LSTM) + EOT;
+    const LST =
+      moment.utc().diff(moment.utc().startOf("day"), "minutes") / 60 + TC / 60;
+    const HRA = 15 * (LST - 12);
+    return THREE.MathUtils.degToRad(HRA);
   }
 }

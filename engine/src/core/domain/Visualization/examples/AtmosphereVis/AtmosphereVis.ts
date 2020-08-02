@@ -6,7 +6,6 @@ import vertexShader from "./atm.vs";
 import vertexGroundShader from "./atmGround.vs";
 import fragmentShader from "./atm.fs";
 import fragmentGroundShader from "./atmGround.fs";
-import { Vector3, MeshBasicMaterial, Quaternion } from "three";
 import * as d3 from "d3-ease";
 /**
  * @category VisualizationExamples
@@ -23,7 +22,7 @@ export default class AtmosphereVis extends Visualization {
       light: { value: 0 },
       power: { value: 1.25 },
       glowColor: { value: new THREE.Color(0x87ceeb) },
-      viewVector: { value: new Vector3(0, 0, 1) },
+      viewVector: { value: new THREE.Vector3() },
       ...THREE.UniformsLib.lights,
     },
     depthFunc: THREE.NeverDepth,
@@ -40,59 +39,70 @@ export default class AtmosphereVis extends Visualization {
       fadeOut: { value: 0 },
       power: { value: 1 },
       glowColor: { value: new THREE.Color(0x87ceeb) },
-      viewVector: { value: new Vector3(0, 0, 1) },
+      viewVector: { value: new THREE.Vector3() },
       ...THREE.UniformsLib.lights,
     },
-    depthFunc: THREE.AlwaysDepth,
     lights: true,
-    transparent: true,
     side: THREE.FrontSide,
+    transparent: false,
+    blending: THREE.AdditiveBlending,
+    depthFunc: THREE.AlwaysDepth,
   });
+
   private atmoSphere: THREE.SphereBufferGeometry;
   private atmoSphereGround: THREE.SphereBufferGeometry;
   constructor(
     private G: number = 6371,
     private T: number = 480,
+    private groundRenderOrder = 50,
     private GT = G + T
   ) {
     super();
-    this.atmoSphere = new THREE.SphereBufferGeometry(GT, 300, 300);
-    this.atmoSphereGround = new THREE.SphereBufferGeometry(G, 601, 601);
+    this.atmoSphere = new THREE.SphereBufferGeometry(GT, 200, 100);
+    this.atmoSphereGround = new THREE.SphereBufferGeometry(G, 200, 100);
     Object.seal(this);
   }
-  //xddd
+
   setupCamera(camera: TrackballCamera): void {
     this.camera = camera;
     camera.setGlobalOrbitRadius(this.G).setLocalOrbitRadius(this.GT);
   }
-
+  private group: THREE.Group | null = null;
   setupScene(scene: THREE.Scene, group: THREE.Group): void {
+    this.group = group;
     const sphereMesh = new THREE.Mesh(this.atmoSphere, this.atmosphereMaterial);
-    sphereMesh.translateZ(-this.G);
-    scene.add(sphereMesh);
+    sphereMesh.renderOrder = 0;
+    group.add(sphereMesh);
 
     const sphereMeshGround = new THREE.Mesh(
       this.atmoSphereGround,
       this.atmosphereGroundMaterial
     );
-    sphereMeshGround.translateZ(-this.G);
-    scene.add(sphereMeshGround);
+    sphereMeshGround.renderOrder = this.groundRenderOrder;
+    group.add(sphereMeshGround);
   }
 
   update(deltaFactor: number): void {
     const globalOrbit = this.camera?.getGlobalOrbit();
     const localOrbit = this.camera?.getLocalOrbit();
-    if (globalOrbit && localOrbit) {
-      const GL = new Vector3(0, 0, this.G).add(localOrbit.v);
+    if (globalOrbit && localOrbit && this.group) {
+      const q = new THREE.Quaternion()
+        .setFromRotationMatrix(this.group.matrix)
+        .conjugate();
+      const GL = new THREE.Vector3(0, 0, this.G)
+        .applyQuaternion(q)
+        .add(localOrbit.v.clone().applyQuaternion(q));
+
       const GLNormalized = GL.clone().normalize();
       this.atmosphereMaterial.uniforms.viewVector.value = GLNormalized;
       this.atmosphereGroundMaterial.uniforms.viewVector.value = GLNormalized;
+      const GLLength = GL.length();
 
-      const alpha = Math.acos(this.GT / GL.length()) || 0;
-      const beta = Math.acos(this.G / GL.length());
+      const alpha = Math.acos(this.GT / GLLength) || 0;
+      const beta = Math.acos(this.G / GLLength);
       const gamma = Math.acos(this.G / this.GT);
 
-      const underAtmFrac = 1 - Math.min(GL.length() - this.G, this.T) / this.T;
+      const underAtmFrac = 1 - Math.min(GLLength - this.G, this.T) / this.T;
 
       let fadeOut = (beta + gamma - alpha) / Math.PI;
       const stop = (beta + gamma) / Math.PI;

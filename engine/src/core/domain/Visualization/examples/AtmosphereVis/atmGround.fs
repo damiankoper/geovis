@@ -7,6 +7,7 @@ uniform vec3 glowColor;
 
 varying vec3 vNormal;
 varying vec3 vViewPosition;
+#include <logdepthbuf_pars_fragment>
 
 #if NUM_DIR_LIGHTS > 0
 struct DirectionalLight {
@@ -20,6 +21,8 @@ float easeInOut(float x) { return x == 0. ? 0. : pow(2., 10. * x - 10.); }
 float easeOutSine(float x) { return sin((x * M_PI) / 2.); }
 
 void main() {
+#include <logdepthbuf_fragment>
+
   float intensity = 0.;
   float stop = M_PI * stop;
   float dotP = dot(vNormal, normalize(vViewPosition));
@@ -36,5 +39,5 @@ void main() {
 
   intensity = pow(max(0., min(1., intensity)), power) * lightIntensity;
 
-  gl_FragColor = vec4(glowColor, intensity);
+  gl_FragColor = vec4(glowColor * intensity, 1.);
 }
