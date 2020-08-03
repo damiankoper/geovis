@@ -14,29 +14,25 @@ import AtmosphereVis from "../AtmosphereVis/AtmosphereVis";
 import { Vector3, Mesh } from "three";
 import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
 import moment from "moment";
+import TimeService from "./TimeService";
 /**
  * @category VisualizationExamples
  */
 export default class EarthVis extends Visualization {
   readonly r = 6371;
   camera: TrackballCamera | null = null;
-  mesh: Mesh | null = null;
-  cloudMesh: Mesh | null = null;
+  private earthGroup = new THREE.Group().rotateY(-Math.PI / 2);
   private nightMap: THREE.Texture = new THREE.TextureLoader().load(
     earthNightMap
   );
-  private sphere = new THREE.SphereGeometry(this.r, 200, 100).rotateY(
-    -Math.PI / 2
-  );
+  private sphere = new THREE.SphereGeometry(this.r, 200, 100);
   private sphereMaterial = new THREE.MeshPhongMaterial({
     map: new THREE.TextureLoader().load(earthMap),
     specularMap: new THREE.TextureLoader().load(earthSpecularMap),
     normalMap: new THREE.TextureLoader().load(earthNormalMap),
     shininess: 100,
   });
-  private sphereClouds = new THREE.SphereGeometry(this.r + 4, 200, 100).rotateY(
-    -Math.PI / 2
-  );
+  private sphereClouds = new THREE.SphereGeometry(this.r + 4, 200, 100);
   private sphereCloudsMaterial = new THREE.MeshPhongMaterial({
     transparent: true,
     blending: THREE.AdditiveBlending,
@@ -63,27 +59,28 @@ export default class EarthVis extends Visualization {
   }
 
   setupScene(scene: THREE.Scene, group: THREE.Group): void {
-    this.mesh = new THREE.Mesh(this.sphere, this.sphereMaterial);
-    group.add(this.mesh);
-
-    this.cloudMesh = new THREE.Mesh(
-      this.sphereClouds,
-      this.sphereCloudsMaterial
-    );
-    group.add(this.cloudMesh);
-
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.01);
     scene.add(ambientLight);
 
     group.add(this.directionalLight);
     group.add(this.directionalLight.target);
+
+    const mesh = new THREE.Mesh(this.sphere, this.sphereMaterial);
+    const cloudMesh = new THREE.Mesh(
+      this.sphereClouds,
+      this.sphereCloudsMaterial
+    );
+    this.earthGroup.add(mesh);
+    this.earthGroup.add(cloudMesh);
+
+    group.add(this.earthGroup);
   }
 
   update(deltaFactor: number): void {
     this.directionalLight.position
       .set(0, 0, 10000)
       .applyAxisAngle(new Vector3(1, 0, 0), this.getSunDeclination())
-      .applyAxisAngle(new Vector3(0, -1, 0), this.getHourAngle());
+      .applyAxisAngle(new Vector3(0, -1, 0), TimeService.getHourAngle());
   }
 
   destroy(): void {
@@ -109,19 +106,6 @@ export default class EarthVis extends Visualization {
     return Math.asin(
       0.39795 * Math.cos(0.08563 * (moment().dayOfYear() - 173))
     );
-  }
-
-  // Source: https://www.pveducation.org/pvcdrom/properties-of-sunlight/solar-time
-  getHourAngle(fromTimezone = 0, longitude = 0) {
-    const LSTM = 15 * fromTimezone;
-    const timeLong = longitude;
-    const B = (360 / 365) * (moment().dayOfYear() - 81);
-    const EOT = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
-    const TC = 4 * (timeLong - LSTM) + EOT;
-    const LST =
-      moment.utc().diff(moment.utc().startOf("day"), "minutes") / 60 + TC / 60;
-    const HRA = 15 * (LST - 12);
-    return THREE.MathUtils.degToRad(HRA);
   }
 
   modifyShader(shader: THREE.Shader) {

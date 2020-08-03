@@ -3,6 +3,7 @@ import * as THREE from "three";
 import TrackballCamera from "@/core/domain/Camera/interfaces/TrackballCamera";
 import Vue from "vue";
 import starsMap from "@/assets/textures/4k_stars.jpg";
+import TimeService from "../EarthVis/TimeService";
 
 /**
  * @category VisualizationExamples
@@ -14,6 +15,7 @@ export default class StarsVis extends Visualization {
     map: new THREE.TextureLoader().load(starsMap),
     depthWrite: false,
   });
+  private mesh = new THREE.Mesh(this.stars, this.starsMaterial);
 
   constructor() {
     super();
@@ -25,14 +27,12 @@ export default class StarsVis extends Visualization {
   }
 
   setupScene(scene: THREE.Scene, group: THREE.Group): void {
-    const starsMesh = new THREE.Mesh(this.stars, this.starsMaterial);
-    starsMesh.renderOrder = 0;
-    starsMesh.matrixAutoUpdate = false;
-    group.add(starsMesh);
+    this.mesh.renderOrder = 0;
+    group.add(this.mesh);
   }
 
   update(deltaFactor: number): void {
-    //
+    this.mesh.rotation.y = TimeService.getHourAngle();
   }
 
   destroy(): void {

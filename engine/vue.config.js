@@ -13,5 +13,12 @@ module.exports = {
       .use("ts-shader-loader")
       .loader("ts-shader-loader")
       .end();
+
+    config.module
+      .rule("obj")
+      .test(/\.(obj)$/)
+      .use("file-loader")
+      .loader("file-loader")
+      .end();
   },
 };
