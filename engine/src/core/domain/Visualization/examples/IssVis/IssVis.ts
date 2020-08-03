@@ -4,7 +4,7 @@ import Visualization from "../../models/Visualization";
 import { TrackballCamera } from "@/GeoVisEngine";
 import EarthVis from "../EarthVis/EarthVis";
 import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
-import { Matrix4, ArrowHelper } from "three";
+import { Matrix4, ArrowHelper, AxesHelper } from "three";
 import moment from "moment";
 import GeoPosMapper from "@/core/domain/GeoPosition/services/GeoPosMapper";
 import _ from "lodash";
@@ -13,11 +13,6 @@ export default class IssVis extends Visualization {
   private camera: TrackballCamera | null = null;
   private issMesh: THREE.Mesh | null = null;
   private orbit: THREE.Line | null = null;
-  orbitTransformMatrix = new THREE.Matrix4()
-    .makeRotationY(THREE.MathUtils.degToRad(-90))
-    .multiply(
-      new THREE.Matrix4().makeRotationX(THREE.MathUtils.degToRad(51.64))
-    );
 
   constructor() {
     super();
@@ -47,13 +42,10 @@ export default class IssVis extends Visualization {
     // Create the final object to add to the scene
     this.orbit = new THREE.Line(orbitGeometry, material);
     this.orbit.matrixAutoUpdate = false;
-    this.orbit.matrix = this.orbitTransformMatrix;
 
     group.add(this.orbit);
 
-    const issGrometry = new THREE.SphereGeometry(100, 30, 30).rotateX(
-      Math.PI / 2
-    );
+    const issGrometry = new THREE.SphereGeometry(100, 30, 30);
     this.issMesh = new THREE.Mesh(
       issGrometry,
       new THREE.MeshBasicMaterial({ color: 0xffffff })
@@ -77,13 +69,21 @@ export default class IssVis extends Visualization {
               THREE.MathUtils.degToRad(data.iss_position.longitude)
             )
           ).multiply(new Matrix4().makeTranslation(0, 0, fromCenter));
-          this.issMesh.updateMatrixWorld();
         }
       });
   }
 
   update() {
     this.updateIssThrottled();
+
+    if (this.orbit)
+      this.orbit.matrix = new THREE.Matrix4()
+        .makeRotationY(-this.getHourAngle() + Math.PI / 2 - Math.PI / 8)
+        .multiply(
+          new THREE.Matrix4().makeRotationX(
+            THREE.MathUtils.degToRad(90 - 51.6438)
+          )
+        );
   }
   destroy() {
     //
