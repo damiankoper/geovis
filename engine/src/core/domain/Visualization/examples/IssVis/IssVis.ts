@@ -24,7 +24,7 @@ export default class IssVis extends Visualization {
 
   setupCamera(camera: TrackballCamera) {
     this.camera = camera;
-    this.camera.setZoomBounds(new Range(200, 20000));
+    this.camera.setZoomBounds(new Range(200, 30000));
   }
 
   setupScene(scene: THREE.Scene, group: THREE.Group) {

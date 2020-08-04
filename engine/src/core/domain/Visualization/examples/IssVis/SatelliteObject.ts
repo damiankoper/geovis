@@ -46,6 +46,10 @@ export default class SatelliteObject {
     if (this.mesh) this.mesh.matrixAutoUpdate = false;
   }
 
+  private get rFactor() {
+    return this.r / 6371;
+  }
+
   setTLE(tle: [string, string, string]) {
     const G = 3.986004418e14;
     const e = TLE.getEccentricity(tle);
@@ -58,8 +62,8 @@ export default class SatelliteObject {
     const curve = new THREE.EllipseCurve(
       0,
       0,
-      a / 1000,
-      b / 1000,
+      (a / 1000) * this.rFactor,
+      (b / 1000) * this.rFactor,
       0,
       0,
       false,
@@ -70,7 +74,7 @@ export default class SatelliteObject {
       SatelliteObject.orbitLineMaterial
     );
     this.orbitLine.matrixAutoUpdate = false;
-    this.orbitC = (a * e) / 1000;
+    this.orbitC = ((a * e) / 1000) * this.rFactor;
   }
 
   update(timestamp = +moment.utc()) {
@@ -93,7 +97,7 @@ export default class SatelliteObject {
         new THREE.Matrix4().makeTranslation(
           0,
           0,
-          this.r + (satInfo.height * this.r) / 6371
+          this.r + satInfo.height * this.rFactor
         )
       )
       .multiply(
@@ -114,24 +118,32 @@ export default class SatelliteObject {
         new THREE.Matrix4().makeTranslation(
           0,
           0,
-          this.r + (satInfo.height * this.r) / 6371
+          this.r + satInfo.height * this.rFactor
         )
       )
       .multiply(new THREE.Matrix4().makeScale(0, 0, satInfo.height * 1.1));
   }
 
   getOrbitTransformMatrix(timestamp = +moment.utc()): THREE.Matrix4 {
-    return new THREE.Matrix4()
+    const m = new THREE.Matrix4()
       .makeRotationY(
         TimeService.getFirstPointOfAriesAngle(timestamp) +
           THREE.MathUtils.degToRad(TLE.getRightAscension(this.tle)) +
           -TimeService.getHourAngle(0, 0, timestamp)
       )
+
       .multiply(
         new THREE.Matrix4().makeRotationX(
           THREE.MathUtils.degToRad(90 - TLE.getInclination(this.tle))
         )
+      );
+
+    return new THREE.Matrix4()
+      .makeRotationAxis(
+        new THREE.Vector3(0, 0, 1).applyMatrix4(m).normalize(),
+        THREE.MathUtils.degToRad(360 - TLE.getPerigee(this.tle))
       )
-      .multiply(new THREE.Matrix4().makeTranslation(-this.orbitC, 0, 0));
+      .multiply(m)
+      .multiply(new THREE.Matrix4().makeTranslation(this.orbitC, 0, 0));
   }
 }
