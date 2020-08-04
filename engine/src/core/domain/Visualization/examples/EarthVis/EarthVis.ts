@@ -79,13 +79,11 @@ export default class EarthVis extends Visualization {
   update(deltaFactor: number): void {
     this.directionalLight.position
       .set(0, 0, 10000)
-      .applyAxisAngle(new Vector3(1, 0, 0), this.getSunDeclination())
+      .applyAxisAngle(new Vector3(1, 0, 0), TimeService.getSunDeclination())
       .applyAxisAngle(new Vector3(0, -1, 0), TimeService.getHourAngle());
   }
 
   destroy(): void {
-    console.log("distroyed 1");
-
     this.sphereMaterial.map?.dispose();
     this.sphereMaterial.specularMap?.dispose();
     this.sphereMaterial.normalMap?.dispose();
@@ -99,13 +97,6 @@ export default class EarthVis extends Visualization {
 
   getControls() {
     return EarthVisControls;
-  }
-
-  // Source: http://mypages.iit.edu/~maslanka/SolarGeo.pdf
-  getSunDeclination() {
-    return Math.asin(
-      0.39795 * Math.cos(0.08563 * (moment().dayOfYear() - 173))
-    );
   }
 
   modifyShader(shader: THREE.Shader) {

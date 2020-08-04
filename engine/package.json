@@ -24,6 +24,7 @@
     "perf-marks": "^1.8.1",
     "strongly-typed-events": "^1.6.12",
     "three": "^0.118.1",
+    "tle.js": "^4.1.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^9.0.0",
