@@ -34,6 +34,14 @@ export default class SatelliteObject {
   public orbitLine?: THREE.Line;
   private orbitC = 0;
 
+  public useGroundLine = true;
+  public useOrbit = true;
+  public useMesh = true;
+
+  private get rFactor() {
+    return this.r / 6371;
+  }
+
   constructor(
     public readonly tle: [string, string, string],
     private readonly r = 6371,
@@ -46,8 +54,16 @@ export default class SatelliteObject {
     if (this.mesh) this.mesh.matrixAutoUpdate = false;
   }
 
-  private get rFactor() {
-    return this.r / 6371;
+  addTo(group: THREE.Object3D) {
+    if (this.useGroundLine) group.add(this.line);
+    if (this.useOrbit && this.orbitLine) group.add(this.orbitLine);
+    if (this.useMesh && this.mesh) group.add(this.mesh);
+  }
+
+  removeFrom(group: THREE.Object3D) {
+    if (this.useGroundLine) group.remove(this.line);
+    if (this.useOrbit && this.orbitLine) group.remove(this.orbitLine);
+    if (this.useMesh && this.mesh) group.remove(this.mesh);
   }
 
   setTLE(tle: [string, string, string]) {
@@ -59,16 +75,8 @@ export default class SatelliteObject {
     const a = G ** (1 / 3) / ((2 * meanMotion * Math.PI) / 86400) ** (2 / 3);
     const b = a * Math.sqrt(1 - e ** 2);
 
-    const curve = new THREE.EllipseCurve(
-      0,
-      0,
-      (a / 1000) * this.rFactor,
-      (b / 1000) * this.rFactor,
-      0,
-      0,
-      false,
-      0
-    );
+    const [aE, bE] = [a, b].map((x) => (x / 1000) * this.rFactor);
+    const curve = new THREE.EllipseCurve(0, 0, aE, bE, 0, 0, false, 0);
     this.orbitLine = new THREE.Line(
       new THREE.BufferGeometry().setFromPoints(curve.getPoints(300)),
       SatelliteObject.orbitLineMaterial
@@ -78,10 +86,11 @@ export default class SatelliteObject {
   }
 
   update(timestamp = +moment.utc()) {
-    this.line.matrix = this.getGroundTransformMatrix(timestamp);
-    if (this.mesh)
+    if (this.useGroundLine)
+      this.line.matrix = this.getGroundTransformMatrix(timestamp);
+    if (this.useMesh && this.mesh)
       this.mesh.matrix = this.getPositionTransformMatrix(timestamp);
-    if (this.orbitLine)
+    if (this.useOrbit && this.orbitLine)
       this.orbitLine.matrix = this.getOrbitTransformMatrix(timestamp);
   }
 

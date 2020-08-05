@@ -10,6 +10,11 @@ declare module "*.obj" {
   const value: any;
   export = value;
 }
+
+declare module "*.stl" {
+  const value: any;
+  export = value;
+}
 declare module "worker-loader!*" {
   class WebpackWorker extends Worker {
     constructor();

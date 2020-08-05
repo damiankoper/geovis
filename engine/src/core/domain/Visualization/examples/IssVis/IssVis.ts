@@ -41,8 +41,8 @@ export default class IssVis extends Visualization {
       this.issObject = new SatelliteObject(
         [
           "BREEZE-M DEB [TANK]",
-          "1 45988U 20053D   20216.53226157 -.00000011  00000-0  00000-0 0  9999",
-          "2 45988  49.5155 277.5322 6272609 181.3077 175.6695  3.52889105   204",
+          "1 45988U 20053D   20217.66460264 -.00000000  00000-0  00000-0 0  9991",
+          "2 45988  49.5157 277.0214 6272791 181.7417 174.1906  3.52888681   246",
         ],
         /*  [
           "ISS",
@@ -55,8 +55,7 @@ export default class IssVis extends Visualization {
         2
       );
 
-      group.add(this.issObject.line, obj);
-      if (this.issObject.orbitLine) group.add(this.issObject.orbitLine);
+      this.issObject.addTo(group);
     });
   }
 

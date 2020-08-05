@@ -28,17 +28,19 @@ export default class TimeService {
   }
 
   static getFirstPointOfAriesAngle(timestamp: number = +moment.utc()) {
-    const dayOfYearFrac =
-      moment.utc(timestamp).dayOfYear() +
-      moment.utc(timestamp).diff(moment.utc().startOf("day"), "ms") /
-        3600000 /
-        24;
     const correctionAngle = Math.PI;
-    const correctionDays = -2.25;
+    const vernalEquinoxReference = moment.utc("2020-03-20 03:49:00");
+    const solarYear = moment.duration({
+      days: 365,
+      hours: 5,
+      minutes: 48,
+      seconds: 46,
+    });
+
+    const sinceVE = moment.utc(timestamp).diff(vernalEquinoxReference, "ms");
+
     return (
-      (2 * Math.PI * (dayOfYearFrac - 80 + correctionDays)) /
-        (moment.utc(timestamp).isLeapYear() ? 365 : 366) +
-      correctionAngle
+      (2 * Math.PI * sinceVE) / solarYear.asMilliseconds() + correctionAngle
     );
   }
 }
