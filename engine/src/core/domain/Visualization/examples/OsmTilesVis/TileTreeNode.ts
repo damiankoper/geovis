@@ -6,7 +6,7 @@ import * as PerfMarks from "perf-marks";
 export class TileTreeNode {
   canvas: HTMLCanvasElement = this.service.createCanvas();
   canvasCtx = this.canvas.getContext("bitmaprenderer");
-  tilesDrawRequested = false;
+  tileDrawRequested = false;
 
   material = new THREE.MeshPhongMaterial({
     shininess: 5,
@@ -59,10 +59,8 @@ export class TileTreeNode {
   }
 
   private onCanvasDraw(message: MessageEvent) {
-    PerfMarks.start("onCanvasDraw");
     this.canvasCtx?.transferFromImageBitmap(message.data.image);
     if (this.material.map) this.material.map.needsUpdate = true;
-    PerfMarks.end("onCanvasDraw");
   }
 
   calcDeep(
@@ -103,10 +101,16 @@ export class TileTreeNode {
     return propagateUpper;
   }
 
+  refreshDeep(camera: TrackballCamera, group: THREE.Group) {
+    this.tileDrawRequested = false;
+    if (this.mesh?.visible) this.showTile(camera, group);
+    this.children.forEach((c) => c.refreshDeep(camera, group));
+  }
+
   showTile(camera: TrackballCamera, group: THREE.Group) {
     if (this.isVisibleByAngle(camera, (Math.PI / 2) * 0.8)) {
-      if (!this.tilesDrawRequested) {
-        this.tilesDrawRequested = true;
+      if (!this.tileDrawRequested) {
+        this.tileDrawRequested = true;
         this.service.requestCanvasDraw(this, this.tileDistance(camera));
       }
 
@@ -212,21 +216,6 @@ export class TileTreeNode {
             this.zoom + 1,
             this
           );
-          const tileSize = this.service.tileSize;
-          const tileSizeDv = tileSize / 2;
-          if (tile.canvasCtx) {
-            /*  tile.canvasCtx.drawImage(
-              this.canvas,
-              tileSizeDv * x,
-              tileSizeDv * y,
-              tileSizeDv,
-              tileSizeDv,
-              0,
-              0,
-              tileSize,
-              tileSize
-            ); */
-          }
           this.children.push(tile);
         }
       }

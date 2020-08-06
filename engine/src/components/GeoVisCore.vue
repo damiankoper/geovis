@@ -6,13 +6,16 @@
       :camera="camera"
       :hasVisControls="visualization.getControls() != null"
       v-if="camera"
-      :visTitle="'TODO: Title from vis metadata'"
+      :visTitle="visInfo.title"
     >
       <component
         :vis="visualization"
         class="vis-controls"
         :is="visualization.getControls()"
       />
+      <template v-slot:info>
+        <visualization-info :info="visInfo" />
+      </template>
     </core-controls>
   </div>
 </template>
@@ -22,13 +25,16 @@ import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import GeoVisCore from "../core/GeoVisCore";
 import Visualization from "../core/domain/Visualization/models/Visualization";
 import CoreControls from "./CoreControls.vue";
+import VisualizationInfo from "./VisualizationInfo.vue";
+import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
 
 @Component({
-  components: { CoreControls },
+  components: { CoreControls, VisualizationInfo },
 })
 export default class GeoVisCoreVue extends Vue {
   geoVisCore: GeoVisCore | null = null;
   @Prop() visualization!: Visualization;
+  visInfo = new VisualizationMeta().getData();
 
   get camera() {
     return this.geoVisCore?.cameraController;
@@ -59,6 +65,8 @@ export default class GeoVisCoreVue extends Vue {
   onVisChange(v?: Visualization) {
     if (v && this.geoVisCore) {
       this.geoVisCore.run(v);
+      v._setupMeta();
+      this.visInfo = v.meta.getData();
     }
   }
 }

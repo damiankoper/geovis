@@ -1,12 +1,12 @@
 <template>
   <v-container fluid>
     <v-row align="end" class="mx-0">
-      <v-col v-if="hasVisControls" cols="auto" class="pr-0">
+      <v-col cols="auto" class="pr-0">
         <v-btn
-          @click="visControls = true"
+          @click="visControlPanel = true"
           fab
           x-small
-          v-if="!visControls"
+          v-if="!visControlPanel"
           class="clickable"
         >
           <v-icon>mdi-menu</v-icon>
@@ -15,18 +15,34 @@
           color="rgba(255,255,255,0.7)"
           rounded
           :elevation="4"
-          v-if="visControls"
+          v-if="visControlPanel"
           class="clickable"
         >
           <v-toolbar color="transparent" elevation="0">
-            <v-btn @click="visControls = false" icon>
+            <v-btn @click="visControlPanel = false" icon>
               <v-icon>mdi-close</v-icon>
             </v-btn>
             <v-toolbar-title>
               {{ visTitle }}
             </v-toolbar-title>
           </v-toolbar>
-          <slot />
+
+          <v-tabs background-color="transparent" v-model="tab" vertical>
+            <v-tab>
+              Info
+            </v-tab>
+            <v-tab v-if="hasVisControls">
+              Controls
+            </v-tab>
+            <v-tabs-items
+              :value="tab"
+              vertical=""
+              style="background: transparent;"
+            >
+              <v-tab-item> <slot name="info" /> </v-tab-item>
+              <v-tab-item v-if="hasVisControls"> <slot /> </v-tab-item>
+            </v-tabs-items>
+          </v-tabs>
         </v-sheet>
       </v-col>
       <v-spacer />
@@ -76,8 +92,9 @@ export default class CoreControls extends Vue {
   @Prop() camera!: TrackballCamera;
   @Prop({ default: false }) hasVisControls!: boolean;
   @Prop({ default: "Visualization controls" }) visTitle!: string;
+  tab = 0;
 
-  visControls = false;
+  visControlPanel = false;
 
   globalOrbitChange?: () => void;
   globalOrbitPosition: GeoPosition = new GeoPosition();

@@ -51,18 +51,19 @@ class TilePainter {
   }
 
   async paintTileLayers(data: PaintTileLayersMessageData) {
-    const abortController =
-      this.abortControllers.get(data.tileKey) || new AbortController();
-    this.abortControllers.set(data.tileKey, abortController);
-
-    const cacheBlob = this.tileCache.get(data.tileKey);
+    const visibleLayers = data.layers.filter((layer) => layer.visible);
+    const cacheKey = visibleLayers.reduce((r, layer) => r + layer.tileUrl, "");
+    const cacheBlob = this.tileCache.get(cacheKey);
     if (cacheBlob) {
       const image = await createImageBitmap(cacheBlob);
       this.ctx.postMessage({ tileKey: data.tileKey, image }, [image]);
     } else {
       try {
+        const abortController =
+          this.abortControllers.get(cacheKey) || new AbortController();
+        this.abortControllers.set(cacheKey, abortController);
         const images = await Promise.all(
-          data.layers.map((layer) => {
+          visibleLayers.map((layer) => {
             const url = layer.tileUrl as string;
             return this.createBitmap(url, abortController.signal);
           })
@@ -70,14 +71,14 @@ class TilePainter {
 
         const ctx = this.offscreen.getContext("2d", { alpha: false });
         if (ctx)
-          for (let i = 0; i < data.layers.length; i++) {
-            ctx.filter = data.layers[i].filter || "none";
+          for (let i = 0; i < visibleLayers.length; i++) {
+            ctx.filter = visibleLayers[i].filter || "none";
             ctx.drawImage(images[i], 0, 0);
           }
 
         this.offscreen
           .convertToBlob()
-          .then((blob) => this.tileCache.set(data.tileKey, blob));
+          .then((blob) => this.tileCache.set(cacheKey, blob));
         const image = this.offscreen.transferToImageBitmap();
         this.ctx.postMessage({ tileKey: data.tileKey, image }, [image]);
       } catch (e) {

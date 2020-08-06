@@ -39,5 +39,5 @@ void main() {
 
   intensity = pow(max(0., min(1., intensity)), power) * lightIntensity;
 
-  gl_FragColor = vec4(glowColor * intensity, 1.);
+  gl_FragColor = vec4(glowColor, 1. * intensity);
 }

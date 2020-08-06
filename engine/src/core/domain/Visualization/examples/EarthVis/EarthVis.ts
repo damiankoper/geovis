@@ -15,6 +15,7 @@ import { Vector3, Mesh } from "three";
 import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
 import moment from "moment";
 import TimeService from "./TimeService";
+import VisualizationMeta from "../../models/VisualizationMeta";
 /**
  * @category VisualizationExamples
  */
@@ -134,5 +135,9 @@ export default class EarthVis extends Visualization {
       #endif
       `
     );
+  }
+
+  setupMeta(meta: VisualizationMeta) {
+    //
   }
 }

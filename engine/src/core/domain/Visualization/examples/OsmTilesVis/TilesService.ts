@@ -46,13 +46,15 @@ export class TilesService {
   }
 
   requestCanvasDraw(tile: TileTreeNode, tileDistance: number) {
+    const layers = this.layers.map((layer) => {
+      const l = _.cloneDeep(layer);
+      if (typeof l.tileUrl === "function")
+        l.tileUrl = l.tileUrl(tile.x, tile.y, tile.zoom);
+      return l;
+    });
+
     const data: PaintTileLayersMessageData = {
-      layers: this.layers.map((layer) => {
-        const l = _.cloneDeep(layer);
-        if (typeof l.tileUrl === "function")
-          l.tileUrl = l.tileUrl(tile.x, tile.y, tile.zoom);
-        return l;
-      }),
+      layers,
       name: "paintTileLayers",
       tileKey: tile.key,
       priority: tile.zoom - tileDistance,

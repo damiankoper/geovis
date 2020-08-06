@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="pt-0">
     <v-row>
       <v-col :cols="6">
         <h4>Camera</h4>

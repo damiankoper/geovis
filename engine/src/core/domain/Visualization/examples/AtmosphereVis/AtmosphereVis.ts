@@ -7,6 +7,7 @@ import vertexGroundShader from "./atmGround.vs";
 import fragmentShader from "./atm.fs";
 import fragmentGroundShader from "./atmGround.fs";
 import * as d3 from "d3-ease";
+import VisualizationMeta from "../../models/VisualizationMeta";
 /**
  * @category VisualizationExamples
  */
@@ -45,8 +46,8 @@ export default class AtmosphereVis extends Visualization {
     },
     lights: true,
     side: THREE.FrontSide,
-    transparent: false,
-    blending: THREE.AdditiveBlending,
+    transparent: true,
+    //blending: THREE.AdditiveBlending,
     depthFunc: THREE.AlwaysDepth,
   });
 
@@ -80,6 +81,7 @@ export default class AtmosphereVis extends Visualization {
       this.atmosphereGroundMaterial
     );
     sphereMeshGround.renderOrder = this.groundRenderOrder;
+    sphereMeshGround.renderOrder = 51;
     group.add(sphereMeshGround);
   }
 
@@ -130,5 +132,9 @@ export default class AtmosphereVis extends Visualization {
 
   getControls() {
     return new Vue();
+  }
+
+  setupMeta(meta: VisualizationMeta) {
+    //
   }
 }

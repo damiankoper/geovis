@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import TrackballCamera from "../../Camera/interfaces/TrackballCamera";
 import { VueConstructor } from "vue/types/umd";
+import VisualizationMeta from "./VisualizationMeta";
 
 /**
  * Base class for every visualization.
@@ -8,6 +9,12 @@ import { VueConstructor } from "vue/types/umd";
  */
 export default abstract class Visualization {
   public parents: Visualization[] = [];
+  public readonly meta = new VisualizationMeta();
+
+  /**
+   * @param meta Metadata for GUI and managemant
+   */
+  abstract setupMeta(meta: VisualizationMeta): void;
 
   /**
    * @param scene Root container. Good to set static lights in.
@@ -24,7 +31,7 @@ export default abstract class Visualization {
   /**
    * Method called every frame to update stuff.
    * @param deltaFactor What part of `1000/60ms` period has elapsed since previous update.
-   *                    Should be around `1` when good performance.
+   *                    Should be around `1` with good performance and 60Hz screen.
    */
   abstract update(deltaFactor: number): void;
 
@@ -42,7 +49,17 @@ export default abstract class Visualization {
     this.parents.push(visualization);
   }
 
+  /**
+   *
+   * @returns Vue compoment instance or constructor
+   */
   abstract getControls(): Vue | VueConstructor<Vue> | null;
+
+  /** @ignore */
+  public _setupMeta(meta = this.meta) {
+    this.parents.forEach((p) => p._setupMeta(meta));
+    this.setupMeta(meta);
+  }
 
   /** @ignore */
   public _setup(

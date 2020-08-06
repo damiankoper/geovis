@@ -10,6 +10,7 @@ import { TilesService } from "./TilesService";
 import * as PerfMarks from "perf-marks";
 import _ from "lodash";
 import AtmosphereVis from "../AtmosphereVis/AtmosphereVis";
+import VisualizationMeta from "../../models/VisualizationMeta";
 /**
  * @category VisualizationExamples
  */
@@ -19,6 +20,10 @@ export default class OsmTilesVis extends Visualization {
   sphereGroup = new THREE.Group();
   osmTilesService: TilesService;
   maxZoom = 200;
+
+  timestamps: number[] = [];
+  timestampIndex = 0;
+
   constructor() {
     super();
     this.addParent(new StarsVis());
@@ -29,9 +34,9 @@ export default class OsmTilesVis extends Visualization {
           tileUrl: (x, y, z) =>
             `https://tile.openstreetmap.org/${z}/${x}/${y}.png`,
           visible: true,
-          filter: "brightness(100%)",
+          filter: "brightness(60%)",
         },
-        /* {
+        {
           tileUrl: (x, y, z) =>
             `https://tilecache.rainviewer.com/v2/coverage/0/256/${z}/${x}/${y}.png`,
           visible: true,
@@ -39,11 +44,12 @@ export default class OsmTilesVis extends Visualization {
         },
         {
           tileUrl: (x, y, z) =>
-            `https://tilecache.rainviewer.com/v2/radar/1595672400/256/${z}/${x}/${y}/4/1_1.png`,
-            //`https://weather.openportguide.de/tiles/actual/wind_stream/0h/${z}/${x}/${y}.png`,
+            `https://tilecache.rainviewer.com/v2/radar/${
+              this.timestamps[this.timestampIndex]
+            }/256/${z}/${x}/${y}/4/1_1.png`,
           visible: true,
           filter: "opacity(60%)",
-        }, */
+        },
       ],
       100
     );
@@ -63,10 +69,11 @@ export default class OsmTilesVis extends Visualization {
       .setGlobalOrbitSlowFactor(1);
   }
 
-  setupScene(scene: THREE.Scene, group: THREE.Group): void {
+  async setupScene(scene: THREE.Scene, group: THREE.Group): Promise<void> {
     this.group = group;
     this.group.renderOrder = 50;
     this.group.add(this.sphereGroup);
+    await this.updateTimestamps();
 
     if (this.camera) {
       this.sphereGroup.rotateY(-Math.PI / 2);
@@ -76,12 +83,21 @@ export default class OsmTilesVis extends Visualization {
       this.camera.onZoomChange.sub(_.debounce(this.calcTiles.bind(this), 150));
       this.calcTiles(this.camera);
     }
+
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
     scene.add(ambientLight);
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
     scene.add(directionalLight);
     directionalLight.position.set(0, 0, 10000);
+  }
+
+  async updateTimestamps() {
+    const data = await (
+      await fetch("https://api.rainviewer.com/public/maps.json")
+    ).json();
+    if (!this.timestamps.length) this.timestampIndex = data.length - 1;
+    this.timestamps = data;
   }
 
   private calcTiles(camera: TrackballCamera) {
@@ -98,6 +114,11 @@ export default class OsmTilesVis extends Visualization {
     PerfMarks.end("TilesCalc");
   }
 
+  public refreshDeep() {
+    if (this.camera && this.group)
+      this.osmTilesService.tileTreeRoot.refreshDeep(this.camera, this.group);
+  }
+
   update(deltaFactor: number): void {
     //
   }
@@ -108,5 +129,14 @@ export default class OsmTilesVis extends Visualization {
 
   getControls() {
     return OsmTilesVisControls;
+  }
+
+  setupMeta(meta: VisualizationMeta) {
+    meta.setTitle("OpenStreetMap and Weather Tiles");
+    meta.setAuthor("Damian Koper");
+    meta.setDescription(
+      `Displays tiles map with adjustable layers - radar coverage and rain radar. Uses RainviewerAPI & OSM Standard Tile Layer.`
+    );
+    meta.setKeywords(["tiles", "weather"]);
   }
 }

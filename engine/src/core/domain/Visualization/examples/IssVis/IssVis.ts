@@ -13,6 +13,7 @@ import SatelliteObject from "./SatelliteObject";
 import iss from "@/assets/models/isscombined.obj";
 import hst from "@/assets/models/hst.obj";
 import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
+import VisualizationMeta from "../../models/VisualizationMeta";
 export default class IssVis extends Visualization {
   readonly r = 6371;
   public camera: TrackballCamera | null = null;
@@ -123,5 +124,15 @@ export default class IssVis extends Visualization {
 
   getControls() {
     return IssVisControls;
+  }
+
+  setupMeta(meta: VisualizationMeta) {
+    meta.setTitle("Satellites");
+    meta.setAuthor("Damian Koper");
+    meta.setDescription(
+      `Shows position relative to earth of arbitrary chosen three satellites - ISS, Hubble Space Telescope and HotBird 13C.
+Position is calculated using TLE records.`
+    );
+    meta.setKeywords(["stars", "milkyway"]);
   }
 }

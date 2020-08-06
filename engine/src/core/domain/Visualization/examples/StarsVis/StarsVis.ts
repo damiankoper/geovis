@@ -4,6 +4,7 @@ import TrackballCamera from "@/core/domain/Camera/interfaces/TrackballCamera";
 import Vue from "vue";
 import starsMap from "@/assets/textures/4k_stars.jpg";
 import TimeService from "../EarthVis/TimeService";
+import VisualizationMeta from "../../models/VisualizationMeta";
 
 /**
  * @category VisualizationExamples
@@ -44,6 +45,15 @@ export default class StarsVis extends Visualization {
   }
 
   getControls() {
-    return new Vue();
+    return null;
+  }
+
+  setupMeta(meta: VisualizationMeta) {
+    meta.setTitle("Stars");
+    meta.setAuthor("Damian Koper");
+    meta.setDescription(
+      'Can act as "not so cool" visualization on its own but its true purpose is to be background for other visualizations.'
+    );
+    meta.setKeywords(["stars", "milkyway"]);
   }
 }
