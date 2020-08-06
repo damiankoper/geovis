@@ -22,7 +22,7 @@ export default class GeoVisCore {
     this.scene = new THREE.Scene();
     this.group = new THREE.Group();
 
-    this.camera = new THREE.PerspectiveCamera(60, 1, 0.001, 50000);
+    this.camera = new THREE.PerspectiveCamera(60, 1, 0.001, 70000);
     this.clock = new THREE.Clock();
 
     this.renderer = new THREE.WebGLRenderer({

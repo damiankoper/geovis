@@ -14,6 +14,7 @@ export default class StarsVis extends Visualization {
     side: THREE.BackSide,
     map: new THREE.TextureLoader().load(starsMap),
     depthWrite: false,
+    depthFunc: THREE.NeverDepth,
   });
   private mesh = new THREE.Mesh(this.stars, this.starsMaterial);
 

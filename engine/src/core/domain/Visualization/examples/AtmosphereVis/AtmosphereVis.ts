@@ -29,6 +29,7 @@ export default class AtmosphereVis extends Visualization {
     lights: true,
     transparent: true,
     side: THREE.BackSide,
+    depthWrite: false,
   });
 
   public atmosphereGroundMaterial = new THREE.ShaderMaterial({
