@@ -41,7 +41,7 @@ export default class EarthVis extends Visualization {
   });
   private directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 
-  constructor() {
+  constructor(public timestamp = moment.utc()) {
     super();
     this.addParent(new StarsVis());
     this.addParent(new AtmosphereVis());
@@ -80,8 +80,14 @@ export default class EarthVis extends Visualization {
   update(deltaFactor: number): void {
     this.directionalLight.position
       .set(0, 0, 10000)
-      .applyAxisAngle(new Vector3(1, 0, 0), TimeService.getSunDeclination())
-      .applyAxisAngle(new Vector3(0, -1, 0), TimeService.getHourAngle());
+      .applyAxisAngle(
+        new Vector3(1, 0, 0),
+        TimeService.getSunDeclination(this.timestamp)
+      )
+      .applyAxisAngle(
+        new Vector3(0, -1, 0),
+        TimeService.getHourAngle(undefined, undefined, this.timestamp)
+      );
   }
 
   destroy(): void {

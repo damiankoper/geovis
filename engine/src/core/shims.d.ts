@@ -24,3 +24,4 @@ declare module "worker-loader!*" {
 }
 
 declare module "tle.js";
+declare module "satellite.js";

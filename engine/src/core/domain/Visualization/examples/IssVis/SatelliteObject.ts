@@ -1,10 +1,11 @@
+import * as Satellite from "satellite.js";
 import * as TLE from "tle.js";
 import * as THREE from "three";
 import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
 import GeoPosMapper from "@/core/domain/GeoPosition/services/GeoPosMapper";
 import TimeService from "../EarthVis/TimeService";
 import moment from "moment";
-import { Matrix4, Vector3 } from "three";
+import { times } from "lodash";
 export default class SatelliteObject {
   static groundLineMaterial = new THREE.LineBasicMaterial({
     color: 0xffffff,
@@ -37,11 +38,6 @@ export default class SatelliteObject {
   public orbitLine?: THREE.Line;
   private orbitC = 0;
 
-  public useGroundLine = true;
-  public useOrbit = true;
-  public useMesh = true;
-  public useLabel = true;
-
   private labelTexture?: THREE.CanvasTexture;
   private labelCanvas?: HTMLCanvasElement;
   private labelSprite?: THREE.Sprite;
@@ -52,11 +48,17 @@ export default class SatelliteObject {
     return this.r / 6371;
   }
 
+  private satrec: Record<string, number> = {};
+
   constructor(
     public tle: [string, string, string],
-    private readonly r = 6371,
+    public readonly r = 6371,
     public readonly mesh?: THREE.Object3D,
-    public baseTransform: THREE.Matrix4 = new THREE.Matrix4()
+    public baseTransform: THREE.Matrix4 = new THREE.Matrix4(),
+    public useGroundLine = true,
+    public useOrbit = true,
+    public useMesh = true,
+    public useLabel = true
   ) {
     this.setTLE(tle);
     this.line.matrixAutoUpdate = false;
@@ -136,27 +138,30 @@ export default class SatelliteObject {
 
   setTLE(tle: [string, string, string]) {
     this.tle = tle;
-    const G = 3.986004418e14;
-    const e = TLE.getEccentricity(tle);
-    const meanMotion = TLE.getMeanMotion(tle);
+    this.satrec = Satellite.twoline2satrec(tle[1], tle[2]);
 
-    // Source: https://space.stackexchange.com/questions/18289/how-to-get-semi-major-axis-from-tle?rq=1
-    const a = G ** (1 / 3) / ((2 * meanMotion * Math.PI) / 86400) ** (2 / 3);
-    const b = a * Math.sqrt(1 - e ** 2);
+    if (this.useOrbit) {
+      const G = 3.986004418e14;
+      const e = TLE.getEccentricity(tle);
+      const meanMotion = TLE.getMeanMotion(tle);
 
-    const [aE, bE] = [a, b].map((x) => (x / 1000) * this.rFactor);
-    const curve = new THREE.EllipseCurve(0, 0, aE, bE, 0, 0, false, 0);
-    this.orbitLine = new THREE.Line(
-      new THREE.BufferGeometry().setFromPoints(curve.getPoints(600)),
-      SatelliteObject.orbitLineMaterial
-    );
-    this.orbitLine.matrixAutoUpdate = false;
-    this.orbitC = ((a * e) / 1000) * this.rFactor;
+      // Source: https://space.stackexchange.com/questions/18289/how-to-get-semi-major-axis-from-tle?rq=1
+      const a = G ** (1 / 3) / ((2 * meanMotion * Math.PI) / 86400) ** (2 / 3);
+      const b = a * Math.sqrt(1 - e ** 2);
 
+      const [aE, bE] = [a, b].map((x) => (x / 1000) * this.rFactor);
+      const curve = new THREE.EllipseCurve(0, 0, aE, bE, 0, 0, false, 0);
+      this.orbitLine = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints(curve.getPoints(600)),
+        SatelliteObject.orbitLineMaterial
+      );
+      this.orbitLine.matrixAutoUpdate = false;
+      this.orbitC = ((a * e) / 1000) * this.rFactor;
+    }
     if (this.useLabel) this.updateLabel();
   }
 
-  update(timestamp = +moment.utc(), camPos?: THREE.Vector3) {
+  update(timestamp = moment.utc(), camPos?: THREE.Vector3) {
     if (this.useGroundLine)
       this.line.matrix = this.getGroundTransformMatrix(timestamp);
     if (this.useMesh && this.mesh)
@@ -169,30 +174,31 @@ export default class SatelliteObject {
       this.labelSprite.matrix = this.getLabelTransformMatrix(timestamp, camPos);
   }
 
-  getPositionTransformMatrix(timestamp = +moment.utc()): THREE.Matrix4 {
-    const satInfo = TLE.getSatelliteInfo(this.tle, timestamp, 0, 0, 0);
+  getPositionTransformMatrix(timestamp = moment.utc()): THREE.Matrix4 {
+    const date = timestamp.toDate();
+    const positionAndVelocity = Satellite.propagate(this.satrec, date);
+    const positionEci = positionAndVelocity.position;
+    const gmst = Satellite.gstime(date);
+    const positionGd = Satellite.eciToGeodetic(positionEci, gmst);
     return GeoPosMapper.toRotationMatrix(
-      new GeoPosition(
-        THREE.MathUtils.degToRad(satInfo.lat),
-        THREE.MathUtils.degToRad(satInfo.lng)
-      )
+      new GeoPosition(positionGd.latitude, positionGd.longitude)
     ).multiply(
       new THREE.Matrix4().makeTranslation(
         0,
         0,
-        this.r + satInfo.height * this.rFactor
+        this.r + positionGd.height * this.rFactor
       )
     );
   }
 
-  getPosition(timestamp = +moment.utc()) {
+  getPosition(timestamp = moment.utc()) {
     return new THREE.Vector3().applyMatrix4(
       this.getPositionTransformMatrix(timestamp)
     );
   }
 
   getLabelTransformMatrix(
-    timestamp = +moment.utc(),
+    timestamp = moment.utc(),
     camPos: THREE.Vector3 = new THREE.Vector3()
   ) {
     const pos = this.getPosition(timestamp);
@@ -202,7 +208,7 @@ export default class SatelliteObject {
     );
   }
 
-  getGroundTransformMatrix(timestamp = +moment.utc()): THREE.Matrix4 {
+  getGroundTransformMatrix(timestamp = moment.utc()): THREE.Matrix4 {
     const satInfo = TLE.getSatelliteInfo(this.tle, timestamp, 0, 0, 0);
     return GeoPosMapper.toRotationMatrix(
       new GeoPosition(
@@ -220,7 +226,7 @@ export default class SatelliteObject {
       .multiply(new THREE.Matrix4().makeScale(0, 0, satInfo.height * 1.1));
   }
 
-  getOrbitTransformMatrix(timestamp = +moment.utc()): THREE.Matrix4 {
+  getOrbitTransformMatrix(timestamp = moment.utc()): THREE.Matrix4 {
     const m = new THREE.Matrix4()
       .makeRotationY(
         TimeService.getFirstPointOfAriesAngle(timestamp) +

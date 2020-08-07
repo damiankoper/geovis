@@ -22,6 +22,7 @@
     "moment": "^2.27.0",
     "p-queue": "^6.6.0",
     "perf-marks": "^1.8.1",
+    "satellite.js": "^4.0.0",
     "strongly-typed-events": "^1.6.12",
     "three": "^0.118.1",
     "tle.js": "^4.1.0",
