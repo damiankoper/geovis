@@ -8,7 +8,10 @@ import VisualizationMeta from "./VisualizationMeta";
  * @category VisualizationBase
  */
 export default abstract class Visualization {
+  /** @internal */
   public parents: Visualization[] = [];
+
+  /** @internal */
   public readonly meta = new VisualizationMeta();
 
   /**
@@ -36,7 +39,7 @@ export default abstract class Visualization {
   abstract update(deltaFactor: number): void;
 
   /**
-   * Method called when visualizartion is changed or whole GeoVisCore is destroyed.
+   * Method called when visalization is changed or whole GeoVisCore is destroyed.
    * Good place to remove event listeners to avoid memory leaks.
    */
   abstract destroy(): void;
@@ -50,7 +53,6 @@ export default abstract class Visualization {
   }
 
   /**
-   *
    * @returns Vue compoment instance or constructor
    */
   abstract getControls(): Vue | VueConstructor<Vue> | null;

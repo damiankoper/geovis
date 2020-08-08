@@ -1,13 +1,14 @@
-import Visualization from "../../models/Visualization";
 import * as THREE from "three";
-import TrackballCamera from "@/core/domain/Camera/interfaces/TrackballCamera";
-import Vue from "vue";
+import * as d3 from "d3-ease";
 import vertexShader from "./atm.vs";
 import vertexGroundShader from "./atmGround.vs";
 import fragmentShader from "./atm.fs";
 import fragmentGroundShader from "./atmGround.fs";
-import * as d3 from "d3-ease";
-import VisualizationMeta from "../../models/VisualizationMeta";
+
+import Visualization from "@/core/domain/Visualization/models/Visualization";
+import TrackballCamera from "@/core/domain/Camera/interfaces/TrackballCamera";
+import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
+
 /**
  * @category VisualizationExamples
  */
@@ -47,7 +48,6 @@ export default class AtmosphereVis extends Visualization {
     lights: true,
     side: THREE.FrontSide,
     transparent: true,
-    //blending: THREE.AdditiveBlending,
     depthFunc: THREE.AlwaysDepth,
   });
 
@@ -123,7 +123,6 @@ export default class AtmosphereVis extends Visualization {
   }
 
   destroy(): void {
-    console.log("distroyed 3");
     this.atmoSphereGround.dispose();
     this.atmoSphere.dispose();
     this.atmosphereMaterial.dispose();
@@ -131,10 +130,13 @@ export default class AtmosphereVis extends Visualization {
   }
 
   getControls() {
-    return new Vue();
+    return null;
   }
 
   setupMeta(meta: VisualizationMeta) {
-    //
+    meta.setAuthor("Damian Koper");
+    meta.addKeywords(["atmosphere"]);
+    meta.setTitle("Atmosphere");
+    meta.setDescription("Atmosphere meshes without main sphere.");
   }
 }

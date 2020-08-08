@@ -1,5 +1,5 @@
-import GeoPosition from "../models/GeoPosition";
 import * as THREE from "three";
+import GeoPosition from "../models/GeoPosition";
 /**
  * @category VisualizationBase
  */

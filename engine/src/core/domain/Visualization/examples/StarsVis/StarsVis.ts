@@ -1,10 +1,9 @@
-import Visualization from "../../models/Visualization";
 import * as THREE from "three";
 import TrackballCamera from "@/core/domain/Camera/interfaces/TrackballCamera";
-import Vue from "vue";
-import starsMap from "@/assets/textures/4k_stars.jpg";
-import TimeService from "../EarthVis/TimeService";
-import VisualizationMeta from "../../models/VisualizationMeta";
+import Visualization from "@/core/domain/Visualization/models/Visualization";
+import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
+import TimeService from "@/core/domain/Visualization/examples/EarthVis/TimeService";
+import starsMap from "@/core/domain/Visualization/examples/StarsVis/assets/textures/4k_stars.jpg";
 
 /**
  * @category VisualizationExamples
@@ -24,21 +23,23 @@ export default class StarsVis extends Visualization {
     Object.seal(this);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setupCamera(camera: TrackballCamera): void {
-    ///
+    //
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setupScene(scene: THREE.Scene, group: THREE.Group): void {
     this.mesh.renderOrder = 0;
     group.add(this.mesh);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   update(deltaFactor: number): void {
     this.mesh.rotation.y = TimeService.getHourAngle();
   }
 
   destroy(): void {
-    console.log("distroyed 2");
     this.stars.dispose();
     this.starsMaterial.map?.dispose();
     this.starsMaterial.dispose();
@@ -54,6 +55,6 @@ export default class StarsVis extends Visualization {
     meta.setDescription(
       'Can act as "not so cool" visualization on its own but its true purpose is to be background for other visualizations.'
     );
-    meta.setKeywords(["stars", "milkyway"]);
+    meta.addKeywords(["stars", "milkyway"]);
   }
 }

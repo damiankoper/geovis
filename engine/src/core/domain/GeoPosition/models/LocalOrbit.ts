@@ -1,6 +1,9 @@
 import * as THREE from "three";
 import Orbit from "./Orbit";
 
+/**
+ * @category Camera
+ */
 export default class LocalOrbit extends Orbit {
   protected getLatPlane() {
     return new THREE.Vector3(0, 0, 1);

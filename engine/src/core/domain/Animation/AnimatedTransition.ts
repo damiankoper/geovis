@@ -1,8 +1,15 @@
 import * as d3 from "d3-ease";
 import * as THREE from "three";
+/**
+ * @internal For internal GeoVisCore purposes
+ */
 interface Clonable<T> {
   clone(): T;
 }
+
+/**
+ * @internal For internal GeoVisCore purposes
+ */
 export default class AnimatedTransition<T extends Clonable<T>> {
   private clock = new THREE.Clock(false);
   public from: T;

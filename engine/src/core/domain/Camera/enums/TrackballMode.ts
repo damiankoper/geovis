@@ -1,5 +1,6 @@
 /**
  * Camera mode.
+ * @category Camera
  */
 export enum TrackballMode {
   /**

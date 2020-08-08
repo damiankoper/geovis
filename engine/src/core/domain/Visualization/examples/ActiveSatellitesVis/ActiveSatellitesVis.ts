@@ -1,16 +1,20 @@
-import _, { times } from "lodash";
+import _ from "lodash";
 import * as THREE from "three";
-import { TrackballCamera } from "@/GeoVisEngine";
-import Visualization from "../../models/Visualization";
-import EarthVis from "../EarthVis/EarthVis";
-import Range from "@/core/domain/GeoPosition/models/Range";
 import moment, { Moment } from "moment";
+import Range from "@/core/domain/Utils/Range";
+import EarthVis from "@/core/domain/Visualization/examples/EarthVis/EarthVis";
+import Visualization from "@/core/domain/Visualization/models/Visualization";
+import { TrackballCamera } from "@/GeoVisEngine";
+import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
 import ActiveSatellitesVisControls from "./ActiveSatellitesVisControls.vue";
 
-import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
-import VisualizationMeta from "../../models/VisualizationMeta";
-import SatelliteObject from "../IssVis/SatelliteObject";
-import TLEService from "../IssVis/TLEService";
+import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
+import SatelliteObject from "@/core/domain/Visualization/examples/EarthCommon/SatelliteObject";
+import TLEService from "@/core/domain/Visualization/examples/EarthCommon/TLEService";
+
+/**
+ * @category VisualizationExamples
+ */
 export default class ActiveSatellitesVis extends Visualization {
   readonly r = 6371;
   public camera: TrackballCamera | null = null;
@@ -111,6 +115,6 @@ export default class ActiveSatellitesVis extends Visualization {
       `Shows position relative to earth of all active satelices from celestrak.com.
 Position is calculated using TLE records.`
     );
-    meta.setKeywords(["satellites", "celestrack", "active"]);
+    meta.addKeywords(["satellites", "celestrack", "active"]);
   }
 }

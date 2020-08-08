@@ -1,19 +1,18 @@
 import * as THREE from "three";
 import _ from "lodash";
-import { TrackballMode } from "../enums/TrackballMode";
-import TrackballCamera from "../interfaces/TrackballCamera";
-import GeoPosition from "../../GeoPosition/models/GeoPosition";
-import GlobalOrbit from "../../GeoPosition/models/GlobalOrbit";
-import LocalOrbit from "../../GeoPosition/models/LocalOrbit";
-import AnimatedTransition from "../../Animation/AnimatedTransition";
-import Range from "../../GeoPosition/models/Range";
+import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
+import TrackballCamera from "@/core/domain/Camera/interfaces/TrackballCamera";
+import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
+import GlobalOrbit from "@/core/domain/GeoPosition/models/GlobalOrbit";
+import LocalOrbit from "@/core/domain/GeoPosition/models/LocalOrbit";
+import AnimatedTransition from "@/core/domain/Animation/AnimatedTransition";
+import Range from "@/core/domain/Utils/Range";
 import { EventDispatcher } from "strongly-typed-events";
-import Orbit from "../../GeoPosition/models/Orbit";
-import * as PerfMarks from "perf-marks";
-import { Matrix4, Vector3 } from "three";
+import Orbit from "@/core/domain/GeoPosition/models/Orbit";
 
 /**
  * @category Camera
+ * @internal For internal GeoVisCore purposes
  */
 export default class TrackballController implements TrackballCamera {
   private pointerCaptured = false;
@@ -37,9 +36,10 @@ export default class TrackballController implements TrackballCamera {
     0.3
   );
 
+  private group = new THREE.Group();
+
   constructor(
     private readonly camera: THREE.Camera,
-    private readonly group: THREE.Group,
     private readonly eventSource: HTMLCanvasElement
   ) {
     this.group.matrixAutoUpdate = false;
@@ -47,6 +47,12 @@ export default class TrackballController implements TrackballCamera {
     this.setGroupTransformMatrix();
     this.setCameraTransformMatrix();
     this.setEvents();
+  }
+
+  setGroup(group: THREE.Group) {
+    this.group = group;
+    this.group.matrixAutoUpdate = false;
+    this.setGroupTransformMatrix();
   }
 
   update() {
@@ -81,7 +87,7 @@ export default class TrackballController implements TrackballCamera {
     const pos = this.localOrbit.v;
     this.camera.matrixWorld.makeTranslation(pos.x, pos.y, pos.z);
     this.camera.matrixWorld.multiply(
-      new Matrix4().lookAt(pos, new Vector3(), this.localOrbit.up)
+      new THREE.Matrix4().lookAt(pos, new THREE.Vector3(), this.localOrbit.up)
     );
   }
 

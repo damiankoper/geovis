@@ -8,7 +8,6 @@ export default class GeoVisCore {
   private visualization: Visualization | null = null;
 
   private scene: THREE.Scene;
-  private readonly group: THREE.Group;
   private readonly camera: THREE.PerspectiveCamera;
   private readonly renderer: THREE.Renderer;
   private readonly clock: THREE.Clock;
@@ -20,7 +19,6 @@ export default class GeoVisCore {
     this.container = container;
 
     this.scene = new THREE.Scene();
-    this.group = new THREE.Group();
 
     this.camera = new THREE.PerspectiveCamera(60, 1, 0.001, 70000);
     this.clock = new THREE.Clock();
@@ -33,11 +31,10 @@ export default class GeoVisCore {
 
     this.cameraController = new TrackballController(
       this.camera,
-      this.group,
       this.renderer.domElement
     );
 
-    //   Do not allow Vue to set reactivity here and deeper
+    // Do not allow Vue to set reactivity here and deeper
     Object.seal(this);
   }
 
@@ -50,13 +47,17 @@ export default class GeoVisCore {
   }
 
   public run(visualization: Visualization) {
+    this.visualization?._destroy();
     this.scene.dispose();
+
+    const group = new THREE.Group();
     this.scene = new THREE.Scene();
-    this.scene.add(this.group);
-    if (this.visualization) this.visualization._destroy();
+    this.scene.add(group);
+    this.cameraController.setGroup(group);
 
     this.visualization = visualization;
-    this.visualization._setup(this.scene, this.group, this.cameraController);
+    this.visualization._setup(this.scene, group, this.cameraController);
+
     this._run();
   }
 

@@ -1,21 +1,24 @@
-import Visualization from "@/core/domain/Visualization/models/Visualization";
 import * as THREE from "three";
+import moment from "moment";
+
+import Visualization from "@/core/domain/Visualization/models/Visualization";
+import VisualizationMeta from "../../models/VisualizationMeta";
 import TrackballCamera from "@/core/domain/Camera/interfaces/TrackballCamera";
-import Range from "@/core/domain/GeoPosition/models/Range";
+import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
+
+import Range from "@/core/domain/Utils/Range";
 import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
-import earthMap from "@/assets/textures/8k_earth_daymap.jpg";
-import earthNightMap from "@/assets/textures/8k_earth_nightmap.jpg";
-import earthNormalMap from "@/assets/textures/8k_earth_normal_map.jpg";
-import earthSpecularMap from "@/assets/textures/8k_earth_specular_map.jpg";
-import earthCloudsMap from "@/assets/textures/8k_earth_clouds.jpg";
 import StarsVis from "@/core/domain/Visualization/examples/StarsVis/StarsVis";
 import EarthVisControls from "./EarthVisControls.vue";
 import AtmosphereVis from "../AtmosphereVis/AtmosphereVis";
-import { Vector3, Mesh } from "three";
-import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
-import moment from "moment";
 import TimeService from "./TimeService";
-import VisualizationMeta from "../../models/VisualizationMeta";
+
+import earthMap from "@/core/domain/Visualization/examples/EarthVis/assets/textures/8k_earth_daymap.jpg";
+import earthNightMap from "@/core/domain/Visualization/examples/EarthVis/assets/textures/8k_earth_nightmap.jpg";
+import earthNormalMap from "@/core/domain/Visualization/examples/EarthVis/assets/textures/8k_earth_normal_map.jpg";
+import earthSpecularMap from "@/core/domain/Visualization/examples/EarthVis/assets/textures/8k_earth_specular_map.jpg";
+import earthCloudsMap from "@/core/domain/Visualization/examples/EarthVis/assets/textures/8k_earth_clouds.jpg";
+
 /**
  * @category VisualizationExamples
  */
@@ -81,11 +84,11 @@ export default class EarthVis extends Visualization {
     this.directionalLight.position
       .set(0, 0, 10000)
       .applyAxisAngle(
-        new Vector3(1, 0, 0),
+        new THREE.Vector3(1, 0, 0),
         TimeService.getSunDeclination(this.timestamp)
       )
       .applyAxisAngle(
-        new Vector3(0, -1, 0),
+        new THREE.Vector3(0, -1, 0),
         TimeService.getHourAngle(undefined, undefined, this.timestamp)
       );
   }
@@ -144,6 +147,9 @@ export default class EarthVis extends Visualization {
   }
 
   setupMeta(meta: VisualizationMeta) {
-    //
+    meta.setTitle("Earth");
+    meta.setDescription("Earth illuminated by the sun at the current time.");
+    meta.addKeywords(["earth"]);
+    meta.setAuthor("Damian Koper");
   }
 }

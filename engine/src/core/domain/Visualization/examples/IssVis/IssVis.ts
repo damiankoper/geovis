@@ -1,19 +1,25 @@
-import _ from "lodash";
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+
 import { TrackballCamera } from "@/GeoVisEngine";
-import Visualization from "../../models/Visualization";
-import EarthVis from "../EarthVis/EarthVis";
-import Range from "@/core/domain/GeoPosition/models/Range";
-
-import TLEService from "./TLEService";
-import IssVisControls from "./IssVisControls.vue";
-import SatelliteObject from "./SatelliteObject";
-
-import iss from "@/assets/models/isscombined.obj";
-import hst from "@/assets/models/hst.obj";
 import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
-import VisualizationMeta from "../../models/VisualizationMeta";
+
+import Range from "@/core/domain/Utils/Range";
+import EarthVis from "@/core/domain/Visualization/examples/EarthVis/EarthVis";
+import IssVisControls from "./IssVisControls.vue";
+
+import Visualization from "@/core/domain/Visualization/models/Visualization";
+import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
+
+import SatelliteObject from "@/core/domain/Visualization/examples/EarthCommon/SatelliteObject";
+import TLEService from "@/core/domain/Visualization/examples/EarthCommon/TLEService";
+
+import iss from "@/core/domain/Visualization/examples/IssVis/assets/models/isscombined.obj";
+import hst from "@/core/domain/Visualization/examples/IssVis/assets/models/hst.obj";
+
+/**
+ * @category VisualizationExamples
+ */
 export default class IssVis extends Visualization {
   readonly r = 6371;
   public camera: TrackballCamera | null = null;
@@ -82,7 +88,7 @@ export default class IssVis extends Visualization {
 
   loadSatelliteModel(path: string) {
     const m = this.satelliteMaterial;
-    return new Promise<THREE.Object3D>((resolve, reject) => {
+    return new Promise<THREE.Object3D>((resolve) => {
       new OBJLoader().load(path, (obj) => {
         obj.matrixAutoUpdate = false;
         obj.renderOrder = 51;
@@ -133,6 +139,6 @@ export default class IssVis extends Visualization {
       `Shows position relative to earth of arbitrary chosen three satellites - ISS, Hubble Space Telescope and HotBird 13C.
 Position is calculated using TLE records.`
     );
-    meta.setKeywords(["stars", "milkyway"]);
+    meta.addKeywords(["stars", "milkyway"]);
   }
 }

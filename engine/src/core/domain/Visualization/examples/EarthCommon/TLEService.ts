@@ -1,8 +1,18 @@
 import { SimpleEventDispatcher } from "strongly-typed-events";
 
+/**
+ * @category VisualizationHelper
+ */
 export type TLE = [string, string, string];
+
+/**
+ * @category VisualizationHelper
+ */
 export type TLEMap = Record<string, TLE>;
 
+/**
+ * @category VisualizationHelper
+ */
 export default class TLEService {
   private _onUpdate = new SimpleEventDispatcher<TLEMap>();
   get onUpdate() {

@@ -1,21 +1,33 @@
-import { TileLayerConfig } from "./TileLayerConfig";
-import * as THREE from "three";
 import PQueue from "p-queue";
-import delay from "delay";
+import * as THREE from "three";
+import { TileLayerConfig } from "./TileLayerConfig";
+
+/**
+ * @category VisualizationHelper
+ */
 interface TileKey {
   tileKey: string;
 }
 
+/**
+ * @category VisualizationHelper
+ */
 export interface PaintTileLayersMessageData extends TileKey {
   name: "paintTileLayers";
   layers: TileLayerConfig[];
   priority: number;
 }
 
+/**
+ * @category VisualizationHelper
+ */
 export interface AbortTileMessageData extends TileKey {
   name: "abortTile";
 }
 
+/**
+ * @category VisualizationHelper
+ */
 class TilePainter {
   // eslint-disable-next-line
   ctx: Worker = self as any;

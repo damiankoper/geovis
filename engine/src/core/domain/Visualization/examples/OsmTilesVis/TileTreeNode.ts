@@ -1,8 +1,11 @@
 import * as THREE from "three";
 import { TrackballCamera } from "@/GeoVisEngine";
-import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
 import { TilesService } from "./TilesService";
-import * as PerfMarks from "perf-marks";
+import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
+
+/**
+ * @category VisualizationHelper
+ */
 export class TileTreeNode {
   canvas: HTMLCanvasElement = this.service.createCanvas();
   canvasCtx = this.canvas.getContext("bitmaprenderer");

@@ -1,15 +1,21 @@
 import * as THREE from "three";
-import { SphereBufferGeometry, TextureLoader, NearestFilter } from "three";
+import _ from "lodash";
 import { TileTreeNode } from "./TileTreeNode";
 import { TileLayerConfig } from "./TileLayerConfig";
-import TilePainterWorker from "worker-loader!./TilePainter.worker";
 import { PaintTileLayersMessageData } from "./TilePainter.worker";
-import _ from "lodash";
-import bgTile from "@/assets/textures/tile_bg.png";
+import TilePainterWorker from "worker-loader!./TilePainter.worker";
+import bgTile from "@/core/domain/Visualization/examples/OsmTilesVis/assets/textures/tile_bg.png";
+
+/**
+ * @category VisualizationHelper
+ */
 export class TilesService {
   public thetaShift = THREE.MathUtils.degToRad(90 - 85.0511);
   public thetaBound = THREE.MathUtils.degToRad(85.0511);
-  public geometryMap = new Map<number, Map<number, SphereBufferGeometry>>();
+  public geometryMap = new Map<
+    number,
+    Map<number, THREE.SphereBufferGeometry>
+  >();
   public bgTile = new THREE.ImageLoader().load(bgTile);
   public tileSize = 256;
 
@@ -85,14 +91,14 @@ export class TilesService {
   getGeometry(zoom: number, y: number) {
     let latMap = this.geometryMap.get(zoom);
     if (!latMap) {
-      latMap = new Map<number, SphereBufferGeometry>();
+      latMap = new Map<number, THREE.SphereBufferGeometry>();
       this.geometryMap.set(zoom, latMap);
     }
 
     let geometry = latMap.get(y);
     if (!geometry) {
       const d = Math.floor((-Math.tanh(zoom / 4) + 1) * 30 + 1);
-      geometry = new SphereBufferGeometry(
+      geometry = new THREE.SphereBufferGeometry(
         this.r,
         d,
         d,

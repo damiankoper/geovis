@@ -1,11 +1,14 @@
 import * as THREE from "three";
-import Range from "./Range";
-import GeoPosition from "./GeoPosition";
-import GeoPosMapper from "../services/GeoPosMapper";
-import { TrackballMode } from "../../Camera/enums/TrackballMode";
-import NumUtils from "../../Utils/NumUtils";
-import { Vector3 } from "three";
 import _ from "lodash";
+import Range from "@/core/domain/Utils/Range";
+import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
+import GeoPosMapper from "@/core/domain/GeoPosition/services/GeoPosMapper";
+import NumUtils from "@/core/domain/Utils/NumUtils";
+import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
+
+/**
+ * @category Camera
+ */
 export default abstract class Orbit {
   protected compassNorth = new THREE.Vector3(0, 1, 0);
 
@@ -57,7 +60,7 @@ export default abstract class Orbit {
     const v1Long = this.v.clone().projectOnPlane(longPlane).normalize();
     const v2Long = this.getLongOrigin().projectOnPlane(longPlane).normalize();
     const qLong = new THREE.Quaternion().setFromUnitVectors(v1Long, v2Long);
-    const dot = new Vector3(qLong.x, qLong.y, qLong.z).dot(longPlane);
+    const dot = new THREE.Vector3(qLong.x, qLong.y, qLong.z).dot(longPlane);
     const longitude = qLong.angleTo(new THREE.Quaternion()) * Math.sign(dot);
     // Latitude
     const latPlane = this.getLatPlane();
@@ -141,7 +144,7 @@ export default abstract class Orbit {
       .normalize()
       .applyQuaternion(
         new THREE.Quaternion().setFromAxisAngle(
-          new Vector3().crossVectors(this.v, this.up).normalize(),
+          new THREE.Vector3().crossVectors(this.v, this.up).normalize(),
           pos.lat
         )
       )

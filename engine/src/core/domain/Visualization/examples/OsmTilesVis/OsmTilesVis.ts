@@ -1,16 +1,18 @@
-import Visualization from "@/core/domain/Visualization/models/Visualization";
 import * as THREE from "three";
-import TrackballCamera from "@/core/domain/Camera/interfaces/TrackballCamera";
-import Range from "@/core/domain/GeoPosition/models/Range";
-import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
-import StarsVis from "@/core/domain/Visualization/examples/StarsVis/StarsVis";
-import OsmTilesVisControls from "./OsmTilesVisControls.vue";
-import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
-import { TilesService } from "./TilesService";
-import * as PerfMarks from "perf-marks";
 import _ from "lodash";
-import AtmosphereVis from "../AtmosphereVis/AtmosphereVis";
-import VisualizationMeta from "../../models/VisualizationMeta";
+import Visualization from "@/core/domain/Visualization/models/Visualization";
+import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
+import TrackballCamera from "@/core/domain/Camera/interfaces/TrackballCamera";
+import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
+import Range from "@/core/domain/Utils/Range";
+import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
+
+import OsmTilesVisControls from "./OsmTilesVisControls.vue";
+import { TilesService } from "./TilesService";
+
+import StarsVis from "@/core/domain/Visualization/examples/StarsVis/StarsVis";
+import AtmosphereVis from "@/core/domain/Visualization/examples/AtmosphereVis/AtmosphereVis";
+
 /**
  * @category VisualizationExamples
  */
@@ -105,13 +107,11 @@ export default class OsmTilesVis extends Visualization {
     const desiredZoom =
       Math.max(Math.floor(-Math.log2(R) + Math.log2(this.maxZoom)), 0) + 3;
 
-    PerfMarks.start("TilesCalc");
     this.osmTilesService.tileTreeRoot.calcDeep(
       camera,
       this.sphereGroup,
       desiredZoom
     );
-    PerfMarks.end("TilesCalc");
   }
 
   public refreshDeep() {
@@ -124,7 +124,7 @@ export default class OsmTilesVis extends Visualization {
   }
 
   destroy(): void {
-    console.info("destroy");
+    //
   }
 
   getControls() {
@@ -137,6 +137,6 @@ export default class OsmTilesVis extends Visualization {
     meta.setDescription(
       `Displays tiles map with adjustable layers - radar coverage and rain radar. Uses RainviewerAPI & OSM Standard Tile Layer.`
     );
-    meta.setKeywords(["tiles", "weather"]);
+    meta.addKeywords(["tiles", "weather"]);
   }
 }

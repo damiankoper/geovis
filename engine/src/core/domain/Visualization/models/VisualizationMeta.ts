@@ -1,4 +1,9 @@
 import _ from "lodash";
+/**
+ * Contains base information about visualization.
+ * Child visualization can overwrite parents' fields.
+ * @category VisualizationBase
+ */
 export default class VisualizationMeta {
   protected title = "Title";
   protected description = "Description.";
@@ -21,6 +26,13 @@ export default class VisualizationMeta {
     this.keywords = s;
   }
 
+  addKeywords(s: string[]) {
+    this.keywords.push(...s);
+  }
+
+  /**
+   * @returns Copy of fields in plain JS object
+   */
   getData() {
     return _.assign({}, this);
   }

@@ -5,7 +5,10 @@ import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
 import GeoPosMapper from "@/core/domain/GeoPosition/services/GeoPosMapper";
 import TimeService from "../EarthVis/TimeService";
 import moment from "moment";
-import { times } from "lodash";
+
+/**
+ * @category VisualizationHelper
+ */
 export default class SatelliteObject {
   static groundLineMaterial = new THREE.LineBasicMaterial({
     color: 0xffffff,
@@ -174,12 +177,16 @@ export default class SatelliteObject {
       this.labelSprite.matrix = this.getLabelTransformMatrix(timestamp, camPos);
   }
 
-  getPositionTransformMatrix(timestamp = moment.utc()): THREE.Matrix4 {
+  getPositionGd(timestamp = moment.utc()) {
     const date = timestamp.toDate();
     const positionAndVelocity = Satellite.propagate(this.satrec, date);
     const positionEci = positionAndVelocity.position;
     const gmst = Satellite.gstime(date);
-    const positionGd = Satellite.eciToGeodetic(positionEci, gmst);
+    return Satellite.eciToGeodetic(positionEci, gmst);
+  }
+
+  getPositionTransformMatrix(timestamp = moment.utc()): THREE.Matrix4 {
+    const positionGd = this.getPositionGd(timestamp);
     return GeoPosMapper.toRotationMatrix(
       new GeoPosition(positionGd.latitude, positionGd.longitude)
     ).multiply(
@@ -209,21 +216,18 @@ export default class SatelliteObject {
   }
 
   getGroundTransformMatrix(timestamp = moment.utc()): THREE.Matrix4 {
-    const satInfo = TLE.getSatelliteInfo(this.tle, timestamp, 0, 0, 0);
+    const positionGd = this.getPositionGd(timestamp);
     return GeoPosMapper.toRotationMatrix(
-      new GeoPosition(
-        THREE.MathUtils.degToRad(satInfo.lat),
-        THREE.MathUtils.degToRad(satInfo.lng)
-      )
+      new GeoPosition(positionGd.latitude, positionGd.longitude)
     )
       .multiply(
         new THREE.Matrix4().makeTranslation(
           0,
           0,
-          this.r + satInfo.height * this.rFactor
+          this.r + positionGd.height * this.rFactor
         )
       )
-      .multiply(new THREE.Matrix4().makeScale(0, 0, satInfo.height * 1.1));
+      .multiply(new THREE.Matrix4().makeScale(0, 0, positionGd.height * 1.1));
   }
 
   getOrbitTransformMatrix(timestamp = moment.utc()): THREE.Matrix4 {
