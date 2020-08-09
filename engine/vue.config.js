@@ -1,12 +1,13 @@
 module.exports = {
   transpileDependencies: ["vuetify"],
+  publicPath: "/",
   pluginOptions: {
     storybook: {
       allowedPlugins: ["VuetifyLoaderPlugin"],
     },
   },
+  css: { extract: false },
   chainWebpack: (config) => {
-    // GraphQL Loader
     config.module
       .rule("shaders")
       .test(/\.(glsl|vs|fs)$/)
@@ -14,18 +15,31 @@ module.exports = {
       .loader("ts-shader-loader")
       .end();
 
+    const svgRule = config.module.rule("svg");
+    svgRule.uses.clear();
+    svgRule
+      .test(/\.svg$/)
+      .use("svg-url-loader")
+      .loader("svg-url-loader");
+
     config.module
       .rule("obj")
       .test(/\.(obj)$/)
       .use("file-loader")
       .loader("file-loader")
+      .options({ outputPath: "models" })
       .end();
 
-    config.module
-      .rule("stl")
-      .test(/\.(stl)$/)
-      .use("file-loader")
-      .loader("file-loader")
-      .end();
+    config.externals([
+      function (context, request, callback) {
+        if (/^three/.test(request)) {
+          return callback(null, request);
+        }
+        callback();
+      },
+      "vuetify",
+      "moment",
+      "lodash",
+    ]);
   },
 };

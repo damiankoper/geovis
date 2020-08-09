@@ -16,7 +16,9 @@ export class TilesService {
     number,
     Map<number, THREE.SphereBufferGeometry>
   >();
-  public bgTile = new THREE.ImageLoader().load(bgTile);
+  public bgTile = new Promise<HTMLImageElement>((r) =>
+    new THREE.ImageLoader().load(bgTile, (i) => r(i))
+  );
   public tileSize = 256;
 
   public tilePainter = new TilePainterWorker();
@@ -44,10 +46,12 @@ export class TilesService {
     const canvas = document.createElement("canvas");
     canvas.width = this.tileSize;
     canvas.height = this.tileSize;
-    createImageBitmap(this.bgTile).then((bitmap) => {
-      const ctx = canvas.getContext("bitmaprenderer");
-      if (ctx) ctx.transferFromImageBitmap(bitmap);
-    });
+    this.bgTile
+      .then((b) => createImageBitmap(b))
+      .then((bitmap) => {
+        const ctx = canvas.getContext("bitmaprenderer");
+        if (ctx) ctx.transferFromImageBitmap(bitmap);
+      });
     return canvas;
   }
 

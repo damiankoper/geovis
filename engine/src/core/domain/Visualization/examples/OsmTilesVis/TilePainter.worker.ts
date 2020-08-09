@@ -1,5 +1,4 @@
 import PQueue from "p-queue";
-import * as THREE from "three";
 import { TileLayerConfig } from "./TileLayerConfig";
 
 /**
@@ -32,7 +31,6 @@ class TilePainter {
   // eslint-disable-next-line
   ctx: Worker = self as any;
   offscreen = new OffscreenCanvas(256, 256);
-  loader = new THREE.FileLoader();
   tileCache = new Map<string, Blob>();
   abortControllers = new Map<string, AbortController>();
 
@@ -40,7 +38,6 @@ class TilePainter {
 
   constructor() {
     this.ctx.onmessage = this.onMessage.bind(this);
-    this.loader.setResponseType("blob");
   }
 
   async onMessage(event: MessageEvent) {
@@ -71,13 +68,15 @@ class TilePainter {
       this.ctx.postMessage({ tileKey: data.tileKey, image }, [image]);
     } else {
       try {
-        const abortController =
-          this.abortControllers.get(cacheKey) || new AbortController();
-        this.abortControllers.set(cacheKey, abortController);
+        const abortController = this.abortControllers.get(cacheKey);
+        abortController?.abort();
+
+        const newAbortController = new AbortController();
+        this.abortControllers.set(cacheKey, newAbortController);
         const images = await Promise.all(
           visibleLayers.map((layer) => {
             const url = layer.tileUrl as string;
-            return this.createBitmap(url, abortController.signal);
+            return this.createBitmap(url, newAbortController.signal);
           })
         );
 

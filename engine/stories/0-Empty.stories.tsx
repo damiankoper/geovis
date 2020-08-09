@@ -32,10 +32,12 @@ export const Basic = () => ({
   components: { GeoVisCore },
   render(h: any) {
     return (
-      <geo-vis-core
-        style="height:99.9999vh"
-        visualization={(this as any).vis}
-      />
+      <div>
+        <geo-vis-core
+          style="height:600px;width:100vw"
+          visualization={(this as any).vis}
+        />
+      </div>
     );
   },
   props: {

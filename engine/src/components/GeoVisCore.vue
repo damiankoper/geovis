@@ -1,5 +1,5 @@
 <template>
-  <div class="geo-vis">
+  <div class="geo-vis" ref="geoVis">
     <div class="three-container" ref="threeContainer"></div>
     <core-controls
       class="core-controls"
@@ -27,6 +27,8 @@ import Visualization from "../core/domain/Visualization/models/Visualization";
 import CoreControls from "./CoreControls.vue";
 import VisualizationInfo from "./VisualizationInfo.vue";
 import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
+import Vuetify from "vuetify/lib";
+if (process.env.NODE_ENV === "production") Vue.use(Vuetify);
 
 @Component({
   components: { CoreControls, VisualizationInfo },
@@ -35,6 +37,7 @@ export default class GeoVisCoreVue extends Vue {
   geoVisCore: GeoVisCore | null = null;
   @Prop() visualization!: Visualization;
   visInfo = new VisualizationMeta().getData();
+  observer!: ResizeObserver;
 
   get camera() {
     return this.geoVisCore?.cameraController;
@@ -45,19 +48,18 @@ export default class GeoVisCoreVue extends Vue {
     if (container) {
       this.geoVisCore = new GeoVisCore(container as HTMLElement);
       this.onVisChange(this.visualization);
-
-      const resizeObserver = new window.ResizeObserver((entry) => {
+      this.observer = new window.ResizeObserver((entry) => {
         entry.forEach(() => {
           if (this.geoVisCore) this.geoVisCore.setSize();
         });
       });
-      resizeObserver.observe(container);
+      this.observer.observe(this.$refs.geoVis as HTMLElement);
     }
   }
 
   destroyed() {
     console.log("Vue destroyed");
-
+    this.observer.disconnect();
     if (this.geoVisCore) this.geoVisCore.destroy();
   }
 
