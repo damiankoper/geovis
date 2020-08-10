@@ -1,14 +1,14 @@
 import * as THREE from "three";
 import _ from "lodash";
-import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
-import TrackballCamera from "@/core/domain/Camera/interfaces/TrackballCamera";
-import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
-import GlobalOrbit from "@/core/domain/GeoPosition/models/GlobalOrbit";
-import LocalOrbit from "@/core/domain/GeoPosition/models/LocalOrbit";
-import AnimatedTransition from "@/core/domain/Animation/AnimatedTransition";
-import Range from "@/core/domain/Utils/Range";
+import { TrackballMode } from "../../../../core/domain/Camera/enums/TrackballMode";
+import TrackballCamera from "../../../../core/domain/Camera/interfaces/TrackballCamera";
+import GeoPosition from "../../../../core/domain/GeoPosition/models/GeoPosition";
+import GlobalOrbit from "../../../../core/domain/GeoPosition/models/GlobalOrbit";
+import LocalOrbit from "../../../../core/domain/GeoPosition/models/LocalOrbit";
+import AnimatedTransition from "../../../../core/domain/Animation/AnimatedTransition";
+import Range from "../../../../core/domain/Utils/Range";
 import { EventDispatcher } from "strongly-typed-events";
-import Orbit from "@/core/domain/GeoPosition/models/Orbit";
+import Orbit from "../../../../core/domain/GeoPosition/models/Orbit";
 
 /**
  * @category Camera

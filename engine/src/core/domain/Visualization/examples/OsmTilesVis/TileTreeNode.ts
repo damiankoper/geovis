@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import { TrackballCamera } from "@/GeoVisEngine";
+import { TrackballCamera } from "../../../../../GeoVisEngine";
 import { TilesService } from "./TilesService";
-import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
+import GeoPosition from "../../../../../core/domain/GeoPosition/models/GeoPosition";
 
 /**
  * @category VisualizationHelper

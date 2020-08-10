@@ -4,7 +4,7 @@ import { TileTreeNode } from "./TileTreeNode";
 import { TileLayerConfig } from "./TileLayerConfig";
 import { PaintTileLayersMessageData } from "./TilePainter.worker";
 import TilePainterWorker from "worker-loader!./TilePainter.worker";
-import bgTile from "@/core/domain/Visualization/examples/OsmTilesVis/assets/textures/tile_bg.png";
+import bgTile from "../../../../../core/domain/Visualization/examples/OsmTilesVis/assets/textures/tile_bg.png";
 
 /**
  * @category VisualizationHelper

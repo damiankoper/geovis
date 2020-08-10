@@ -1,10 +1,10 @@
 import * as THREE from "three";
 import _ from "lodash";
-import Range from "@/core/domain/Utils/Range";
-import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
-import GeoPosMapper from "@/core/domain/GeoPosition/services/GeoPosMapper";
-import NumUtils from "@/core/domain/Utils/NumUtils";
-import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
+import Range from "../../../../core/domain/Utils/Range";
+import GeoPosition from "../../../../core/domain/GeoPosition/models/GeoPosition";
+import GeoPosMapper from "../../../../core/domain/GeoPosition/services/GeoPosMapper";
+import NumUtils from "../../../../core/domain/Utils/NumUtils";
+import { TrackballMode } from "../../../../core/domain/Camera/enums/TrackballMode";
 
 /**
  * @category Camera

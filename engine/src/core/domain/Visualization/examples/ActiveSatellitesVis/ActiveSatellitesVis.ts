@@ -1,16 +1,16 @@
 import _ from "lodash";
 import * as THREE from "three";
 import moment, { Moment } from "moment";
-import Range from "@/core/domain/Utils/Range";
-import EarthVis from "@/core/domain/Visualization/examples/EarthVis/EarthVis";
-import Visualization from "@/core/domain/Visualization/models/Visualization";
-import { TrackballCamera } from "@/GeoVisEngine";
-import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
+import Range from "../../../../../core/domain/Utils/Range";
+import EarthVis from "../../../../../core/domain/Visualization/examples/EarthVis/EarthVis";
+import Visualization from "../../../../../core/domain/Visualization/models/Visualization";
+import { TrackballCamera } from "../../../../../GeoVisEngine";
+import { TrackballMode } from "../../../../../core/domain/Camera/enums/TrackballMode";
 import ActiveSatellitesVisControls from "./ActiveSatellitesVisControls.vue";
 
-import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
-import SatelliteObject from "@/core/domain/Visualization/examples/EarthCommon/SatelliteObject";
-import TLEService from "@/core/domain/Visualization/examples/EarthCommon/TLEService";
+import VisualizationMeta from "../../../../../core/domain/Visualization/models/VisualizationMeta";
+import SatelliteObject from "../../../../../core/domain/Visualization/examples/EarthCommon/SatelliteObject";
+import TLEService from "../../../../../core/domain/Visualization/examples/EarthCommon/TLEService";
 
 /**
  * @category VisualizationExamples

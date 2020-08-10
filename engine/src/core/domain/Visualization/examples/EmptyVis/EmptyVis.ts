@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import TrackballCamera from "@/core/domain/Camera/interfaces/TrackballCamera";
-import Visualization from "@/core/domain/Visualization/models/Visualization";
-import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
+import TrackballCamera from "../../../../../core/domain/Camera/interfaces/TrackballCamera";
+import Visualization from "../../../../../core/domain/Visualization/models/Visualization";
+import VisualizationMeta from "../../../../../core/domain/Visualization/models/VisualizationMeta";
 import { VueConstructor } from "vue/types/umd";
 
 /**

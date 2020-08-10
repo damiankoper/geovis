@@ -1,9 +1,9 @@
 import * as THREE from "three";
-import TrackballCamera from "@/core/domain/Camera/interfaces/TrackballCamera";
-import Visualization from "@/core/domain/Visualization/models/Visualization";
-import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
-import TimeService from "@/core/domain/Visualization/examples/EarthVis/TimeService";
-import starsMap from "@/core/domain/Visualization/examples/StarsVis/assets/textures/4k_stars.jpg";
+import TrackballCamera from "../../../../../core/domain/Camera/interfaces/TrackballCamera";
+import Visualization from "../../../../../core/domain/Visualization/models/Visualization";
+import VisualizationMeta from "../../../../../core/domain/Visualization/models/VisualizationMeta";
+import TimeService from "../../../../../core/domain/Visualization/examples/EarthVis/TimeService";
+import starsMap from "../../../../../core/domain/Visualization/examples/StarsVis/assets/textures/4k_stars.jpg";
 
 /**
  * @category VisualizationExamples

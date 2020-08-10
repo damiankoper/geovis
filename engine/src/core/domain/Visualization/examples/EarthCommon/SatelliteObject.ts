@@ -1,8 +1,8 @@
 import * as Satellite from "satellite.js";
 import * as TLE from "tle.js";
 import * as THREE from "three";
-import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
-import GeoPosMapper from "@/core/domain/GeoPosition/services/GeoPosMapper";
+import GeoPosition from "../../../../../core/domain/GeoPosition/models/GeoPosition";
+import GeoPosMapper from "../../../../../core/domain/GeoPosition/services/GeoPosMapper";
 import TimeService from "../EarthVis/TimeService";
 import moment from "moment";
 

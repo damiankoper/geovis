@@ -1,17 +1,17 @@
 import * as THREE from "three";
 import _ from "lodash";
-import Visualization from "@/core/domain/Visualization/models/Visualization";
-import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
-import TrackballCamera from "@/core/domain/Camera/interfaces/TrackballCamera";
-import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
-import Range from "@/core/domain/Utils/Range";
-import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
+import Visualization from "../../../../../core/domain/Visualization/models/Visualization";
+import VisualizationMeta from "../../../../../core/domain/Visualization/models/VisualizationMeta";
+import TrackballCamera from "../../../../../core/domain/Camera/interfaces/TrackballCamera";
+import { TrackballMode } from "../../../../../core/domain/Camera/enums/TrackballMode";
+import Range from "../../../../../core/domain/Utils/Range";
+import GeoPosition from "../../../../../core/domain/GeoPosition/models/GeoPosition";
 
 import OsmTilesVisControls from "./OsmTilesVisControls.vue";
 import { TilesService } from "./TilesService";
 
-import StarsVis from "@/core/domain/Visualization/examples/StarsVis/StarsVis";
-import AtmosphereVis from "@/core/domain/Visualization/examples/AtmosphereVis/AtmosphereVis";
+import StarsVis from "../../../../../core/domain/Visualization/examples/StarsVis/StarsVis";
+import AtmosphereVis from "../../../../../core/domain/Visualization/examples/AtmosphereVis/AtmosphereVis";
 
 /**
  * @category VisualizationExamples

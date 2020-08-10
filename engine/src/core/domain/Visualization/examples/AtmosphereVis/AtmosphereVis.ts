@@ -5,9 +5,9 @@ import vertexGroundShader from "./atmGround.vs";
 import fragmentShader from "./atm.fs";
 import fragmentGroundShader from "./atmGround.fs";
 
-import Visualization from "@/core/domain/Visualization/models/Visualization";
-import TrackballCamera from "@/core/domain/Camera/interfaces/TrackballCamera";
-import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
+import Visualization from "../../../../../core/domain/Visualization/models/Visualization";
+import TrackballCamera from "../../../../../core/domain/Camera/interfaces/TrackballCamera";
+import VisualizationMeta from "../../../../../core/domain/Visualization/models/VisualizationMeta";
 
 /**
  * @category VisualizationExamples

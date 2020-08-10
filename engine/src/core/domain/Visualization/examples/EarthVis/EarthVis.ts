@@ -1,23 +1,23 @@
 import * as THREE from "three";
 import moment from "moment";
 
-import Visualization from "@/core/domain/Visualization/models/Visualization";
+import Visualization from "../../../../../core/domain/Visualization/models/Visualization";
 import VisualizationMeta from "../../models/VisualizationMeta";
-import TrackballCamera from "@/core/domain/Camera/interfaces/TrackballCamera";
-import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
+import TrackballCamera from "../../../../../core/domain/Camera/interfaces/TrackballCamera";
+import { TrackballMode } from "../../../../../core/domain/Camera/enums/TrackballMode";
 
-import Range from "@/core/domain/Utils/Range";
-import GeoPosition from "@/core/domain/GeoPosition/models/GeoPosition";
-import StarsVis from "@/core/domain/Visualization/examples/StarsVis/StarsVis";
+import Range from "../../../../../core/domain/Utils/Range";
+import GeoPosition from "../../../../../core/domain/GeoPosition/models/GeoPosition";
+import StarsVis from "../../../../../core/domain/Visualization/examples/StarsVis/StarsVis";
 import EarthVisControls from "./EarthVisControls.vue";
 import AtmosphereVis from "../AtmosphereVis/AtmosphereVis";
 import TimeService from "./TimeService";
 
-import earthMap from "@/core/domain/Visualization/examples/EarthVis/assets/textures/8k_earth_daymap.jpg";
-import earthNightMap from "@/core/domain/Visualization/examples/EarthVis/assets/textures/8k_earth_nightmap.jpg";
-import earthNormalMap from "@/core/domain/Visualization/examples/EarthVis/assets/textures/8k_earth_normal_map.jpg";
-import earthSpecularMap from "@/core/domain/Visualization/examples/EarthVis/assets/textures/8k_earth_specular_map.jpg";
-import earthCloudsMap from "@/core/domain/Visualization/examples/EarthVis/assets/textures/8k_earth_clouds.jpg";
+import earthMap from "../../../../../core/domain/Visualization/examples/EarthVis/assets/textures/8k_earth_daymap.jpg";
+import earthNightMap from "../../../../../core/domain/Visualization/examples/EarthVis/assets/textures/8k_earth_nightmap.jpg";
+import earthNormalMap from "../../../../../core/domain/Visualization/examples/EarthVis/assets/textures/8k_earth_normal_map.jpg";
+import earthSpecularMap from "../../../../../core/domain/Visualization/examples/EarthVis/assets/textures/8k_earth_specular_map.jpg";
+import earthCloudsMap from "../../../../../core/domain/Visualization/examples/EarthVis/assets/textures/8k_earth_clouds.jpg";
 
 /**
  * @category VisualizationExamples

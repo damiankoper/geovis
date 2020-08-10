@@ -16,6 +16,8 @@
     "paths": {
       "@/*": ["src/*"]
     },
+    "declaration": true,
+    "declarationDir": "dist/types",
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
   "include": [

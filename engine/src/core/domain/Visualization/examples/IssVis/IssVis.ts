@@ -1,21 +1,21 @@
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 
-import { TrackballCamera } from "@/GeoVisEngine";
-import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
+import { TrackballCamera } from "../../../../../GeoVisEngine";
+import { TrackballMode } from "../../../../../core/domain/Camera/enums/TrackballMode";
 
-import Range from "@/core/domain/Utils/Range";
-import EarthVis from "@/core/domain/Visualization/examples/EarthVis/EarthVis";
+import Range from "../../../../../core/domain/Utils/Range";
+import EarthVis from "../../../../../core/domain/Visualization/examples/EarthVis/EarthVis";
 import IssVisControls from "./IssVisControls.vue";
 
-import Visualization from "@/core/domain/Visualization/models/Visualization";
-import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
+import Visualization from "../../../../../core/domain/Visualization/models/Visualization";
+import VisualizationMeta from "../../../../../core/domain/Visualization/models/VisualizationMeta";
 
-import SatelliteObject from "@/core/domain/Visualization/examples/EarthCommon/SatelliteObject";
-import TLEService from "@/core/domain/Visualization/examples/EarthCommon/TLEService";
+import SatelliteObject from "../../../../../core/domain/Visualization/examples/EarthCommon/SatelliteObject";
+import TLEService from "../../../../../core/domain/Visualization/examples/EarthCommon/TLEService";
 
-import iss from "@/core/domain/Visualization/examples/IssVis/assets/models/isscombined.obj";
-import hst from "@/core/domain/Visualization/examples/IssVis/assets/models/hst.obj";
+import iss from "../../../../../core/domain/Visualization/examples/IssVis/assets/models/isscombined.obj";
+import hst from "../../../../../core/domain/Visualization/examples/IssVis/assets/models/hst.obj";
 
 /**
  * @category VisualizationExamples
