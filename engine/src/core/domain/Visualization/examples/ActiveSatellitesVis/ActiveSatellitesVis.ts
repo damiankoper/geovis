@@ -12,6 +12,8 @@ import VisualizationMeta from "../../../../../core/domain/Visualization/models/V
 import SatelliteObject from "../../../../../core/domain/Visualization/examples/EarthCommon/SatelliteObject";
 import TLEService from "../../../../../core/domain/Visualization/examples/EarthCommon/TLEService";
 
+import thumbnail from "!!base64-image-loader!./assets/thumbnail.jpg";
+
 /**
  * @category VisualizationExamples
  */

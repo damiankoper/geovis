@@ -13,6 +13,8 @@ import { TilesService } from "./TilesService";
 import StarsVis from "../../../../../core/domain/Visualization/examples/StarsVis/StarsVis";
 import AtmosphereVis from "../../../../../core/domain/Visualization/examples/AtmosphereVis/AtmosphereVis";
 
+import thumbnail from "!!base64-image-loader!./assets/thumbnail.jpg";
+
 /**
  * @category VisualizationExamples
  */
@@ -138,5 +140,6 @@ export default class OsmTilesVis extends Visualization {
       `Displays tiles map with adjustable layers - radar coverage and rain radar. Uses RainviewerAPI & OSM Standard Tile Layer.`
     );
     meta.addKeywords(["tiles", "weather"]);
+    meta.setThumbnail(thumbnail);
   }
 }

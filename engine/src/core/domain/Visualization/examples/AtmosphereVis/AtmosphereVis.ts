@@ -9,6 +9,8 @@ import Visualization from "../../../../../core/domain/Visualization/models/Visua
 import TrackballCamera from "../../../../../core/domain/Camera/interfaces/TrackballCamera";
 import VisualizationMeta from "../../../../../core/domain/Visualization/models/VisualizationMeta";
 
+import thumbnail from "!!base64-image-loader!./assets/thumbnail.jpg";
+
 /**
  * @category VisualizationExamples
  */
@@ -138,5 +140,6 @@ export default class AtmosphereVis extends Visualization {
     meta.addKeywords(["atmosphere"]);
     meta.setTitle("Atmosphere");
     meta.setDescription("Atmosphere meshes without main sphere.");
+    meta.setThumbnail(thumbnail);
   }
 }

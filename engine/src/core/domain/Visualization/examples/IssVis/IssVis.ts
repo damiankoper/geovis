@@ -17,6 +17,8 @@ import TLEService from "../../../../../core/domain/Visualization/examples/EarthC
 import iss from "../../../../../core/domain/Visualization/examples/IssVis/assets/models/isscombined.obj";
 import hst from "../../../../../core/domain/Visualization/examples/IssVis/assets/models/hst.obj";
 
+import thumbnail from "!!base64-image-loader!./assets/thumbnail.jpg";
+
 /**
  * @category VisualizationExamples
  */
@@ -140,5 +142,6 @@ export default class IssVis extends Visualization {
 Position is calculated using TLE records.`
     );
     meta.addKeywords(["stars", "milkyway"]);
+    meta.setThumbnail(thumbnail);
   }
 }

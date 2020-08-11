@@ -9,8 +9,7 @@ export default class VisualizationMeta {
   protected description = "Description.";
   protected author = "GeoVis";
   protected keywords: string[] = ["vis"];
-  protected thumbnailB64 =
-    "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";
+  protected thumbnailB64?: string;
 
   setTitle(s: string) {
     this.title = s;

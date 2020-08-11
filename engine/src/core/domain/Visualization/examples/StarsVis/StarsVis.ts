@@ -5,6 +5,8 @@ import VisualizationMeta from "../../../../../core/domain/Visualization/models/V
 import TimeService from "../../../../../core/domain/Visualization/examples/EarthVis/TimeService";
 import starsMap from "../../../../../core/domain/Visualization/examples/StarsVis/assets/textures/4k_stars.jpg";
 
+import thumbnail from "!!base64-image-loader!./assets/thumbnail.jpg";
+
 /**
  * @category VisualizationExamples
  */
@@ -56,5 +58,6 @@ export default class StarsVis extends Visualization {
       'Can act as "not so cool" visualization on its own but its true purpose is to be background for other visualizations.'
     );
     meta.addKeywords(["stars", "milkyway"]);
+    meta.setThumbnail(thumbnail);
   }
 }
