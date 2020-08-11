@@ -135,7 +135,7 @@ export default class AtmosphereVis extends Visualization {
     return null;
   }
 
-  setupMeta(meta: VisualizationMeta) {
+  setupOwnMeta(meta: VisualizationMeta) {
     meta.setAuthor("Damian Koper");
     meta.addKeywords(["atmosphere"]);
     meta.setTitle("Atmosphere");

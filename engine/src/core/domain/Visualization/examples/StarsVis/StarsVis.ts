@@ -51,7 +51,7 @@ export default class StarsVis extends Visualization {
     return null;
   }
 
-  setupMeta(meta: VisualizationMeta) {
+  setupOwnMeta(meta: VisualizationMeta) {
     meta.setTitle("Stars");
     meta.setAuthor("Damian Koper");
     meta.setDescription(

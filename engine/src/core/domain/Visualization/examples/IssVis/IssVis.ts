@@ -134,7 +134,7 @@ export default class IssVis extends Visualization {
     return IssVisControls;
   }
 
-  setupMeta(meta: VisualizationMeta) {
+  setupOwnMeta(meta: VisualizationMeta) {
     meta.setTitle("Satellites");
     meta.setAuthor("Damian Koper");
     meta.setDescription(

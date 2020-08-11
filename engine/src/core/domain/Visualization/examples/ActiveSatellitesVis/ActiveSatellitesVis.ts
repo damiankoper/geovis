@@ -110,7 +110,7 @@ export default class ActiveSatellitesVis extends Visualization {
     return ActiveSatellitesVisControls;
   }
 
-  setupMeta(meta: VisualizationMeta) {
+  setupOwnMeta(meta: VisualizationMeta) {
     meta.setTitle("Active satellites");
     meta.setAuthor("Damian Koper");
     meta.setDescription(

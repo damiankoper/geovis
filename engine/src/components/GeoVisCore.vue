@@ -67,7 +67,7 @@ export default class GeoVisCoreVue extends Vue {
   onVisChange(v?: Visualization) {
     if (v && this.geoVisCore) {
       this.geoVisCore.run(v);
-      v._setupMeta();
+      v.setupMeta();
       this.visInfo = v.meta.getData();
     }
   }

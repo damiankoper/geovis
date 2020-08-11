@@ -148,7 +148,7 @@ export default class EarthVis extends Visualization {
     );
   }
 
-  setupMeta(meta: VisualizationMeta) {
+  setupOwnMeta(meta: VisualizationMeta) {
     meta.setTitle("Earth");
     meta.setDescription("Earth illuminated by the sun at the current time.");
     meta.addKeywords(["earth"]);

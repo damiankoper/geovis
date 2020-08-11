@@ -133,7 +133,7 @@ export default class OsmTilesVis extends Visualization {
     return OsmTilesVisControls;
   }
 
-  setupMeta(meta: VisualizationMeta) {
+  setupOwnMeta(meta: VisualizationMeta) {
     meta.setTitle("OpenStreetMap and Weather Tiles");
     meta.setAuthor("Damian Koper");
     meta.setDescription(

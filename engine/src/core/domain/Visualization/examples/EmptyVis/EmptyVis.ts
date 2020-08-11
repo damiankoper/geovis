@@ -38,7 +38,7 @@ export default class EmptyVis extends Visualization {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  setupMeta(meta: VisualizationMeta): void {
+  setupOwnMeta(meta: VisualizationMeta): void {
     //
   }
 }

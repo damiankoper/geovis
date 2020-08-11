@@ -15,9 +15,11 @@ export default abstract class Visualization {
   public readonly meta = new VisualizationMeta();
 
   /**
+   * Method called with param containing metadata set from parent visualizations.
+   * Parent (or default) metadata can be overwritten here using {@link VisualizationMeta} class
    * @param meta Metadata for GUI and managemant
    */
-  abstract setupMeta(meta: VisualizationMeta): void;
+  abstract setupOwnMeta(meta: VisualizationMeta): void;
 
   /**
    * @param scene Root container. Good to set static lights in.
@@ -58,9 +60,9 @@ export default abstract class Visualization {
   abstract getControls(): Vue | VueConstructor<Vue> | null;
 
   /** @ignore */
-  public _setupMeta(meta = this.meta) {
-    this.parents.forEach((p) => p._setupMeta(meta));
-    this.setupMeta(meta);
+  public setupMeta(meta = this.meta) {
+    this.parents.forEach((p) => p.setupMeta(meta));
+    this.setupOwnMeta(meta);
   }
 
   /** @ignore */

@@ -13,6 +13,6 @@ import GeoVisEngine, { Examples } from "geo-vis-engine";
 @Component({ components: { GeoVisEngine } })
 export default class HelloWorld extends Vue {
   starsVis = new Examples.EarthVis();
-  info = this.starsVis._setupMeta();
+  info = this.starsVis.setupMeta();
 }
 </script>
