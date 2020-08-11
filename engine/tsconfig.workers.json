@@ -12,10 +12,12 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "baseUrl": ".",
-    "types": ["webpack-env", "jest", "vuetify"],
+    "types": ["webpack-env"],
     "paths": {
       "@/*": ["src/*"]
     },
+    "declaration": true,
+    "declarationDir": "dist/types",
     "lib": ["esnext", "webworker"]
   },
   "include": ["**/*.worker.ts"],

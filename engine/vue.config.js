@@ -7,6 +7,16 @@ module.exports = {
     },
   },
   css: { extract: false },
+  configureWebpack: (config) => {
+    config.module.rules.unshift({
+      test: /\.worker\.ts$/,
+      use: [
+        {
+          loader: "worker-loader",
+        },
+      ],
+    });
+  },
   chainWebpack: (config) => {
     config.module
       .rule("shaders")
@@ -28,6 +38,7 @@ module.exports = {
       .use("file-loader")
       .loader("file-loader")
       .options({ outputPath: "models" })
+      .before("ts")
       .end();
 
     config.externals([

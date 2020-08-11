@@ -103,5 +103,6 @@ class TilePainter {
     return createImageBitmap(imgData);
   }
 }
-
 new TilePainter();
+
+export default null as any;

@@ -9,6 +9,8 @@ export default class VisualizationMeta {
   protected description = "Description.";
   protected author = "GeoVis";
   protected keywords: string[] = ["vis"];
+  protected thumbnailB64 =
+    "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";
 
   setTitle(s: string) {
     this.title = s;
@@ -28,6 +30,10 @@ export default class VisualizationMeta {
 
   addKeywords(s: string[]) {
     this.keywords.push(...s);
+  }
+
+  setThumbnail(base64: string) {
+    this.thumbnailB64 = base64;
   }
 
   /**

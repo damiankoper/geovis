@@ -19,6 +19,8 @@ import earthNormalMap from "../../../../../core/domain/Visualization/examples/Ea
 import earthSpecularMap from "../../../../../core/domain/Visualization/examples/EarthVis/assets/textures/8k_earth_specular_map.jpg";
 import earthCloudsMap from "../../../../../core/domain/Visualization/examples/EarthVis/assets/textures/8k_earth_clouds.jpg";
 
+import thumbnail from "!!base64-image-loader!./assets/thumbnail.jpg";
+
 /**
  * @category VisualizationExamples
  */
@@ -151,5 +153,6 @@ export default class EarthVis extends Visualization {
     meta.setDescription("Earth illuminated by the sun at the current time.");
     meta.addKeywords(["earth"]);
     meta.setAuthor("Damian Koper");
+    meta.setThumbnail(thumbnail);
   }
 }

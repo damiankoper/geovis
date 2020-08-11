@@ -15,6 +15,7 @@ import Orbit from "../../../../core/domain/GeoPosition/models/Orbit";
  * @internal For internal GeoVisCore purposes
  */
 export default class TrackballController implements TrackballCamera {
+  private pressedKeys: Record<string, boolean> = {};
   private pointerCaptured = false;
   private lastPanPosition = new THREE.Vector2();
   private mode: TrackballMode = TrackballMode.Free;
@@ -81,6 +82,52 @@ export default class TrackballController implements TrackballCamera {
       this.setCameraTransformMatrix();
       this.calcAndDispatchNorth();
     });
+
+    this.handleKeyboardControl();
+  }
+
+  private handleKeyboardControl() {
+    let keyboardControl = false;
+    let shift = false;
+    const panDelta = new THREE.Vector2();
+    for (const keyCode in this.pressedKeys) {
+      const d = 5;
+      // Shift
+      if (keyCode === "16") {
+        shift = true;
+      }
+      // ArrowTop
+      if (keyCode === "38") {
+        panDelta.add(new THREE.Vector2(0, d));
+        keyboardControl = true;
+      }
+      // ArrowRight
+      if (keyCode === "39") {
+        panDelta.add(new THREE.Vector2(-d, 0));
+        keyboardControl = true;
+      }
+      // ArrowBottom
+      if (keyCode === "40") {
+        panDelta.add(new THREE.Vector2(0, -d));
+        keyboardControl = true;
+      }
+      // ArrowLeft
+      if (keyCode === "37") {
+        panDelta.add(new THREE.Vector2(d, 0));
+        keyboardControl = true;
+      }
+    }
+    if (keyboardControl) {
+      this.lastPanDelta.copy(panDelta);
+      if (shift)
+        this.handleLocalOrbitRotate(
+          this.lastPanDelta.multiplyScalar(this.localOrbit.slowFactor)
+        );
+      else
+        this.handleGlobalOrbitRotate(
+          this.lastPanDelta.multiplyScalar(this.globalOrbit.slowFactor)
+        );
+    }
   }
 
   private setCameraTransformMatrix() {
@@ -105,9 +152,12 @@ export default class TrackballController implements TrackballCamera {
       this.onPointerMove.bind(this)
     );
     this.eventSource.removeEventListener("wheel", this.onWheel.bind(this));
+    this.eventSource.removeEventListener("keydown", this.onKeyDown.bind(this));
+    this.eventSource.removeEventListener("keyup", this.onKeyUp.bind(this));
   }
 
   private setEvents() {
+    this.eventSource.tabIndex = 0;
     this.eventSource.addEventListener(
       "pointerdown",
       this.onPointerDown.bind(this)
@@ -118,6 +168,21 @@ export default class TrackballController implements TrackballCamera {
       this.onPointerMove.bind(this)
     );
     this.eventSource.addEventListener("wheel", this.onWheel.bind(this));
+    this.eventSource.addEventListener("keydown", this.onKeyDown.bind(this));
+    this.eventSource.addEventListener("keyup", this.onKeyUp.bind(this));
+  }
+
+  private onKeyDown(e: KeyboardEvent) {
+    this.pressedKeys[String(e.keyCode)] = true;
+    if (e.key === "+") this.zoomIn();
+    if (e.key === "-") this.zoomOut();
+  }
+
+  private onKeyUp(e: KeyboardEvent) {
+    delete this.pressedKeys[e.keyCode];
+    /*  if (!e.shiftKey)
+      if (this.lastPanDelta.manhattanLength() <= 2) this.stopMovement();
+      else this.panAnim.start(); */
   }
 
   private onWheel(e: WheelEvent) {

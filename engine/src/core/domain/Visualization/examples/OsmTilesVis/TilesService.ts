@@ -3,8 +3,8 @@ import _ from "lodash";
 import { TileTreeNode } from "./TileTreeNode";
 import { TileLayerConfig } from "./TileLayerConfig";
 import { PaintTileLayersMessageData } from "./TilePainter.worker";
-import TilePainterWorker from "worker-loader!./TilePainter.worker";
 import bgTile from "../../../../../core/domain/Visualization/examples/OsmTilesVis/assets/textures/tile_bg.png";
+import TilePainterWorker from "./TilePainter.worker";
 
 /**
  * @category VisualizationHelper
@@ -21,7 +21,7 @@ export class TilesService {
   );
   public tileSize = 256;
 
-  public tilePainter = new TilePainterWorker();
+  public tilePainter = new TilePainterWorker() as Worker;
   public canvasDrawnHandlerMap = new Map<
     string,
     (message: MessageEvent) => void

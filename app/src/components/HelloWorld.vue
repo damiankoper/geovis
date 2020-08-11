@@ -1,6 +1,8 @@
 <template>
   <v-container>
-    <geo-vis-engine style="height:600px" :visualization="starsVis" />
+    <!--     <geo-vis-engine style="height:600px" :visualization="starsVis" />
+ -->
+    <v-img :src="starsVis.meta.getData().thumbnailB64" />
   </v-container>
 </template>
 
@@ -10,6 +12,7 @@ import { Component } from "vue-property-decorator";
 import GeoVisEngine, { Examples } from "geo-vis-engine";
 @Component({ components: { GeoVisEngine } })
 export default class HelloWorld extends Vue {
-  starsVis = new Examples.TilesVis();
+  starsVis = new Examples.EarthVis();
+  info = this.starsVis._setupMeta();
 }
 </script>

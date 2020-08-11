@@ -6,7 +6,7 @@
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint",
-    "build-bundle": "vue-cli-service build --target lib --name GeoVisEngine src/GeoVisEngine.ts && npx tsc --emitDeclarationOnly",
+    "build-bundle": "vue-cli-service build --target lib --name GeoVisEngine src/GeoVisEngine.ts && npx tsc --emitDeclarationOnly && npx tsc --emitDeclarationOnly -p tsconfig.workers.json",
     "storybook:build": "vue-cli-service storybook:build -c config/storybook",
     "storybook:serve": "vue-cli-service storybook:serve -p 6006 -c config/storybook"
   },
@@ -56,6 +56,7 @@
     "babel-loader": "^8.1.0",
     "babel-preset-react": "^6.24.1",
     "babel-preset-vue": "^2.0.2",
+    "base64-image-loader": "^1.2.1",
     "eslint": "^7.3.1",
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-vue": "^6.2.2",
