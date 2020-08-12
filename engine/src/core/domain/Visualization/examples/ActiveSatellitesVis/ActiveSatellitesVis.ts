@@ -118,5 +118,6 @@ export default class ActiveSatellitesVis extends Visualization {
 Position is calculated using TLE records.`
     );
     meta.addKeywords(["satellites", "celestrack", "active"]);
+    meta.setThumbnail(thumbnail);
   }
 }
