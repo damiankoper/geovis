@@ -51,6 +51,8 @@ export default class EarthVis extends Visualization {
     this.addParent(new StarsVis());
     this.addParent(new AtmosphereVis());
     this.sphereMaterial.onBeforeCompile = this.modifyShader.bind(this);
+    console.log("earth");
+
     Object.seal(this);
   }
 
@@ -70,6 +72,8 @@ export default class EarthVis extends Visualization {
 
     group.add(this.directionalLight);
     group.add(this.directionalLight.target);
+    this.sphereMaterial.needsUpdate = true;
+    this.sphereCloudsMaterial.needsUpdate = true;
 
     const mesh = new THREE.Mesh(this.sphere, this.sphereMaterial);
     const cloudMesh = new THREE.Mesh(
@@ -96,7 +100,7 @@ export default class EarthVis extends Visualization {
   }
 
   destroy(): void {
-    this.sphereMaterial.map?.dispose();
+    /*  this.sphereMaterial.map?.dispose();
     this.sphereMaterial.specularMap?.dispose();
     this.sphereMaterial.normalMap?.dispose();
     this.sphereMaterial.dispose();
@@ -104,7 +108,7 @@ export default class EarthVis extends Visualization {
     this.sphereCloudsMaterial.map?.dispose();
     this.sphereCloudsMaterial.dispose();
     this.sphereClouds.dispose();
-    this.nightMap.dispose();
+    this.nightMap.dispose(); */
   }
 
   getControls() {

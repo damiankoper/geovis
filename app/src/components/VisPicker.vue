@@ -14,7 +14,7 @@
         label="Search"
         width="100"
         prepend-icon="mdi-magnify"
-        style="max-width: 300px"
+        style="max-width: 300px;"
       ></v-text-field>
     </v-app-bar>
 

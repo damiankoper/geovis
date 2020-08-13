@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card :loading="loading">
     <v-img
       v-if="meta.thumbnailB64"
       class="white--text align-end"
@@ -16,7 +16,7 @@
     >
       <div
         class="d-flex justify-center align-center flex-grow-1"
-        style="position: absolute; height:200px; width:100%"
+        style="position: absolute; height: 200px; width: 100%;"
       >
         <v-icon size="60" color="white"> mdi-image-off-outline </v-icon>
       </div>
@@ -36,7 +36,7 @@
     </v-card-text>
     <v-card-actions>
       <v-spacer />
-      <v-btn color="primary" text @click="$emit('show', v)">
+      <v-btn color="primary" text @click="show">
         Show
       </v-btn>
     </v-card-actions>
@@ -51,6 +51,7 @@ import _ from "lodash";
 export default class VisCard extends Vue {
   @Prop() v!: Visualization;
   meta = new VisualizationMeta().getData();
+  loading = false;
 
   @Watch("v", { immediate: true })
   onVChange(v: Visualization | null) {
@@ -62,6 +63,17 @@ export default class VisCard extends Vue {
 
   get keywords() {
     return _.uniq(((this.meta as any).keywords || []).reverse());
+  }
+
+  show() {
+    this.loading = true;
+    this.$nextTick(() => {
+      this.$router.push({
+        name: "VisViewer",
+        params: { vis: this.v.constructor.name },
+      });
+      this.loading = false;
+    });
   }
 }
 </script>

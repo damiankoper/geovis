@@ -48,6 +48,10 @@ export default class GeoVisCore {
 
   public run(visualization: Visualization) {
     this.visualization?._destroy();
+
+    while (this.scene.children.length) {
+      this.scene.remove(this.scene.children[0]);
+    }
     this.scene.dispose();
 
     const group = new THREE.Group();

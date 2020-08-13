@@ -29,6 +29,7 @@ export default class VisualizationMeta {
 
   addKeywords(s: string[]) {
     this.keywords.push(...s);
+    this.keywords = _.uniq(this.keywords);
   }
 
   setThumbnail(base64: string) {
