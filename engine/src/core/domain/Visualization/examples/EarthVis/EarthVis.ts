@@ -51,8 +51,6 @@ export default class EarthVis extends Visualization {
     this.addParent(new StarsVis());
     this.addParent(new AtmosphereVis());
     this.sphereMaterial.onBeforeCompile = this.modifyShader.bind(this);
-    console.log("earth");
-
     Object.seal(this);
   }
 
@@ -100,15 +98,8 @@ export default class EarthVis extends Visualization {
   }
 
   destroy(): void {
-    /*  this.sphereMaterial.map?.dispose();
-    this.sphereMaterial.specularMap?.dispose();
-    this.sphereMaterial.normalMap?.dispose();
-    this.sphereMaterial.dispose();
-    this.sphere.dispose();
-    this.sphereCloudsMaterial.map?.dispose();
-    this.sphereCloudsMaterial.dispose();
-    this.sphereClouds.dispose();
-    this.nightMap.dispose(); */
+    while (this.earthGroup.children.length)
+      this.earthGroup.remove(this.earthGroup.children[0]);
   }
 
   getControls() {
