@@ -3,7 +3,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   transpileDependencies: ["vuetify"],
-  chainWebpack: config => {
+  chainWebpack: (config) => {
     config.resolve.symlinks(false);
   },
   configureWebpack: {
@@ -15,10 +15,10 @@ module.exports = {
           {
             from: "node_modules/geo-vis-engine/dist/*.worker.js",
             to: "js",
-            flatten: true
-          }
-        ]
-      })
-    ]
-  }
+            flatten: true,
+          },
+        ],
+      }),
+    ],
+  },
 };
