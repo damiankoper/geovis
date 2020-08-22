@@ -16,11 +16,21 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import Visualization from "@/core/domain/Visualization/models/Visualization";
+import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
 
 @Component
 export default class VisualizationInfo extends Vue {
-  @Prop() info!: VisualizationInfo;
+  @Prop() vis!: Visualization;
+  info = new VisualizationMeta().getData();
+
+  @Watch("vis", { immediate: true })
+  onVisChange(v?: Visualization) {
+    if (v) {
+      this.info = v.meta.getData();
+    }
+  }
 }
 </script>
 

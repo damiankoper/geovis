@@ -11,19 +11,19 @@ export default class VisualizationMeta {
   protected keywords: string[] = ["vis"];
   protected thumbnailB64?: string;
 
-  setTitle(s: string) {
+  public setTitle(s: string) {
     this.title = s;
   }
 
-  setDescription(s: string) {
+  public setDescription(s: string) {
     this.description = s;
   }
 
-  setAuthor(s: string) {
+  public setAuthor(s: string) {
     this.author = s;
   }
 
-  setKeywords(s: string[]) {
+  public setKeywords(s: string[]) {
     this.keywords = s;
   }
 
@@ -32,14 +32,14 @@ export default class VisualizationMeta {
     this.keywords = _.uniq(this.keywords);
   }
 
-  setThumbnail(base64: string) {
+  public setThumbnail(base64: string) {
     this.thumbnailB64 = base64;
   }
 
   /**
    * @returns Copy of fields in plain JS object
    */
-  getData() {
+  public getData() {
     return _.assign({}, this);
   }
 }

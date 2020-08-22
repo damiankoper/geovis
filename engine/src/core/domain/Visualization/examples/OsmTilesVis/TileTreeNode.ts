@@ -7,24 +7,23 @@ import GeoPosition from "../../../../../core/domain/GeoPosition/models/GeoPositi
  * @category VisualizationHelper
  */
 export class TileTreeNode {
-  canvas: HTMLCanvasElement = this.service.createCanvas();
-  canvasCtx = this.canvas.getContext("bitmaprenderer");
-  tileDrawRequested = false;
+  private canvas: HTMLCanvasElement = this.service.createCanvas();
+  private canvasCtx = this.canvas.getContext("bitmaprenderer");
+  private tileDrawRequested = false;
 
-  material = new THREE.MeshPhongMaterial({
+  private material = new THREE.MeshPhongMaterial({
     shininess: 5,
     map: new THREE.CanvasTexture(this.canvas),
   });
 
-  mesh: THREE.Mesh | null = null;
+  private mesh: THREE.Mesh | null = null;
 
   public readonly children: TileTreeNode[] = [];
 
-  geometry: THREE.SphereBufferGeometry;
-  position: GeoPosition;
-  positionCenter: GeoPosition;
+  private geometry: THREE.SphereBufferGeometry;
+  private positionCenter: GeoPosition;
 
-  getTilesDistance(desiredZoom: number) {
+  private getTilesDistance(desiredZoom: number) {
     if (this.zoom > desiredZoom - 3) return 4;
 
     if (this.zoom === 1) return 2;
@@ -48,7 +47,6 @@ export class TileTreeNode {
     const longNext = this.service.tile2long(this.x + 1, this.zoom);
 
     this.geometry = this.service.getGeometry(zoom, y);
-    this.position = new GeoPosition(lat, long);
     this.positionCenter = new GeoPosition(
       (lat + latNext) / 2,
       (long + longNext) / 2
@@ -66,7 +64,7 @@ export class TileTreeNode {
     if (this.material.map) this.material.map.needsUpdate = true;
   }
 
-  calcDeep(
+  public calcDeep(
     camera: TrackballCamera,
     group: THREE.Group,
     desiredZoom: number
@@ -104,13 +102,13 @@ export class TileTreeNode {
     return propagateUpper;
   }
 
-  refreshDeep(camera: TrackballCamera, group: THREE.Group) {
+  public refreshDeep(camera: TrackballCamera, group: THREE.Group) {
     this.tileDrawRequested = false;
     if (this.mesh?.visible) this.showTile(camera, group);
     this.children.forEach((c) => c.refreshDeep(camera, group));
   }
 
-  showTile(camera: TrackballCamera, group: THREE.Group) {
+  private showTile(camera: TrackballCamera, group: THREE.Group) {
     if (this.isVisibleByAngle(camera, (Math.PI / 2) * 0.8)) {
       if (!this.tileDrawRequested) {
         this.tileDrawRequested = true;
@@ -131,18 +129,18 @@ export class TileTreeNode {
     this.hideSubtree();
   }
 
-  hideTile() {
+  private hideTile() {
     if (this.mesh) this.mesh.visible = false;
   }
 
-  hideSubtree() {
+  private hideSubtree() {
     this.children.forEach((c) => {
       c.hideTile();
       c.hideSubtree();
     });
   }
 
-  destroyDangling(
+  private destroyDangling(
     camera: TrackballCamera,
     group: THREE.Group,
     desiredZoom: number
@@ -160,7 +158,7 @@ export class TileTreeNode {
     }
   }
 
-  destroy(group: THREE.Group) {
+  private destroy(group: THREE.Group) {
     if (this.mesh) group.remove(this.mesh);
     this.service.tilePainter.postMessage({
       name: "abortTile",
@@ -172,11 +170,14 @@ export class TileTreeNode {
     this.service.canvasDrawnHandlerMap.delete(this.key);
   }
 
-  isVisibleByTileDistance(camera: TrackballCamera, manhattanDistance: number) {
+  private isVisibleByTileDistance(
+    camera: TrackballCamera,
+    manhattanDistance: number
+  ) {
     return this.tileDistance(camera) <= manhattanDistance;
   }
 
-  tileDistance(camera: TrackballCamera) {
+  private tileDistance(camera: TrackballCamera) {
     const pos = camera.getGlobalOrbitPosition();
     const tileX = this.service.long2tile(pos.long, this.zoom);
     const tileY = this.service.lat2tile(pos.lat, this.zoom);
@@ -191,7 +192,7 @@ export class TileTreeNode {
     return new THREE.Vector2(x, y).manhattanLength();
   }
 
-  isVisibleByAngle(camera: TrackballCamera, angle: number) {
+  private isVisibleByAngle(camera: TrackballCamera, angle: number) {
     const R = camera.getGlobalOrbitRadius();
     const RE = R + camera.getLocalOrbitRadius();
     const calcAngle = camera
@@ -208,7 +209,7 @@ export class TileTreeNode {
     return B >= angle;
   }
 
-  generateChildren() {
+  private generateChildren() {
     if (this.children.length === 0)
       for (let x = 0; x < 2; x++) {
         for (let y = 0; y < 2; y++) {

@@ -22,7 +22,8 @@ export default class TLEService {
   private data: TLEMap = {};
   private defaultUrl =
     "https://api.codetabs.com/v1/proxy/?quest=http://celestrak.com/NORAD/elements/gp.php?GROUP=ACTIVE&FORMAT=TLE";
-  async update(url = this.defaultUrl): Promise<TLEMap> {
+
+  public async update(url = this.defaultUrl): Promise<TLEMap> {
     const plain = await (
       await fetch(url, { headers: { origin: "celestrak.com" } })
     ).text();

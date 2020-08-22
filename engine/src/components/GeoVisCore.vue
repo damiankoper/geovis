@@ -6,7 +6,7 @@
       :camera="camera"
       :hasVisControls="visualization.getControls() != null"
       v-if="camera"
-      :visTitle="visInfo.title"
+      :visTitle="meta.getData().title"
     >
       <component
         :vis="visualization"
@@ -14,7 +14,7 @@
         :is="visualization.getControls()"
       />
       <template v-slot:info>
-        <visualization-info :info="visInfo" />
+        <visualization-info :vis="visualization" />
       </template>
     </core-controls>
   </div>
@@ -26,18 +26,18 @@ import GeoVisCore from "../core/GeoVisCore";
 import Visualization from "../core/domain/Visualization/models/Visualization";
 import CoreControls from "./CoreControls.vue";
 import VisualizationInfo from "./VisualizationInfo.vue";
-import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
 import Vuetify from "vuetify/lib";
+import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
 if (process.env.NODE_ENV === "production") Vue.use(Vuetify);
 
 @Component({
   components: { CoreControls, VisualizationInfo },
 })
 export default class GeoVisCoreVue extends Vue {
-  geoVisCore: GeoVisCore | null = null;
   @Prop() visualization!: Visualization;
-  visInfo = new VisualizationMeta().getData();
+  geoVisCore: GeoVisCore | null = null;
   observer!: ResizeObserver;
+  meta: VisualizationMeta = new VisualizationMeta();
 
   get camera() {
     return this.geoVisCore?.cameraController;
@@ -58,7 +58,6 @@ export default class GeoVisCoreVue extends Vue {
   }
 
   destroyed() {
-    console.log("Vue destroyed");
     this.observer.disconnect();
     if (this.geoVisCore) this.geoVisCore.destroy();
   }
@@ -66,9 +65,9 @@ export default class GeoVisCoreVue extends Vue {
   @Watch("visualization")
   onVisChange(v?: Visualization) {
     if (v && this.geoVisCore) {
+      v._setupMeta();
       this.geoVisCore.run(v);
-      v.setupMeta();
-      this.visInfo = v.meta.getData();
+      this.meta = v.meta;
     }
   }
 }

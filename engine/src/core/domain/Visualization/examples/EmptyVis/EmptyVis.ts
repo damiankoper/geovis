@@ -1,8 +1,8 @@
+import { VueConstructor } from "vue/types/umd";
 import * as THREE from "three";
 import TrackballCamera from "../../../../../core/domain/Camera/interfaces/TrackballCamera";
 import Visualization from "../../../../../core/domain/Visualization/models/Visualization";
 import VisualizationMeta from "../../../../../core/domain/Visualization/models/VisualizationMeta";
-import { VueConstructor } from "vue/types/umd";
 
 /**
  * Example of empty visualization
@@ -15,30 +15,30 @@ export default class EmptyVis extends Visualization {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  setupCamera(camera: TrackballCamera): void {
+  public setupCamera(camera: TrackballCamera): void {
     //
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  setupScene(scene: THREE.Scene, group: THREE.Group): void {
+  public setupScene(scene: THREE.Scene, group: THREE.Group): void {
     //
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  update(deltaFactor: number): void {
+  public update(deltaFactor: number): void {
     //
   }
 
-  destroy(): void {
+  public destroy(): void {
     //
   }
 
-  getControls(): Vue | VueConstructor<Vue> | null {
+  public getControls(): Vue | VueConstructor<Vue> | null {
     return null;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  setupOwnMeta(meta: VisualizationMeta): void {
+  public setupOwnMeta(meta: VisualizationMeta): void {
     //
   }
 }

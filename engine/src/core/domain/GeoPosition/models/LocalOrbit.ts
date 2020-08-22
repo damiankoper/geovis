@@ -20,7 +20,7 @@ export default class LocalOrbit extends Orbit {
   protected getLongOrigin() {
     return new THREE.Vector3(0, -1, 0);
   }
-  clone() {
+  public clone() {
     return new LocalOrbit(
       this.v.clone(),
       this.bounds,

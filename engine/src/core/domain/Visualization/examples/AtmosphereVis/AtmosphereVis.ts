@@ -55,6 +55,8 @@ export default class AtmosphereVis extends Visualization {
 
   private atmoSphere: THREE.SphereBufferGeometry;
   private atmoSphereGround: THREE.SphereBufferGeometry;
+  private group: THREE.Group | null = null;
+
   constructor(
     private G: number = 6371,
     private T: number = 480,
@@ -67,12 +69,12 @@ export default class AtmosphereVis extends Visualization {
     Object.seal(this);
   }
 
-  setupCamera(camera: TrackballCamera): void {
+  public setupCamera(camera: TrackballCamera): void {
     this.camera = camera;
     camera.setGlobalOrbitRadius(this.G).setLocalOrbitRadius(this.GT);
   }
-  private group: THREE.Group | null = null;
-  setupScene(scene: THREE.Scene, group: THREE.Group): void {
+
+  public setupScene(scene: THREE.Scene, group: THREE.Group): void {
     this.group = group;
     const sphereMesh = new THREE.Mesh(this.atmoSphere, this.atmosphereMaterial);
     sphereMesh.renderOrder = 0;
@@ -87,7 +89,8 @@ export default class AtmosphereVis extends Visualization {
     group.add(sphereMeshGround);
   }
 
-  update(deltaFactor: number): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public update(deltaFactor: number): void {
     const globalOrbit = this.camera?.getGlobalOrbit();
     const localOrbit = this.camera?.getLocalOrbit();
     if (globalOrbit && localOrbit && this.group) {
@@ -124,18 +127,18 @@ export default class AtmosphereVis extends Visualization {
     }
   }
 
-  destroy(): void {
+  public destroy(): void {
     this.atmoSphereGround.dispose();
     this.atmoSphere.dispose();
     this.atmosphereMaterial.dispose();
     this.atmosphereGroundMaterial.dispose();
   }
 
-  getControls() {
+  public getControls() {
     return null;
   }
 
-  setupOwnMeta(meta: VisualizationMeta) {
+  public setupOwnMeta(meta: VisualizationMeta) {
     meta.setAuthor("Damian Koper");
     meta.addKeywords(["atmosphere"]);
     meta.setTitle("Atmosphere");

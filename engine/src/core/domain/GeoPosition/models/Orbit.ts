@@ -35,16 +35,16 @@ export default abstract class Orbit {
   protected abstract getLatVP(): THREE.Vector3;
   protected abstract getLongPlane(): THREE.Vector3;
   protected abstract getLongOrigin(): THREE.Vector3;
-  abstract clone(): Orbit;
+  public abstract clone(): Orbit;
 
-  copy(orbit: Orbit) {
+  public copy(orbit: Orbit) {
     this.v.copy(orbit.v);
     this.up.copy(orbit.up);
     this.bounds = orbit.bounds;
     this.slowFactor = orbit.slowFactor;
   }
 
-  getGeoPosition = _.memoize(this._getGeoPosition.bind(this), () => {
+  public getGeoPosition = _.memoize(this._getGeoPosition.bind(this), () => {
     return (
       String(this.v.x) +
       String(this.v.y) +
@@ -72,7 +72,7 @@ export default abstract class Orbit {
     return new GeoPosition(latitude, longitude);
   }
 
-  setGeoPosition(position: GeoPosition) {
+  public setGeoPosition(position: GeoPosition) {
     const rotation = GeoPosMapper.toRotationMatrix(position);
     const v = new THREE.Vector3(0, 0, this.v.length());
     this.v = v.applyMatrix4(rotation);
@@ -80,16 +80,16 @@ export default abstract class Orbit {
     return this;
   }
 
-  getRadius() {
+  public getRadius() {
     return this.v.length();
   }
 
-  setRadius(radius: number) {
+  public setRadius(radius: number) {
     this.v.setLength(radius);
     return this;
   }
 
-  correctToBounds(mode: TrackballMode) {
+  public correctToBounds(mode: TrackballMode) {
     const qCorrect = new THREE.Quaternion();
     const coords = this.getGeoPosition();
     const latAxis = this.getLatVP().cross(this.getLatV()).normalize();
@@ -122,7 +122,7 @@ export default abstract class Orbit {
     this.applyQuaternion(qCorrect);
   }
 
-  latchCompassNorth(plane: THREE.Vector3) {
+  public latchCompassNorth(plane: THREE.Vector3) {
     this.compassNorth.copy(this.up).projectOnPlane(plane).normalize();
   }
 
@@ -138,7 +138,10 @@ export default abstract class Orbit {
     } else return new THREE.Quaternion();
   }
 
-  getVectorPointingAt(pos: GeoPosition) {
+  /**
+   * Get vector pointing at GeoPosition in world coordinates
+   */
+  public getVectorPointingAt(pos: GeoPosition) {
     return this.v
       .clone()
       .normalize()
@@ -153,7 +156,11 @@ export default abstract class Orbit {
       );
   }
 
-  applyQuaternion(q: THREE.Quaternion) {
+  /**
+   * Apply quaterion on every vector defining orbit.
+   * Note that you need to call {@link refreshLocalOrbit} or {@link refreshGlobalOrbit} methods regenerate transform matrices.
+   */
+  public applyQuaternion(q: THREE.Quaternion) {
     this.v.applyQuaternion(q);
     this.up.applyQuaternion(q);
     return this;

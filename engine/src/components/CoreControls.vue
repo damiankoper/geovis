@@ -83,35 +83,49 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import _ from "lodash";
 import TrackballCamera from "../core/domain/Camera/interfaces/TrackballCamera";
 import Compass from "./Compass.vue";
-import _ from "lodash";
 import GeoPosition from "../core/domain/GeoPosition/models/GeoPosition";
 @Component({ components: { Compass } })
 export default class CoreControls extends Vue {
   @Prop() camera!: TrackballCamera;
   @Prop({ default: false }) hasVisControls!: boolean;
   @Prop({ default: "Visualization controls" }) visTitle!: string;
-  tab = 0;
+
+  readonly refreshInterval = 1000 / 7;
 
   visControlPanel = false;
+  tab = 0;
 
   globalOrbitChange?: () => void;
-  globalOrbitPosition: GeoPosition = new GeoPosition();
   northAngleEvent?: () => void;
   northAngle = 0;
 
+  globalOrbitPosition: GeoPosition = new GeoPosition();
+
+  /**
+   * Setup event handlers
+   */
   beforeMount() {
     this.northAngleEvent = this.camera.onNorthAngleChange.sub(
       _.throttle((e, angle) => {
         this.northAngle = angle;
-      }, 1000 / 7)
+      }, this.refreshInterval)
     );
     this.globalOrbitChange = this.camera.onGlobalOrbitChange.sub(
       _.throttle((e, orbit) => {
         this.globalOrbitPosition = orbit.getGeoPosition();
-      }, 1000 / 7)
+      }, this.refreshInterval)
     );
+  }
+
+  /**
+   * Destroy event handlers
+   */
+  destroyed() {
+    if (this.northAngleEvent) this.northAngleEvent();
+    if (this.globalOrbitChange) this.globalOrbitChange();
   }
 
   get latFormatted() {
@@ -133,22 +147,17 @@ export default class CoreControls extends Vue {
       ${String(l.d)}\u00B0
       ${String(l.m).padStart(2, "0")}"
       ${String(l.s).padStart(2, "0")}'
-      ${l.dir}`;
+      ${l.dir}
+    `;
   }
-
-  rotateNorth() {
+  private rotateNorth() {
     this.camera.rotateNorth();
   }
-  zoomIn() {
+  private zoomIn() {
     this.camera.zoomIn(1);
   }
-  zoomOut() {
+  private zoomOut() {
     this.camera.zoomOut(1);
-  }
-
-  destroyed() {
-    if (this.northAngleEvent) this.northAngleEvent();
-    if (this.globalOrbitChange) this.globalOrbitChange();
   }
 }
 </script>

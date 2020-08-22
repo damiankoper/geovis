@@ -16,12 +16,13 @@ export class TilesService {
     number,
     Map<number, THREE.SphereBufferGeometry>
   >();
+
   public bgTile = new Promise<HTMLImageElement>((r) =>
     new THREE.ImageLoader().load(bgTile, (i) => r(i))
   );
   public tileSize = 256;
 
-  public tilePainter = new TilePainterWorker() as Worker;
+  public tilePainter = new (TilePainterWorker as new () => Worker)();
   public canvasDrawnHandlerMap = new Map<
     string,
     (message: MessageEvent) => void
@@ -35,14 +36,12 @@ export class TilesService {
   ) {
     this.tilePainter.onmessage = (message) => {
       const handler = this.canvasDrawnHandlerMap.get(message.data.tileKey);
-      if (handler) {
-        handler(message);
-      }
+      if (handler) handler(message);
     };
     Object.seal(this);
   }
 
-  createCanvas() {
+  public createCanvas() {
     const canvas = document.createElement("canvas");
     canvas.width = this.tileSize;
     canvas.height = this.tileSize;
@@ -55,7 +54,7 @@ export class TilesService {
     return canvas;
   }
 
-  requestCanvasDraw(tile: TileTreeNode, tileDistance: number) {
+  public requestCanvasDraw(tile: TileTreeNode, tileDistance: number) {
     const layers = this.layers.map((layer) => {
       const l = _.cloneDeep(layer);
       if (typeof l.tileUrl === "function")
@@ -73,26 +72,7 @@ export class TilesService {
     this.tilePainter.postMessage(data);
   }
 
-  phiStart(x: number, zoom: number) {
-    return this.phiLength(zoom) * x;
-  }
-  phiLength(zoom: number) {
-    return (2 * Math.PI) / 2 ** zoom;
-  }
-
-  thetaStart(y: number, zoom: number) {
-    return this.thetaBound - this.tile2lat(y, zoom) + this.thetaShift;
-  }
-  thetaLength(y: number, zoom: number) {
-    return (
-      this.thetaBound -
-      this.tile2lat(y + 1, zoom) +
-      this.thetaShift -
-      this.thetaStart(y, zoom)
-    );
-  }
-
-  getGeometry(zoom: number, y: number) {
+  public getGeometry(zoom: number, y: number) {
     let latMap = this.geometryMap.get(zoom);
     if (!latMap) {
       latMap = new Map<number, THREE.SphereBufferGeometry>();
@@ -116,20 +96,39 @@ export class TilesService {
     return geometry;
   }
 
-  tile2lat(y: number, z: number) {
+  public phiStart(x: number, zoom: number) {
+    return this.phiLength(zoom) * x;
+  }
+  public phiLength(zoom: number) {
+    return (2 * Math.PI) / 2 ** zoom;
+  }
+
+  public thetaStart(y: number, zoom: number) {
+    return this.thetaBound - this.tile2lat(y, zoom) + this.thetaShift;
+  }
+  public thetaLength(y: number, zoom: number) {
+    return (
+      this.thetaBound -
+      this.tile2lat(y + 1, zoom) +
+      this.thetaShift -
+      this.thetaStart(y, zoom)
+    );
+  }
+
+  public tile2lat(y: number, z: number) {
     const n = Math.PI - (2 * Math.PI * y) / Math.pow(2, z);
     return Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
   }
 
-  tile2long(x: number, z: number) {
+  public tile2long(x: number, z: number) {
     return ((x / Math.pow(2, z)) * 2 - 1) * Math.PI;
   }
 
-  long2tile(lon: number, zoom: number) {
+  public long2tile(lon: number, zoom: number) {
     return Math.floor(((lon + Math.PI) / (Math.PI * 2)) * Math.pow(2, zoom));
   }
 
-  lat2tile(lat: number, zoom: number) {
+  public lat2tile(lat: number, zoom: number) {
     return Math.floor(
       ((1 - Math.log(Math.tan(lat) + 1 / Math.cos(lat)) / Math.PI) / 2) *
         Math.pow(2, zoom)

@@ -40,7 +40,7 @@ class TilePainter {
     this.ctx.onmessage = this.onMessage.bind(this);
   }
 
-  async onMessage(event: MessageEvent) {
+  private async onMessage(event: MessageEvent) {
     switch (event.data.name) {
       case "paintTileLayers": {
         const data = event.data as PaintTileLayersMessageData;
@@ -51,7 +51,9 @@ class TilePainter {
       }
       case "abortTile": {
         const data = event.data as AbortTileMessageData;
-        this.abortControllers.get(data.tileKey)?.abort();
+        const aC = this.abortControllers.get(data.tileKey);
+        aC?.abort();
+
         break;
       }
       default:
@@ -59,7 +61,7 @@ class TilePainter {
     }
   }
 
-  async paintTileLayers(data: PaintTileLayersMessageData) {
+  private async paintTileLayers(data: PaintTileLayersMessageData) {
     const visibleLayers = data.layers.filter((layer) => layer.visible);
     const cacheKey = visibleLayers.reduce((r, layer) => r + layer.tileUrl, "");
     const cacheBlob = this.tileCache.get(cacheKey);
@@ -68,11 +70,10 @@ class TilePainter {
       this.ctx.postMessage({ tileKey: data.tileKey, image }, [image]);
     } else {
       try {
-        const abortController = this.abortControllers.get(cacheKey);
+        const abortController = this.abortControllers.get(data.tileKey);
         abortController?.abort();
-
         const newAbortController = new AbortController();
-        this.abortControllers.set(cacheKey, newAbortController);
+        this.abortControllers.set(data.tileKey, newAbortController);
         const images = await Promise.all(
           visibleLayers.map((layer) => {
             const url = layer.tileUrl as string;
@@ -93,16 +94,16 @@ class TilePainter {
         const image = this.offscreen.transferToImageBitmap();
         this.ctx.postMessage({ tileKey: data.tileKey, image }, [image]);
       } catch (e) {
-        ///
+        console.log(e);
       }
     }
   }
 
-  async createBitmap(url: string, signal: AbortSignal) {
+  private async createBitmap(url: string, signal: AbortSignal) {
     const imgData = await fetch(url, { signal }).then((r) => r.blob());
     return createImageBitmap(imgData);
   }
 }
 new TilePainter();
 
-export default null as any;
+export default null as unknown;

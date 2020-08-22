@@ -26,32 +26,32 @@ export default class StarsVis extends Visualization {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  setupCamera(camera: TrackballCamera): void {
+  public setupCamera(camera: TrackballCamera): void {
     //
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  setupScene(scene: THREE.Scene, group: THREE.Group): void {
+  public setupScene(scene: THREE.Scene, group: THREE.Group): void {
     this.mesh.renderOrder = 0;
     group.add(this.mesh);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  update(deltaFactor: number): void {
+  public update(deltaFactor: number): void {
     this.mesh.rotation.y = TimeService.getHourAngle();
   }
 
-  destroy(): void {
+  public destroy(): void {
     this.stars.dispose();
     this.starsMaterial.map?.dispose();
     this.starsMaterial.dispose();
   }
 
-  getControls() {
+  public getControls() {
     return null;
   }
 
-  setupOwnMeta(meta: VisualizationMeta) {
+  public setupOwnMeta(meta: VisualizationMeta) {
     meta.setTitle("Stars");
     meta.setAuthor("Damian Koper");
     meta.setDescription(

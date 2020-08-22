@@ -7,10 +7,7 @@ import moment from "moment";
 export default class TimeService {
   static vernalEquinoxReference = moment.utc("2020-03-20 03:49:00");
   static solarYear = moment.duration({
-    days: 365,
-    hours: 5,
-    minutes: 48,
-    seconds: 46,
+    days: 365 + 108,
   });
 
   // Source: https://www.pveducation.org/pvcdrom/properties-of-sunlight/solar-time
@@ -39,7 +36,7 @@ export default class TimeService {
   static getFirstPointOfAriesAngle(timestamp = moment.utc()) {
     // Calculated orbit does not always match satellite position
     // It can be caused by TLE being outdated and/or error in reference point calculation increasing over time.
-    const correctionAngle = (Math.PI * 15) / 16;
+    const correctionAngle = Math.PI;
     const sinceVE = timestamp.diff(TimeService.vernalEquinoxReference, "ms");
     return (
       (2 * Math.PI * sinceVE) / TimeService.solarYear.asMilliseconds() +

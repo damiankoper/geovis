@@ -9,19 +9,23 @@ import AnimatedTransition from "../../../../core/domain/Animation/AnimatedTransi
 import Range from "../../../../core/domain/Utils/Range";
 import { EventDispatcher } from "strongly-typed-events";
 import Orbit from "../../../../core/domain/GeoPosition/models/Orbit";
+import { Euler } from "three";
 
 /**
  * @category Camera
  * @internal For internal GeoVisCore purposes
  */
 export default class TrackballController implements TrackballCamera {
+  private readonly keyboardBaseSpeed = 5;
   private pressedKeys: Record<string, boolean> = {};
   private pointerCaptured = false;
   private lastPanPosition = new THREE.Vector2();
   private mode: TrackballMode = TrackballMode.Free;
   private globalOrbit = new GlobalOrbit(new THREE.Vector3(0, 0, 6371));
   private localOrbit = new LocalOrbit(
-    new THREE.Vector3(0, 0, 10000),
+    new THREE.Vector3(0, 0, 10000).applyEuler(
+      new Euler(THREE.MathUtils.degToRad(5))
+    ),
     new Range<GeoPosition>(
       GeoPosition.fromDeg(5, -180),
       GeoPosition.fromDeg(85, 180)
@@ -50,13 +54,13 @@ export default class TrackballController implements TrackballCamera {
     this.setEvents();
   }
 
-  setGroup(group: THREE.Group) {
+  public setGroup(group: THREE.Group) {
     this.group = group;
     this.group.matrixAutoUpdate = false;
     this.setGroupTransformMatrix();
   }
 
-  update() {
+  public update() {
     this.panAnim.update((f, from, to) => {
       this.handleGlobalOrbitRotate(
         new THREE.Vector2().lerpVectors(from, to, f)
@@ -91,29 +95,28 @@ export default class TrackballController implements TrackballCamera {
     let shift = false;
     const panDelta = new THREE.Vector2();
     for (const keyCode in this.pressedKeys) {
-      const d = 5;
       // Shift
       if (keyCode === "16") {
         shift = true;
       }
       // ArrowTop
       if (keyCode === "38") {
-        panDelta.add(new THREE.Vector2(0, d));
+        panDelta.add(new THREE.Vector2(0, this.keyboardBaseSpeed));
         keyboardControl = true;
       }
       // ArrowRight
       if (keyCode === "39") {
-        panDelta.add(new THREE.Vector2(-d, 0));
+        panDelta.add(new THREE.Vector2(-this.keyboardBaseSpeed, 0));
         keyboardControl = true;
       }
       // ArrowBottom
       if (keyCode === "40") {
-        panDelta.add(new THREE.Vector2(0, -d));
+        panDelta.add(new THREE.Vector2(0, -this.keyboardBaseSpeed));
         keyboardControl = true;
       }
       // ArrowLeft
       if (keyCode === "37") {
-        panDelta.add(new THREE.Vector2(d, 0));
+        panDelta.add(new THREE.Vector2(this.keyboardBaseSpeed, 0));
         keyboardControl = true;
       }
     }
@@ -138,7 +141,7 @@ export default class TrackballController implements TrackballCamera {
     );
   }
 
-  destroy() {
+  public destroy() {
     this.eventSource.removeEventListener(
       "pointerdown",
       this.onPointerDown.bind(this)
@@ -180,9 +183,6 @@ export default class TrackballController implements TrackballCamera {
 
   private onKeyUp(e: KeyboardEvent) {
     delete this.pressedKeys[e.keyCode];
-    /*  if (!e.shiftKey)
-      if (this.lastPanDelta.manhattanLength() <= 2) this.stopMovement();
-      else this.panAnim.start(); */
   }
 
   private onWheel(e: WheelEvent) {
@@ -313,7 +313,7 @@ export default class TrackballController implements TrackballCamera {
   }
 
   /** @inheritdoc */
-  getNorthAngle() {
+  public getNorthAngle() {
     const plane = new THREE.Vector3(0, 0, 1);
     const v1 = this.localOrbit.up.clone().projectOnPlane(plane).normalize();
     const v2 = this.globalOrbit.up.clone().projectOnPlane(plane).normalize();
@@ -324,7 +324,7 @@ export default class TrackballController implements TrackballCamera {
   }
 
   /** @inheritdoc */
-  rotateNorth() {
+  public rotateNorth() {
     this.localOrbitAnim.from = this.localOrbit.clone();
     this.localOrbitAnim.to = this.localOrbit
       .clone()
@@ -338,203 +338,203 @@ export default class TrackballController implements TrackballCamera {
   }
 
   /** @inheritdoc */
-  zoomIn(times = 1) {
+  public zoomIn(times = 1) {
     this.zoom(this.zoomFactor ** times);
   }
   /** @inheritdoc */
-  zoomOut(times = 1) {
+  public zoomOut(times = 1) {
     this.zoom(1 / this.zoomFactor ** times);
   }
 
   /** @inheritdoc */
-  getGlobalOrbit() {
+  public getGlobalOrbit() {
     return this.globalOrbit;
   }
 
   /** @inheritdoc */
-  refreshGlobalOrbit() {
+  public refreshGlobalOrbit() {
     this.setGroupTransformMatrix();
     this._onGlobalOrbitChange.dispatch(this, this.globalOrbit);
   }
 
   /** @inheritdoc */
-  getLocalOrbit() {
+  public getLocalOrbit() {
     return this.localOrbit;
   }
 
   /** @inheritdoc */
-  refreshLocalOrbit() {
+  public refreshLocalOrbit() {
     this.setCameraTransformMatrix();
     this._onGlobalOrbitChange.dispatch(this, this.globalOrbit);
   }
 
   /** @inheritdoc */
-  getGlobalOrbitRadius() {
+  public getGlobalOrbitRadius() {
     return this.globalOrbit.getRadius();
   }
   /** @inheritdoc */
-  setGlobalOrbitRadius(radius: number) {
+  public setGlobalOrbitRadius(radius: number) {
     this.globalOrbit.setRadius(radius);
     this.setGroupTransformMatrix();
     return this;
   }
 
   /** @inheritdoc */
-  getGlobalOrbitPosition() {
+  public getGlobalOrbitPosition() {
     return this.globalOrbit.getGeoPosition();
   }
   /** @inheritdoc */
-  setGlobalOrbitPosition(position: GeoPosition) {
+  public setGlobalOrbitPosition(position: GeoPosition) {
     this.globalOrbit.setGeoPosition(position);
     this.setGroupTransformMatrix();
     return this;
   }
 
   /** @inheritdoc */
-  getLocalOrbitRadius() {
+  public getLocalOrbitRadius() {
     return this.localOrbit.getRadius();
   }
   /** @inheritdoc */
-  setLocalOrbitRadius(radius: number) {
+  public setLocalOrbitRadius(radius: number) {
     this.localOrbit.setRadius(radius);
     this.setCameraTransformMatrix();
     return this;
   }
 
   /** @inheritdoc */
-  setLocalOrbitPosition(position: GeoPosition) {
+  public setLocalOrbitPosition(position: GeoPosition) {
     this.localOrbit.setGeoPosition(position);
     this.setCameraTransformMatrix();
     return this;
   }
   /** @inheritdoc */
-  getLocalOrbitPosition() {
+  public getLocalOrbitPosition() {
     return this.localOrbit.getGeoPosition();
   }
 
   /** @inheritdoc */
-  setGlobalOrbitBounds(bounds: Range<GeoPosition>) {
+  public setGlobalOrbitBounds(bounds: Range<GeoPosition>) {
     this.globalOrbit.bounds = bounds;
     return this;
   }
   /** @inheritdoc */
-  getGlobalOrbitBounds() {
+  public getGlobalOrbitBounds() {
     return this.globalOrbit.bounds;
   }
 
   /** @inheritdoc */
-  setLocalOrbitBounds(bounds: Range<GeoPosition>) {
+  public setLocalOrbitBounds(bounds: Range<GeoPosition>) {
     this.localOrbit.bounds = bounds;
     return this;
   }
   /** @inheritdoc */
-  getLocalOrbitBounds() {
+  public getLocalOrbitBounds() {
     return this.localOrbit.bounds;
   }
 
   /** @inheritdoc */
-  setMode(mode: TrackballMode) {
+  public setMode(mode: TrackballMode) {
     this.mode = mode;
     this.globalOrbit.latchCompassNorth(this.localOrbit.v);
     return this;
   }
   /** @inheritdoc */
-  getMode() {
+  public getMode() {
     return this.mode;
   }
 
   /** @inheritdoc */
-  setGlobalOrbitSlowFactor(factor: number) {
+  public setGlobalOrbitSlowFactor(factor: number) {
     this.globalOrbit.slowFactor = factor;
     return this;
   }
   /** @inheritdoc */
-  getGlobalOrbitSlowFactor() {
+  public getGlobalOrbitSlowFactor() {
     return this.globalOrbit.slowFactor;
   }
 
   /** @inheritdoc */
-  setLocalOrbitSlowFactor(factor: number) {
+  public setLocalOrbitSlowFactor(factor: number) {
     this.localOrbit.slowFactor = factor;
     return this;
   }
   /** @inheritdoc */
-  getLocalOrbitSlowFactor() {
+  public getLocalOrbitSlowFactor() {
     return this.localOrbit.slowFactor;
   }
 
   /** @inheritdoc */
-  setGlobalOrbitEaseFn(fn: (t: number) => number) {
+  public setGlobalOrbitEaseFn(fn: (t: number) => number) {
     this.panAnim.easeFn = fn;
     return this;
   }
   /** @inheritdoc */
-  getGlobalOrbitEaseFn() {
+  public getGlobalOrbitEaseFn() {
     return this.panAnim.easeFn;
   }
 
   /** @inheritdoc */
-  setZoomEaseFn(fn: (t: number) => number) {
+  public setZoomEaseFn(fn: (t: number) => number) {
     this.zoomAnim.easeFn = fn;
     return this;
   }
   /** @inheritdoc */
-  getZoomEaseFn() {
+  public getZoomEaseFn() {
     return this.zoomAnim.easeFn;
   }
 
   /** @inheritdoc */
-  setZoomFactor(factor: number) {
+  public setZoomFactor(factor: number) {
     this.zoomFactor = factor;
     return this;
   }
   /** @inheritdoc */
-  getZoomFactor() {
+  public getZoomFactor() {
     return this.zoomFactor;
   }
 
   /** @inheritdoc */
-  setZoomBounds(bounds: Range) {
+  public setZoomBounds(bounds: Range) {
     this.zoomBounds = bounds;
     return this;
   }
   /** @inheritdoc */
-  getZoomBounds() {
+  public getZoomBounds() {
     return this.zoomBounds;
   }
 
   /** @inheritdoc */
-  setZoomTime(time: number) {
+  public setZoomTime(time: number) {
     this.zoomAnim.duration = time;
     return this;
   }
   /** @inheritdoc */
-  getZoomTime() {
+  public getZoomTime() {
     return this.zoomAnim.duration;
   }
 
   /** @inheritdoc */
-  setPanBreakTime(time: number) {
+  public setPanBreakTime(time: number) {
     this.panAnim.duration = time;
     return this;
   }
   /** @inheritdoc */
-  getPanBreakTime() {
+  public getPanBreakTime() {
     return this.panAnim.duration;
   }
 
   /** @inheritdoc */
-  setRotateNorthTime(time: number) {
+  public setRotateNorthTime(time: number) {
     this.localOrbitAnim.duration = time;
     return this;
   }
   /** @inheritdoc */
-  getRotateNorthTime() {
+  public getRotateNorthTime() {
     return this.localOrbitAnim.duration;
   }
 
   /** @inheritdoc */
-  stopMovement() {
+  public stopMovement() {
     this.zoomAnim.stop();
     this.panAnim.stop();
     this.panAnim.from.set(0, 0);

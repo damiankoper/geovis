@@ -19,19 +19,20 @@ import thumbnail from "!!base64-image-loader!./assets/thumbnail.jpg";
  * @category VisualizationExamples
  */
 export default class OsmTilesVis extends Visualization {
-  camera: TrackballCamera | null = null;
-  group: THREE.Group | null = null;
-  sphereGroup = new THREE.Group();
-  osmTilesService: TilesService;
-  maxZoom = 200;
+  public camera: TrackballCamera | null = null;
+  public group: THREE.Group | null = null;
+  public sphereGroup = new THREE.Group();
+  public osmTilesService: TilesService;
+  public maxZoom = 200;
 
-  timestamps: number[] = [];
-  timestampIndex = 0;
+  public timestamps: number[] = [];
+  public timestampIndex = 0;
 
   constructor() {
     super();
     this.addParent(new StarsVis());
     this.addParent(new AtmosphereVis(100, 8));
+
     this.osmTilesService = new TilesService(
       [
         {
@@ -60,7 +61,7 @@ export default class OsmTilesVis extends Visualization {
     Object.seal(this);
   }
 
-  setupCamera(camera: TrackballCamera): void {
+  public setupCamera(camera: TrackballCamera): void {
     this.camera = camera;
     camera
       .setMode(TrackballMode.Compass)
@@ -73,7 +74,10 @@ export default class OsmTilesVis extends Visualization {
       .setGlobalOrbitSlowFactor(1);
   }
 
-  async setupScene(scene: THREE.Scene, group: THREE.Group): Promise<void> {
+  public async setupScene(
+    scene: THREE.Scene,
+    group: THREE.Group
+  ): Promise<void> {
     this.group = group;
     this.group.renderOrder = 50;
     this.group.add(this.sphereGroup);
@@ -96,7 +100,7 @@ export default class OsmTilesVis extends Visualization {
     directionalLight.position.set(0, 0, 10000);
   }
 
-  async updateTimestamps() {
+  public async updateTimestamps() {
     const data = await (
       await fetch("https://api.rainviewer.com/public/maps.json")
     ).json();
@@ -121,6 +125,7 @@ export default class OsmTilesVis extends Visualization {
       this.osmTilesService.tileTreeRoot.refreshDeep(this.camera, this.group);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   update(deltaFactor: number): void {
     //
   }

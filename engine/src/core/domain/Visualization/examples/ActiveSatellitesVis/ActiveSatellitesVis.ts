@@ -48,14 +48,14 @@ export default class ActiveSatellitesVis extends Visualization {
     Object.seal(this);
   }
 
-  setupCamera(camera: TrackballCamera) {
+  public setupCamera(camera: TrackballCamera) {
     this.camera = camera;
     this.camera
       .setZoomBounds(new Range(200, 30000))
       .setMode(TrackballMode.Free);
   }
 
-  async setupScene(scene: THREE.Scene, group: THREE.Group) {
+  public async setupScene(scene: THREE.Scene, group: THREE.Group) {
     this.group = group;
     const tleData = _.shuffle(await this.tleService.update());
 
@@ -76,7 +76,7 @@ export default class ActiveSatellitesVis extends Visualization {
     group.add(this.points);
   }
 
-  update(deltaFrac: number) {
+  public update(deltaFrac: number) {
     this.timestamp.add((1000 / 60) * deltaFrac * this.speed, "ms");
     if (
       !this.prevTimestamp ||
@@ -96,21 +96,21 @@ export default class ActiveSatellitesVis extends Visualization {
     }
   }
 
-  setTimestamp(m: Moment) {
+  public setTimestamp(m: Moment) {
     this.timestamp = m;
     this.earthVis.timestamp = m;
   }
 
-  destroy() {
+  public destroy() {
     this.pointsMaterial.dispose();
     this.points.geometry.dispose();
   }
 
-  getControls() {
+  public getControls() {
     return ActiveSatellitesVisControls;
   }
 
-  setupOwnMeta(meta: VisualizationMeta) {
+  public setupOwnMeta(meta: VisualizationMeta) {
     meta.setTitle("Active satellites");
     meta.setAuthor("Damian Koper");
     meta.setDescription(

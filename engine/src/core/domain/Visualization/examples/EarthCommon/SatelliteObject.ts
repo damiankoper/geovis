@@ -125,21 +125,21 @@ export default class SatelliteObject {
     }
   }
 
-  removeFrom(group: THREE.Object3D) {
+  public removeFrom(group: THREE.Object3D) {
     if (this.useGroundLine) group.remove(this.line);
     if (this.useOrbit && this.orbitLine) group.remove(this.orbitLine);
     if (this.useMesh && this.mesh) group.remove(this.mesh);
     if (this.useLabel && this.labelSprite) group.remove(this.labelSprite);
   }
 
-  visible(v = true) {
+  public visible(v = true) {
     if (this.useGroundLine) this.line.visible = v;
     if (this.useOrbit && this.orbitLine) this.orbitLine.visible = v;
     if (this.useMesh && this.mesh) this.mesh.visible = v;
     if (this.useLabel && this.labelSprite) this.labelSprite.visible = v;
   }
 
-  setTLE(tle: [string, string, string]) {
+  public setTLE(tle: [string, string, string]) {
     this.tle = tle;
     this.satrec = Satellite.twoline2satrec(tle[1], tle[2]);
 
@@ -164,7 +164,7 @@ export default class SatelliteObject {
     if (this.useLabel) this.updateLabel();
   }
 
-  update(timestamp = moment.utc(), camPos?: THREE.Vector3) {
+  public update(timestamp = moment.utc(), camPos?: THREE.Vector3) {
     if (this.useGroundLine)
       this.line.matrix = this.getGroundTransformMatrix(timestamp);
     if (this.useMesh && this.mesh)
@@ -177,7 +177,7 @@ export default class SatelliteObject {
       this.labelSprite.matrix = this.getLabelTransformMatrix(timestamp, camPos);
   }
 
-  getPositionGd(timestamp = moment.utc()) {
+  public getPositionGd(timestamp = moment.utc()) {
     const date = timestamp.toDate();
     const positionAndVelocity = Satellite.propagate(this.satrec, date);
     const positionEci = positionAndVelocity.position;
@@ -185,7 +185,7 @@ export default class SatelliteObject {
     return Satellite.eciToGeodetic(positionEci, gmst);
   }
 
-  getPositionTransformMatrix(timestamp = moment.utc()): THREE.Matrix4 {
+  public getPositionTransformMatrix(timestamp = moment.utc()): THREE.Matrix4 {
     const positionGd = this.getPositionGd(timestamp);
     return GeoPosMapper.toRotationMatrix(
       new GeoPosition(positionGd.latitude, positionGd.longitude)
@@ -198,13 +198,13 @@ export default class SatelliteObject {
     );
   }
 
-  getPosition(timestamp = moment.utc()) {
+  public getPosition(timestamp = moment.utc()) {
     return new THREE.Vector3().applyMatrix4(
       this.getPositionTransformMatrix(timestamp)
     );
   }
 
-  getLabelTransformMatrix(
+  public getLabelTransformMatrix(
     timestamp = moment.utc(),
     camPos: THREE.Vector3 = new THREE.Vector3()
   ) {
@@ -215,7 +215,7 @@ export default class SatelliteObject {
     );
   }
 
-  getGroundTransformMatrix(timestamp = moment.utc()): THREE.Matrix4 {
+  public getGroundTransformMatrix(timestamp = moment.utc()): THREE.Matrix4 {
     const positionGd = this.getPositionGd(timestamp);
     return GeoPosMapper.toRotationMatrix(
       new GeoPosition(positionGd.latitude, positionGd.longitude)
@@ -230,7 +230,7 @@ export default class SatelliteObject {
       .multiply(new THREE.Matrix4().makeScale(0, 0, positionGd.height * 1.1));
   }
 
-  getOrbitTransformMatrix(timestamp = moment.utc()): THREE.Matrix4 {
+  public getOrbitTransformMatrix(timestamp = moment.utc()): THREE.Matrix4 {
     const m = new THREE.Matrix4()
       .makeRotationY(
         TimeService.getFirstPointOfAriesAngle(timestamp) +

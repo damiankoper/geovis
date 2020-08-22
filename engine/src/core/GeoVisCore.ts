@@ -15,6 +15,9 @@ export default class GeoVisCore {
 
   private destroyRequested = false;
 
+  /**
+   * @param container Container which Canvas element will be appended to
+   */
   constructor(container: HTMLElement) {
     this.container = container;
 
@@ -28,6 +31,7 @@ export default class GeoVisCore {
       antialias: true,
     });
     container.appendChild(this.renderer.domElement);
+    this.setSize();
 
     this.cameraController = new TrackballController(
       this.camera,
@@ -38,6 +42,10 @@ export default class GeoVisCore {
     Object.seal(this);
   }
 
+  /**
+   * Needs to be called on `container` size change.
+   * Should be typically called by event handler.
+   */
   public setSize() {
     const width = this.container.offsetWidth;
     const height = this.container.offsetHeight;
@@ -46,8 +54,14 @@ export default class GeoVisCore {
     this.camera.updateProjectionMatrix();
   }
 
+  /**
+   * Setup and run visualization. Previous one will have it's destroy chain called.
+   * @param visualization Visualization to be run
+   */
   public run(visualization: Visualization) {
-    this.visualization?._destroy();
+    if (this.visualization) {
+      this.visualization._destroy();
+    }
 
     while (this.scene.children.length) {
       this.scene.remove(this.scene.children[0]);
@@ -65,10 +79,15 @@ export default class GeoVisCore {
     this._run();
   }
 
+  /**
+   * Destroy while GeoVisCore object. It visualization is set up it's destroy chain would be called.
+   */
   public destroy() {
     this.destroyRequested = true;
+    if (this.visualization) {
+      this.visualization._destroy();
+    }
     this.cameraController.destroy();
-    this.visualization?._destroy();
     this.scene.dispose();
   }
 
