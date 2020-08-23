@@ -26,29 +26,27 @@ export default class IssVis extends Visualization {
   readonly r = 6371;
   public camera: TrackballCamera | null = null;
   public group: THREE.Group | null = null;
-
   private satelliteMaterial = new THREE.MeshBasicMaterial();
-
-  issObject: SatelliteObject | null = null;
-  hstObject: SatelliteObject | null = null;
-  hotbird13EObject: SatelliteObject | null = null;
-
   private tleService = new TLEService();
 
+  public issObject: SatelliteObject | null = null;
+  public hstObject: SatelliteObject | null = null;
+  public hotbird13EObject: SatelliteObject | null = null;
+
   constructor() {
-    super();
+    super("issVis");
     this.addParent(new EarthVis());
     Object.seal(this);
   }
 
-  setupCamera(camera: TrackballCamera) {
+  public setupCamera(camera: TrackballCamera) {
     this.camera = camera;
     this.camera
       .setZoomBounds(new Range(200, 30000))
       .setMode(TrackballMode.Free);
   }
 
-  async setupScene(scene: THREE.Scene, group: THREE.Group) {
+  public async setupScene(scene: THREE.Scene, group: THREE.Group) {
     this.group = group;
     const tleData = await this.tleService.update();
 
@@ -88,7 +86,7 @@ export default class IssVis extends Visualization {
     this.hotbird13EObject.addTo(group);
   }
 
-  loadSatelliteModel(path: string) {
+  public loadSatelliteModel(path: string) {
     const m = this.satelliteMaterial;
     return new Promise<THREE.Object3D>((resolve) => {
       new OBJLoader().load(path, (obj) => {
@@ -104,7 +102,7 @@ export default class IssVis extends Visualization {
     });
   }
 
-  update() {
+  public update() {
     const globalOrbit = this.camera?.getGlobalOrbit();
     const localOrbit = this.camera?.getLocalOrbit();
     if (globalOrbit && localOrbit && this.group) {
@@ -126,15 +124,15 @@ export default class IssVis extends Visualization {
     }
   }
 
-  destroy() {
+  public destroy() {
     this.satelliteMaterial.dispose();
   }
 
-  getControls() {
+  public getControls() {
     return IssVisControls;
   }
 
-  setupOwnMeta(meta: VisualizationMeta) {
+  public setupOwnMeta(meta: VisualizationMeta) {
     meta.setTitle("Satellites");
     meta.setAuthor("Damian Koper");
     meta.setDescription(

@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar app collapse dark>
-      <v-btn icon :to="{ name: 'VisPicker' }">
+      <v-btn icon :to="{ name: 'VisPicker' }" cy-data="back">
         <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
     </v-app-bar>
@@ -24,7 +24,7 @@ export default class VisViewer extends Vue {
     console.log(this.visualizations, this.$route.params.vis);
 
     return this.visualizations?.filter((v) => {
-      return v.constructor.name === this.$route.params.vis;
+      return v.name === this.$route.params.vis;
     })[0];
   }
 }

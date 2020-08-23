@@ -63,7 +63,7 @@ export default class AtmosphereVis extends Visualization {
     private groundRenderOrder = 50,
     private GT = G + T
   ) {
-    super();
+    super("atmosphereVis");
     this.atmoSphere = new THREE.SphereBufferGeometry(GT, 200, 100);
     this.atmoSphereGround = new THREE.SphereBufferGeometry(G, 200, 100);
     Object.seal(this);

@@ -21,7 +21,7 @@ export default class StarsVis extends Visualization {
   private mesh = new THREE.Mesh(this.stars, this.starsMaterial);
 
   constructor() {
-    super();
+    super("starsVis");
     Object.seal(this);
   }
 

@@ -29,7 +29,7 @@ export default class OsmTilesVis extends Visualization {
   public timestampIndex = 0;
 
   constructor() {
-    super();
+    super("tilesVis");
     this.addParent(new StarsVis());
     this.addParent(new AtmosphereVis(100, 8));
 

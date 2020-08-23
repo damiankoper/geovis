@@ -47,7 +47,7 @@ export default class EarthVis extends Visualization {
   private directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 
   constructor(public timestamp = moment.utc()) {
-    super();
+    super("earthVis");
     this.addParent(new StarsVis());
     this.addParent(new AtmosphereVis());
     this.sphereMaterial.onBeforeCompile = this.modifyShader.bind(this);

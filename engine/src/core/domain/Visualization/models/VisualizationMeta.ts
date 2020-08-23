@@ -1,4 +1,13 @@
 import _ from "lodash";
+
+export interface IVisualizationMeta {
+  title: string;
+  description: string;
+  author: string;
+  keywords: string[];
+  thumbnailB64?: string;
+}
+
 /**
  * Contains base information about visualization.
  * Child visualization can overwrite parents' fields.
@@ -27,7 +36,7 @@ export default class VisualizationMeta {
     this.keywords = s;
   }
 
-  addKeywords(s: string[]) {
+  public addKeywords(s: string[]) {
     this.keywords.push(...s);
     this.keywords = _.uniq(this.keywords);
   }
@@ -39,7 +48,7 @@ export default class VisualizationMeta {
   /**
    * @returns Copy of fields in plain JS object
    */
-  public getData() {
-    return _.assign({}, this);
+  public getData(): IVisualizationMeta {
+    return (_.assign({}, this) as unknown) as IVisualizationMeta;
   }
 }

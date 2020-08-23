@@ -15,6 +15,7 @@
         width="100"
         prepend-icon="mdi-magnify"
         style="max-width: 300px;"
+        cy-data="search"
       ></v-text-field>
     </v-app-bar>
 
@@ -23,11 +24,12 @@
         <v-row>
           <v-col
             v-for="v in visibleVisualizations"
-            :key="v.constructor.name"
+            :key="v.name"
             :xl="3"
             :lg="4"
             :sm="6"
             :cols="12"
+            cy-data="vis-card"
           >
             <vis-card :v="v" />
           </v-col>
@@ -51,14 +53,19 @@ export default class VisPicker extends Vue {
 
   get visibleVisualizations() {
     return (this.visualizations || []).filter((v) => {
-      const meta = v.meta.getData() as any;
-      const search = this.search.toLowerCase();
+      const meta = v.meta.getData();
+      const search = this.search.toLowerCase().trim();
       return (
-        !search ||
-        meta.keywords.some((k: string) => k.toLowerCase().includes(search)) ||
-        meta.title.toLowerCase().includes(search) ||
-        meta.author.toLowerCase().includes(search) ||
-        meta.description.toLowerCase().includes(search)
+        search
+          .split(" ")
+          .filter((s) => !!s)
+          .some(
+            (s) =>
+              meta.keywords.some((k: string) => k.toLowerCase().includes(s)) ||
+              meta.title.toLowerCase().includes(s) ||
+              meta.author.toLowerCase().includes(s) ||
+              meta.description.toLowerCase().includes(s)
+          ) || !search
       );
     });
   }

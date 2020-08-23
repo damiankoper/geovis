@@ -10,7 +10,7 @@ import VisualizationMeta from "../../../../../core/domain/Visualization/models/V
  */
 export default class EmptyVis extends Visualization {
   constructor() {
-    super();
+    super("emptyVis");
     Object.seal(this);
   }
 

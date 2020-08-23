@@ -10,7 +10,17 @@
         v-html="info.description"
       ></v-col>
       <v-col :cols="3" class="text-right font-weight-bold">Keywords</v-col>
-      <v-col :cols="9"> {{ info.keywords.join(", ") }} </v-col>
+      <v-col :cols="9">
+        <v-chip
+          x-small
+          v-for="keyword in info.keywords"
+          :key="keyword"
+          class="mr-1"
+          dark
+        >
+          {{ keyword }}
+        </v-chip>
+      </v-col>
     </v-row>
   </v-container>
 </template>

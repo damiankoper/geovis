@@ -42,7 +42,7 @@ export default class ActiveSatellitesVis extends Visualization {
 
   private earthVis: EarthVis;
   constructor() {
-    super();
+    super("activeSatellitesVis");
     this.addParent((this.earthVis = new EarthVis()));
     this.earthVis.timestamp = this.timestamp;
     Object.seal(this);

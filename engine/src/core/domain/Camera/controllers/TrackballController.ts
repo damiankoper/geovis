@@ -16,7 +16,7 @@ import { Euler } from "three";
  * @internal For internal GeoVisCore purposes
  */
 export default class TrackballController implements TrackballCamera {
-  private readonly keyboardBaseSpeed = 5;
+  private readonly keyboardBaseSpeed = 4;
   private pressedKeys: Record<string, boolean> = {};
   private pointerCaptured = false;
   private lastPanPosition = new THREE.Vector2();
@@ -60,7 +60,7 @@ export default class TrackballController implements TrackballCamera {
     this.setGroupTransformMatrix();
   }
 
-  public update() {
+  public update(deltaFactor: number) {
     this.panAnim.update((f, from, to) => {
       this.handleGlobalOrbitRotate(
         new THREE.Vector2().lerpVectors(from, to, f)
@@ -87,10 +87,10 @@ export default class TrackballController implements TrackballCamera {
       this.calcAndDispatchNorth();
     });
 
-    this.handleKeyboardControl();
+    this.handleKeyboardControl(deltaFactor);
   }
 
-  private handleKeyboardControl() {
+  private handleKeyboardControl(deltaFactor: number) {
     let keyboardControl = false;
     let shift = false;
     const panDelta = new THREE.Vector2();
@@ -121,7 +121,7 @@ export default class TrackballController implements TrackballCamera {
       }
     }
     if (keyboardControl) {
-      this.lastPanDelta.copy(panDelta);
+      this.lastPanDelta.copy(panDelta.multiplyScalar(deltaFactor));
       if (shift)
         this.handleLocalOrbitRotate(
           this.lastPanDelta.multiplyScalar(this.localOrbit.slowFactor)

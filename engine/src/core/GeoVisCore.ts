@@ -98,7 +98,7 @@ export default class GeoVisCore {
     const deltaS = this.clock.getDelta();
     const deltaFactor = deltaS * 60; // Target -> 60 FPS
 
-    this.cameraController.update();
+    this.cameraController.update(deltaFactor);
     this.visualization?._update(deltaFactor);
     TWEEN.update(TWEEN.now());
 

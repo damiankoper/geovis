@@ -14,6 +14,10 @@ export default abstract class Visualization {
   /** @internal */
   public readonly meta = new VisualizationMeta();
 
+  constructor(public readonly name: string) {
+    this.setupOwnMeta(this.meta);
+  }
+
   /**
    * Method called with param containing metadata set from parent visualizations.
    * Parent (or default) metadata can be overwritten here using {@link VisualizationMeta} class
@@ -52,6 +56,7 @@ export default abstract class Visualization {
    */
   protected addParent(visualization: Visualization) {
     this.parents.push(visualization);
+    this._setupMeta();
   }
 
   /**
