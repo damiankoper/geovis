@@ -1,14 +1,16 @@
 <template>
   <v-container class="pt-0" style="max-width: 400px;">
     <v-row dense>
-      <v-col :cols="3" class="text-right font-weight-bold">Author</v-col>
-      <v-col :cols="9">{{ info.author }}</v-col>
-      <v-col :cols="3" class="text-right font-weight-bold">Description</v-col>
+      <v-col :cols="3" class="text-right font-weight-bold"> Author </v-col>
+      <v-col :cols="9" cy-data="author">{{ info.author }}</v-col>
+      <v-col :cols="3" class="text-right font-weight-bold"> Description </v-col>
       <v-col
         :cols="9"
         style="white-space: pre-wrap; word-break: break-word;"
         v-html="info.description"
-      ></v-col>
+        cy-data="description"
+      >
+      </v-col>
       <v-col :cols="3" class="text-right font-weight-bold">Keywords</v-col>
       <v-col :cols="9">
         <v-chip
@@ -17,6 +19,7 @@
           :key="keyword"
           class="mr-1"
           dark
+          cy-data="keyword"
         >
           {{ keyword }}
         </v-chip>

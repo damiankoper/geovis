@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test:unit": "vue-cli-service test:unit",
-    "test:e2e": "vue-cli-service test:e2e",
+    "test:e2e": "concurrently --kill-others 'npm run storybook:serve -- --ci' 'npx wait-on http://localhost:6006 && npx cypress open'",
     "lint": "vue-cli-service lint",
     "build:bundle": "vue-cli-service build --target lib --name GeoVisEngine src/GeoVisEngine.ts && npx tsc --emitDeclarationOnly && npx tsc --emitDeclarationOnly -p tsconfig.workers.json",
     "build:docs": "npx typedoc",
@@ -15,7 +15,9 @@
   "types": "dist/types/GeoVisEngine.d.ts",
   "dependencies": {
     "@tweenjs/tween.js": "^18.6.0",
+    "concurrently": "^5.3.0",
     "core-js": "^3.6.5",
+    "cypress-plugin-snapshots": "^1.4.4",
     "d3-ease": "^1.0.6",
     "lodash": "^4.17.15",
     "moment": "^2.27.0",
@@ -58,6 +60,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-vue": "^2.0.2",
     "base64-image-loader": "^1.2.1",
+    "cypress-commands": "^1.1.0",
     "eslint": "^7.3.1",
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-vue": "^6.2.2",
@@ -73,6 +76,7 @@
     "vue-cli-plugin-storybook": "^1.2.2",
     "vue-cli-plugin-vuetify": "^2.0.6",
     "vue-template-compiler": "^2.6.11",
-    "vuetify-loader": "^1.5.0"
+    "vuetify-loader": "^1.5.0",
+    "wait-on": "^5.2.0"
   }
 }

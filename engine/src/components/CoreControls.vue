@@ -8,6 +8,7 @@
           x-small
           v-if="!visControlPanel"
           class="clickable"
+          cy-data="open-control-panel"
         >
           <v-icon>mdi-menu</v-icon>
         </v-btn>
@@ -19,19 +20,23 @@
           class="clickable"
         >
           <v-toolbar color="transparent" elevation="0">
-            <v-btn @click="visControlPanel = false" icon>
+            <v-btn
+              @click="visControlPanel = false"
+              icon
+              cy-data="close-control-panel"
+            >
               <v-icon>mdi-close</v-icon>
             </v-btn>
-            <v-toolbar-title>
+            <v-toolbar-title cy-data="title">
               {{ visTitle }}
             </v-toolbar-title>
           </v-toolbar>
 
           <v-tabs background-color="transparent" v-model="tab" vertical>
-            <v-tab>
+            <v-tab cy-data="tab-info">
               Info
             </v-tab>
-            <v-tab v-if="hasVisControls">
+            <v-tab v-if="hasVisControls" cy-data="tab-controls">
               Controls
             </v-tab>
             <v-tabs-items
@@ -52,9 +57,9 @@
           rounded
           :elevation="4"
           class="px-2 py-1 d-flex flex-column align-center caption"
+          cy-data="position"
         >
-          {{ latFormatted }} |
-          {{ longFormatted }}
+          {{ latFormatted }} | {{ longFormatted }}
         </v-sheet>
       </v-col>
       <v-col cols="auto">
@@ -143,12 +148,9 @@ export default class CoreControls extends Vue {
   }
 
   private formatDMS(l: { dir: string; d: number; m: number; s: number }) {
-    return `
-      ${String(l.d)}\u00B0
-      ${String(l.m).padStart(2, "0")}"
-      ${String(l.s).padStart(2, "0")}'
-      ${l.dir}
-    `;
+    return `${String(l.d)}\u00B0 ${String(l.m).padStart(2, "0")}" ${String(
+      l.s
+    ).padStart(2, "0")}' ${l.dir}`;
   }
   private rotateNorth() {
     this.camera.rotateNorth();

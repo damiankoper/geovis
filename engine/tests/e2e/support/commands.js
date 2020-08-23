@@ -23,3 +23,14 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+Cypress.Commands.add("checkMeta", (fixture) => {
+  cy.fixture(fixture).then((meta) => {
+    cy.get("[cy-data='title']").should("contain.text", meta.title);
+    cy.get("[cy-data='author']").should("contain.text", meta.author);
+    cy.get("[cy-data='description']").should("contain.text", meta.description);
+    meta.keywords.forEach((k) => {
+      cy.get("[cy-data='keyword']").should("contain.text", k);
+    });
+  });
+});
