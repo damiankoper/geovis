@@ -46,7 +46,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import ActiveSatellitesVis from "./ActiveSatellitesVis";
-import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
+import { TrackballMode } from "../../../Camera/enums/TrackballMode";
 import moment from "moment";
 @Component
 export default class ActiveSatellitesVisControls extends Vue {

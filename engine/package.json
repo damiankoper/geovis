@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "test:unit": "vue-cli-service test:unit",
+    "test": "vue-cli-service test:unit",
     "test:e2e": "concurrently --kill-others 'npm run storybook:serve -- --ci' 'npx wait-on http://localhost:6006 && npx cypress open'",
     "lint": "vue-cli-service lint",
     "build:bundle": "vue-cli-service build --target lib --name GeoVisEngine src/GeoVisEngine.ts && npx tsc --emitDeclarationOnly && npx tsc --emitDeclarationOnly -p tsconfig.workers.json",

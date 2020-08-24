@@ -18,7 +18,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import EarthVis from "./EarthVis";
-import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
+import { TrackballMode } from "../../../Camera/enums/TrackballMode";
 @Component
 export default class EarthVisControls extends Vue {
   @Prop() vis!: EarthVis;

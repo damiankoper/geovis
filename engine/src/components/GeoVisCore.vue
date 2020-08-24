@@ -27,7 +27,7 @@ import Visualization from "../core/domain/Visualization/models/Visualization";
 import CoreControls from "./CoreControls.vue";
 import VisualizationInfo from "./VisualizationInfo.vue";
 import Vuetify from "vuetify/lib";
-import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
+import VisualizationMeta from "../core/domain/Visualization/models/VisualizationMeta";
 if (process.env.NODE_ENV === "production") Vue.use(Vuetify);
 
 @Component({

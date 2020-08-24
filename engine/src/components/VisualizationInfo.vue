@@ -30,8 +30,8 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-import Visualization from "@/core/domain/Visualization/models/Visualization";
-import VisualizationMeta from "@/core/domain/Visualization/models/VisualizationMeta";
+import Visualization from "../core/domain/Visualization/models/Visualization";
+import VisualizationMeta from "../core/domain/Visualization/models/VisualizationMeta";
 
 @Component
 export default class VisualizationInfo extends Vue {

@@ -41,7 +41,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import IssVis from "./IssVis";
-import { TrackballMode } from "@/core/domain/Camera/enums/TrackballMode";
+import { TrackballMode } from "../../../Camera/enums/TrackballMode";
 @Component
 export default class IssVisControls extends Vue {
   @Prop() vis!: IssVis;
