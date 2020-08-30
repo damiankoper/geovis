@@ -100,6 +100,7 @@ Możliwość ruchu w każdej z nich, a także przybliżania i oddalania.
 - Czym jest Webpack i idea budowania aplikacji z modułów. Alternatywy Webpacka.
 - Schemat komponentów w połączeniu z osadzonym GeoVisCore.
 - Opis propów, zachowania i przepływu danych.
+- Throttle na obsługę zdarzeń dla kompasu i współrzędnych. Mimo wszystko update Vue jest za wolny na pełne 60fps.
 
 ## Ograniczenia, możliwości optymalizacji i rozwoju
 
@@ -161,7 +162,7 @@ Wszędzie schematy
   - OffscreenCanvas
 - Priorytetyzacja generowania kafelków - najpierw te najbliżej środka obserwatora
 - Wiele warstw kafelków
-- Błąd zakresu liczby zmiennoprzecinkowej dla "rozciągniętych modeli", generowanych daleko od środka.
+- Błąd zakresu liczby zmiennoprzecinkowej dla "rozciągniętych modeli", generowanych daleko od środka. Sposoby rozwiązania. Mnożenie vs dodawanie przy transformacji.
 - Możliwości optymalizacji
 
 # 5. Aplikacja

@@ -14,7 +14,7 @@ export class TilesService {
   public thetaBound = THREE.MathUtils.degToRad(85.0511);
   public geometryMap = new Map<
     number,
-    Map<number, THREE.SphereBufferGeometry>
+    Map<number, { geometry: THREE.SphereGeometry; position: THREE.Vector3 }>
   >();
 
   public bgTile = new Promise<HTMLImageElement>((r) =>
@@ -75,22 +75,37 @@ export class TilesService {
   public getGeometry(zoom: number, y: number) {
     let latMap = this.geometryMap.get(zoom);
     if (!latMap) {
-      latMap = new Map<number, THREE.SphereBufferGeometry>();
+      latMap = new Map<
+        number,
+        { geometry: THREE.SphereGeometry; position: THREE.Vector3 }
+      >();
       this.geometryMap.set(zoom, latMap);
     }
 
     let geometry = latMap.get(y);
     if (!geometry) {
       const d = Math.floor((-Math.tanh(zoom / 4) + 1) * 30 + 1);
-      geometry = new THREE.SphereBufferGeometry(
-        this.r,
-        d,
-        d,
-        0,
-        this.phiLength(zoom),
-        this.thetaStart(y, zoom),
-        this.thetaLength(y, zoom)
-      );
+      geometry = {
+        geometry: new THREE.SphereGeometry(
+          this.r,
+          d,
+          d,
+          0,
+          this.phiLength(zoom),
+          this.thetaStart(y, zoom),
+          this.thetaLength(y, zoom)
+        ),
+        position: new THREE.Vector3(),
+      };
+      geometry.geometry.vertices.forEach((v) => {
+        geometry?.position.add(v);
+      });
+      geometry.position.divideScalar(geometry.geometry.vertices.length);
+
+      geometry.geometry.vertices.forEach((v) => {
+        v.sub(geometry?.position || new THREE.Vector3());
+      });
+      geometry.geometry.verticesNeedUpdate = true;
       latMap.set(y, geometry);
     }
     return geometry;

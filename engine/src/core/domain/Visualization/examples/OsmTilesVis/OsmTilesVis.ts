@@ -70,6 +70,12 @@ export default class OsmTilesVis extends Visualization {
       .setGlobalOrbitBounds(
         new Range(GeoPosition.fromDeg(-85, -180), GeoPosition.fromDeg(85, 180))
       )
+      .setLocalOrbitBounds(
+        new Range<GeoPosition>(
+          GeoPosition.fromDeg(5, -180),
+          GeoPosition.fromDeg(89, 180)
+        )
+      )
       .setLocalOrbitRadius(this.maxZoom)
       .setGlobalOrbitSlowFactor(1);
   }

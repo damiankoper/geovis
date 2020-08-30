@@ -42,7 +42,7 @@ export default class AtmosphereVis extends Visualization {
     uniforms: {
       stop: { value: 0.6 },
       fadeOut: { value: 0 },
-      power: { value: 1 },
+      power: { value: 2 },
       glowColor: { value: new THREE.Color(0x87ceeb) },
       viewVector: { value: new THREE.Vector3() },
       ...THREE.UniformsLib.lights,

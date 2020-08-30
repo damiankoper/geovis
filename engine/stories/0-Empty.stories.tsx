@@ -34,7 +34,7 @@ export const Basic = () => ({
     return (
       <div>
         <geo-vis-core
-          style="height:600px;width:100vw"
+          style="height:99.9999vh;width:100vw"
           visualization={(this as any).vis}
         />
       </div>

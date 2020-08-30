@@ -20,7 +20,7 @@ export class TileTreeNode {
 
   public readonly children: TileTreeNode[] = [];
 
-  private geometry: THREE.SphereBufferGeometry;
+  private geometry: { geometry: THREE.SphereGeometry; position: THREE.Vector3 };
   private positionCenter: GeoPosition;
 
   private getTilesDistance(desiredZoom: number) {
@@ -116,11 +116,12 @@ export class TileTreeNode {
       }
 
       if (!this.mesh) {
-        this.mesh = new THREE.Mesh(this.geometry, this.material);
+        this.mesh = new THREE.Mesh(this.geometry.geometry, this.material);
         this.mesh.matrixAutoUpdate = false;
-        this.mesh.matrix = new THREE.Matrix4().makeRotationY(
-          this.service.phiStart(this.x, this.zoom)
-        );
+        const p = this.geometry.position;
+        this.mesh.matrix = new THREE.Matrix4()
+          .makeRotationY(this.service.phiStart(this.x, this.zoom))
+          .multiply(new THREE.Matrix4().makeTranslation(p.x, p.y, p.z));
         this.mesh.renderOrder = this.zoom;
         group.add(this.mesh);
       }
@@ -164,7 +165,6 @@ export class TileTreeNode {
       name: "abortTile",
       tileKey: this.key,
     });
-    this.geometry.dispose();
     this.material.map?.dispose();
     this.material.dispose();
     this.service.canvasDrawnHandlerMap.delete(this.key);
