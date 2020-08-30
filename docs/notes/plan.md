@@ -109,6 +109,8 @@ Możliwość ruchu w każdej z nich, a także przybliżania i oddalania.
 
 # 4. Wizualizacje
 
+Wszędzie schematy
+
 ## Gwiazdy
 
 - Podstawa do prawie wszystkich wizualizacji
@@ -145,7 +147,7 @@ Możliwość ruchu w każdej z nich, a także przybliżania i oddalania.
 
 ## Kafelki i radar pogodowy
 
-- Standard numerowania kafelków
+- Standard numerowania kafelków. + rysunek
 - Mapowanie współrzędnych na kafelek
 - Projekcja: Odwzorowanie walcowe równokątne, odwzorowanie Merkatora
 - Kafelki nie zawierają skrajnych szerokości
@@ -159,6 +161,7 @@ Możliwość ruchu w każdej z nich, a także przybliżania i oddalania.
   - OffscreenCanvas
 - Priorytetyzacja generowania kafelków - najpierw te najbliżej środka obserwatora
 - Wiele warstw kafelków
+- Błąd zakresu liczby zmiennoprzecinkowej dla "rozciągniętych modeli", generowanych daleko od środka.
 - Możliwości optymalizacji
 
 # 5. Aplikacja
