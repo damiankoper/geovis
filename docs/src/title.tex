@@ -40,19 +40,7 @@
 \usepackage{color,calc}
 %\usepackage{soul} % packege with commands for text highliting
 
-%% Accorging to the rules the main font of the thesis should be Times.
-%% In order to achieve it we use tgtermes font that offers shapes: normal, bold, italic, italic bold.
-%% There is no slanted shape.
-%% If you use slanted font in the text (typing \textsl{} commnand), then LaTeX will substitute it with a standard font giving you a warning.
-%% Additionally tgtermes works for the running text. All maths (formulas, equations) will be rendered with a default font for math.
-%% If you with to change the font for math, you must to do it yourself.
-
-%% After installation of tgtermes package there might be a need to update font and mapping information 
-%% This can be don by running the following commands (as administrator)
-%% initexmf --admin --update-fndb
-%% initexmf --admin --mkmaps
-
-\usepackage{tgtermes}   
+\usepackage{ebgaramond} % package with garamond font (required on the title page)
 
 \renewcommand*\ttdefault{txtt}
 
@@ -80,7 +68,6 @@
 % \usepackage{amsmath}
 \usepackage{tikz}
 \usetikzlibrary{quotes,babel,calc,patterns,angles}
- \usepackage{pdfpages}
 % \usepackage{mathdots}
 % \usepackage{yhmath}
 % \usepackage{cancel}
@@ -543,6 +530,72 @@ Listing \thelstlisting: #1\hfill%\hfill%
 
 %\usepackage[absolute]{textpos} % not used because picture environment was applied
 
+\def\maketitle{%
+  \pagestyle{empty}%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+%% Below there is a declaration of picture including title and author text.
+%% This text must be placed inside a 110mmx75mm window, whose upper left corner
+%% is located at 77mm from the left and 111mm from the top of the page border
+%% (the cover of the thesis has a window cutted in it just of this size). 
+%% Plese check if the title and the author are really correclty placed.
+%% In case of bad fitting pleas e adjust attributes of the commands used
+%% to put the window in a correct place.
+%%
+%% The color cover (with cutted window) should be available from administration
+%% Please notice, that this cover is a bit bigger that A4 page by 3mm. Cutt these 
+%% margins to make the cover of the same size as the page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+\newlength{\tmpfboxrule}
+\setlength{\tmpfboxrule}{\fboxrule}
+\setlength{\fboxsep}{2mm}
+\setlength{\fboxrule}{0mm} 
+%\setlength{\fboxrule}{0.1mm} %% jeśli chcemy zobaczyć ramkę
+\setlength{\unitlength}{1mm}
+\begin{picture}(0,0)
+\put(44,-129){\fbox{
+\parbox[c][71mm][c]{104mm}{\centering%\lineskip=34pt 
+\fontsize{16pt}{18pt}\selectfont \@titleEN\\[5mm]
+\fontsize{16pt}{18pt}\selectfont \@title\\[15mm]
+\fontsize{16pt}{18pt}\selectfont AUTOR:\\[2mm]
+\fontsize{14pt}{16pt}\selectfont \@author}
+}
+}
+\end{picture}
+\setlength{\fboxrule}{\tmpfboxrule} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Reszta strony z nazwą uczelni, wydziału, kierunkiem, specjalnością
+%% promotorem, oceną pracy, miastem i rokiem
+	{\centering%\vspace{-1cm}
+		{\fontsize{22pt}{24pt}\selectfont \@uczelnia}\\[0.4cm]
+		{\fontsize{22pt}{24pt}\selectfont \@wydzial}\\[0.5cm]
+		  \hrule %\vspace*{0.7cm}
+	}
+{\flushleft\fontsize{14pt}{16pt}\selectfont%
+\begin{tabular}{ll}
+KIERUNEK: & \@kierunek\\
+SPECJALNOŚĆ: & \@specjalnosc\\
+\end{tabular}\\[1.3cm]
+}
+{\centering
+{\fontsize{32pt}{36pt}\selectfont PRACA DYPLOMOWA}\\[0.5cm]
+{\fontsize{32pt}{36pt}\selectfont INŻYNIERSKA}\\[2.5cm]
+}
+\vfill
+\begin{tabularx}{\linewidth}{p{6cm}l}
+		&{\fontsize{16pt}{18pt}\selectfont PROWADZĄCY PRACĘ:}\\[2mm] %UWAGA: tutaj jest miejsce na nazwisko promotora pracy
+		&{\fontsize{14pt}{16pt}\selectfont \@promotor}\\[10mm]
+		&{\fontsize{16pt}{18pt}\selectfont OCENA PRACY:}\\[20mm]
+	\end{tabularx}
+\vspace{2cm}
+\hrule\vspace*{0.3cm}
+{\centering
+{\fontsize{16pt}{18pt}\selectfont \@date}\\[0cm]
+}
+\normalfont
+\cleardoublepage
+
+}
 
 \makeatother
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -586,70 +639,7 @@ Listing \thelstlisting: #1\hfill%\hfill%
 %\includeonly{abbreviations,chapter01} % uncomment it if you with to complile only selected latex files (this will speed up compilation, especially if you focuse on a specific part of the thesis)
 
 \begin{document}
-% Here you have the commands for setting the spacying (do not change)
-%\SingleSpacing
-%\OnehalfSpacing
-%\DoubleSpacing
 
-%\settypeoutlayoutunit{cm} % for debbuging
-%\typeoutstandardlayout    % prints on stdout the info about settings
-\pdfbookmark[0]{Title}{Tytul.1}
-\includepdf[page={1}]{../out/title}
-
-\newpage
-
-\chapterstyle{noNumbered}  % Below there are declarations of various lists. Please comment out those which are too short (the list should contain at least 5 items)
-\pagestyle{outer}
-\mbox{}\pdfbookmark[0]{Table of contents}{spisTresci.1}
-\tableofcontents*
-
-\newpage
-\mbox{}\pdfbookmark[0]{List of figures}{spisRysunkow.1}
-%\addcontentsline{toc}{chapter}{Spis rysunków}
-\listoffigures*
-
-\newpage
-\mbox{}\pdfbookmark[0]{List of tables}{spisTabel.1}
-%\addcontentsline{toc}{chapter}{Spis tabel}
-\listoftables*
-
-\newpage
-\mbox{}\pdfbookmark[0]{Spis listingów}{spisListingow.1}
-%\addcontentsline{toc}{chapter}{Spis listingów}
-\lstlistoflistings*
-
-% Below there are inclusions of latex files
-\include{abbreviations} % If abbreviations list is short, you can comment it out
-\chapterstyle{default}{
-\include{chapters/introduction}
-\include{chapters/requirements}
-\include{chapters/architecture}
-% \include{chapter02}
-% \include{chapter03}
-% \include{chapter04}
-% \include{chapter05}
-% \include{chapter06}
-
-%\bibliographystyle{plalpha}
-\bibliographystyle{abbrv}
-% \bibliographystyle{plain}
-
-%Warning: References should be collected in a separate file. You can use the programm JabRef for editing. 
-%         But please remember, that not all JabRef types of entries are supported by BibTeX.
-%         File name below is given without extenion 
-%         (here BibTeX will look for "bibiography.bib" in the main directory)
-\setlength{\bibitemsep}{2pt} % introduced to make smaller seps between bibliographic items
-\bibliography{bibliography}
-
-%\appendix
-%\include{appendixA}
-%\include{appendixB}
-
-%%Uncomment the lines below, if you want to use index
-%%\chapterstyle{noNumbered}
-%%\phantomsection 
-%%\addcontentsline{toc}{chapter}{Index}
-%%\printindex
-
+\maketitle
 
 \end{document}
