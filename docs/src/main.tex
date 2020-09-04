@@ -106,9 +106,24 @@ Listing \thelstlisting: #1\hfill%\hfill%
 \addcontentsline{lol}{lstlisting}{\protect\numberline{\thelstlisting}#1}
 }%
 
+\lstdefinelanguage{JavaScript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+
 % code style with line numbering (but these are commented out)
 \lstset{
-  %%basicstyle=\footnotesize\ttfamily,
+  basicstyle=\footnotesize\ttfamily,
   %%columns=fullflexible,
 	%%showstringspaces=false,
 	%%showspaces=false,
@@ -594,7 +609,7 @@ Listing \thelstlisting: #1\hfill%\hfill%
 %\settypeoutlayoutunit{cm} % for debbuging
 %\typeoutstandardlayout    % prints on stdout the info about settings
 \pdfbookmark[0]{Title}{Tytul.1}
-\includepdf[page={1}]{../out/title}
+\includepdf[pages={1}]{../out/title}
 
 \newpage
 

@@ -18,7 +18,7 @@ Jak dobra architektura aplikacji może pomóc w tworzeniu zróżnicowanych wizua
 
 ## Zawartość pracy
 
-Co jest którym rozdziale opisane
+Co jest którym rozdziale opisane i ogólny cel projektu
 
 # 2. Wymagania
 
