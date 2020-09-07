@@ -37,7 +37,7 @@ W grafice 3D każdy model reprezentowany jest przez zbiór punktów i informacji
 
 Przekształcenia związane z pozycją modelu i kamery w świecie wyrażane są za pomocą macierzy. Transformacja pozycji modelu odbywa się z pomocą macierzy $M$, a transformacja pozycji związana z położeniem kamery z pomocą macierzy widoku $V$. Wyliczanie współrzędnych wierzchołka w układzie współrzędnych świata pokazano w równaniu \ref{eq:MV}.
 
-Aby uzyskać wyjściową pozycję piksela na ekranie konieczne jest pomnożenie macierzy projekcji i wektora pozycji wierzchołka w układzie współrzędnych świata. Macierz projekcji odpowiada za transformację współrzędnych wierzchołka do sześcianu o wymiarach 2x2x2 i środku w punkcie $(0, 0, 0)$. Współrzędne $(x, y)$ transformowanych wierzchołków są współrzędnymi \textit{NDC} (ang. Normalized Device Coordinates). Dzięki temu mogą być one łatwo przekształcone na piksele elementu Canvas, gdzie punkt $(0, 0)$ znajduje się w lewem górnym rogu. Podejście to uniezależnia generowanie pikseli od elementu wyświetlającego, do którego trzeba dostosować tylko sposób przekształcenia współrzędnych \textit{NDC}.
+Aby uzyskać wyjściową pozycję piksela na ekranie konieczne jest pomnożenie macierzy projekcji i wektora pozycji wierzchołka w układzie współrzędnych świata (równanie \ref{eq:MVP}). Macierz projekcji odpowiada za transformację współrzędnych wierzchołka do sześcianu o wymiarach 2x2x2 i środku w punkcie $(0, 0, 0)$. Tranformacja ta może być perspektywiczna, gdzie przekształceniu ulega przestrzeć w kształcie ostrosłupa ściętego. Może być też ortigtraficzna, gdzie przekształceniu ulega przestrzeń w kształcie prostopadłościanu. Punkty leżące poza tą przestrzenią nie są rysowane. Współrzędne $(x, y)$ transformowanych wierzchołków są współrzędnymi \textit{NDC} (ang. Normalized Device Coordinates), niezależnymi od urządzenia. Dzięki temu mogą być one łatwo przekształcone na piksele elementu Canvas, gdzie punkt $(0, 0)$ znajduje się w lewem górnym rogu. Podejście to uniezależnia generowanie pikseli od elementu wyświetlającego, do którego trzeba dostosować tylko sposób przekształcenia współrzędnych \textit{NDC}.
 
 \begin{equation}
     \label{eq:MV}
@@ -68,7 +68,8 @@ Aby uzyskać wyjściową pozycję piksela na ekranie konieczne jest pomnożenie 
     \item{$P$} macierz projekcji
     \item{$p'$} wektor pozycji wierzchołka w układzie współrzędnych widoku
 \end{eqexpl}
-
+\vspace{\baselineskip}
+Kalkulacja pozycji modeli oraz kamery ma szczególne znaczenie przy złożonym zachowaniu kamery oraz sceny w komponencie Silnika.
 
 \subsection{ThreeJS}
 
