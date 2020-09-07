@@ -77,10 +77,15 @@
 %%}%{\ \ }{{\ }}1}
 
 % \usepackage{physics}
-% \usepackage{amsmath}
+\usepackage{amsmath}
 \usepackage{tikz}
 \usetikzlibrary{quotes,babel,calc,patterns,angles}
  \usepackage{pdfpages}
+ \usepackage{float}
+ \usepackage{longtable}
+ \usepackage{xltabular}
+ \usepackage{eqexpl}
+ \eqexplSetIntro{gdzie:}
 % \usepackage{mathdots}
 % \usepackage{yhmath}
 % \usepackage{cancel}
@@ -636,9 +641,9 @@ Listing \thelstlisting: #1\hfill%\hfill%
 % Below there are inclusions of latex files
 \include{abbreviations} % If abbreviations list is short, you can comment it out
 \chapterstyle{default}{
-\include{chapters/introduction}
-\include{chapters/requirements}
-\include{chapters/architecture}
+\include{chapters/01-introduction}
+\include{chapters/02-requirements}
+\include{chapters/03-engine}
 % \include{chapter02}
 % \include{chapter03}
 % \include{chapter04}

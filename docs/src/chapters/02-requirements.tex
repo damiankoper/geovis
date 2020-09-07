@@ -1,0 +1,137 @@
+\chapter{Wymagania}
+
+Ze względu na możliwy podział funkcjonalności projektu na wiele typów, zdefiniowano następujące pojęcia:
+\begin{enumerate}
+    \item Silnik - zbiór komponentów odpowiedzialnych za definicję i~wyświetlenie wizualizacji.
+    \item Wizualizacja - konfigurowalny widok przedstawiający obiekty, których położenie zdefiniowano za pomocą współrzędnych geograficznych, na powierzchni sfery.
+    \item Aplikacja - uruchomiona w~przeglądarce użytkownika strona umożliwiająca wybór i~wyświetlenie wizualizacji.
+\end{enumerate} 
+
+Silnik dostarcza komponenty i~interfejs programistyczny, dzięki którym można definiować, wyświetlać i~zarządzać wizualizacją.
+Pozwala także na zdefiniowane wielu niezależnych wizualizacji. Z tego powodu można wyróżnić dwa typy użytkowników:
+
+\begin{enumerate}
+    \item Twórcę wizualizacji,
+    \item Odbiorcę wizualizacji.
+\end{enumerate}
+
+Wymagania aplikacji zostały zdefiniowane z~podziałem na typ użytkownika.
+Struktura danych definiująca renderowany obraz, zwana dalej będzie sceną. Opis zachowań i~implementacji projektu w~dalszej części pracy będzie odnosił się do numeru wymagania w~celu wskazania jego spełnienia.
+
+\newcommand{\req}[3]{
+    \stepcounter{#2}
+    #1\_\arabic{#2} & #3 \\
+    \hline
+}
+
+\section{Twórca wizualizacji}
+
+\subsection{Wymagania funkcjonalne}
+
+\newcounter{c_RA}
+
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{|l|X|}
+        \hline
+        Numer & Wymaganie \\
+        \hline
+        \hline
+        \req{RA}{c_RA}{Twórca może zdefiniować metadane wizualizacji określone przez interfejs Silnika.}
+        \req{RA}{c_RA}{Twórca może zdefiniować statyczną scenę określając położenie obiektów na sferze z~wykorzystaniem długości i~szerokości geograficznej.}
+        \req{RA}{c_RA}{Twórca do definicji sceny może wykorzystać interfejs tworzenia obiektów dostarczony przez aplikację lub załadować obiekty, materiały i~tekstury z~zewnętrznego źródła.}
+        \req{RA}{c_RA}{Twórca może zagnieżdżać sceny predefiniowane w~silniku, oraz sceny wcześniej stworzonych przez siebie.}
+        \req{RA}{c_RA}{Twórca może parametryzować sceny w~celu określonej ich modyfikacji w~procesie zagnieżdżania.}
+        \req{RA}{c_RA}{Twórca może określić parametry początkowe obserwatora, dynamikę i~zakres jego ruchów:
+            \begin{enumerate}
+                \item położenie,
+                \item prędkość i~przyspieszenie ruchu,
+                \item ograniczenie przybliżenia,
+                \item ograniczenie pozycji.
+            \end{enumerate}
+        }
+        \req{RA}{c_RA}{Twórca może zdefiniować wygląd i~funkcjonalność panelu kontrolnego. Panel ten służyć będzie do zmiany parametrów wizualizacji i~obsługiwany będzie przez odbiorcę.}
+        \req{RA}{c_RA}{Twórca, poprzez interfejs programistyczny dostarczony przez silnik, może aktualizować scenę w~dowolnym momencie, określonym przez siebie w~definicji wizualizacji.}
+        \req{RA}{c_RA}{Twórca może definiować zachowania, które będą odpowiedzią na zdarzenia związane z~poruszaniem się po scenie generowane przez odbiorcę.}
+    \end{tabularx}
+    \caption{Wymagania funkcjonalne zdefiniowane dla twórcy wizualizacji }
+    \label{tab:req_author_f}
+\end{table}
+
+\subsection{Wymagania niefunkcjonalne}
+
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{|l|X|}
+        \hline
+        Numer & Wymaganie \\
+        \hline
+        \hline
+        \req{RA}{c_RA}{Silnik powinien definiować i~w sposób jasny przekazywać potencjalnemu twórcy akceptowalną strukturę danych, plików i~katalogów, określającą jedną wizualizację.}
+        \req{RA}{c_RA}{Włączenie zdefiniowanej wizualizacji do ich zbioru w~aplikacji powinno ustanowione być tylko w~jednym miejscu poprzez prosty interfejs.}
+        \req{RA}{c_RA}{Dane wizualizacji muszą być ładowane asynchronicznie. Dane źródłowe definiujące scenę mogą być przetwarzane po stronie odbiorcy lub być przetworzone wcześniej i~pobrane.}
+    \end{tabularx}
+    \caption{Wymagania niefunkcjonalne zdefiniowane dla twórcy wizualizacji }
+    \label{tab:req_author_nf}
+\end{table}
+
+\section{Odbiorca wizualizacji}
+\newcounter{c_RU}
+
+\subsection{Wymagania funkcjonalne}
+
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{|l|X|}
+        \hline
+        Numer & Wymaganie \\
+        \hline
+        \hline
+        \req{RU}{c_RU}{Odbiorca może zobaczyć dane dostępnych wizualizacji.}
+        \req{RU}{c_RU}{Odbiorca może wyświetlić wybraną wizualizację.}
+        \req{RU}{c_RU}{Odbiorca może poruszać się po wizualizacji, zmieniając położenia kamery, używając myszki lub klawiatury.}
+        \req{RU}{c_RU}{Odbiorca może zobaczyć orientację kamery relatywnie do kierunku północnego i~ją zresetować.}
+        \req{RU}{c_RU}{Odbiorca może wyświetlić lub ukryć panel sterujący wizualizacją dostarczony przez twórcę.}
+    \end{tabularx}
+    \caption{Wymagania funkcjonalne zdefiniowane dla odbiorcy wizualizacji }
+    \label{tab:req_user_f}
+\end{table}
+
+\subsection{Wymagania niefunkcjonalne}
+
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{|l|X|}
+        \hline
+        Numer & Wymaganie \\
+        \hline
+        \hline
+        \req{RU}{c_RU}{Każda akcja użytkownika związana ze sterowaniem kamerą może zostać wykonana używając myszki lub równolegle klawiatury.}
+       
+    \end{tabularx}
+    \caption{Wymagania funkcjonalne zdefiniowane dla odbiorcy wizualizacji }
+    \label{tab:req_user_nf}
+\end{table}
+
+\section{Aplikacja}
+
+\subsection{Wymagania niefunkcjonalne}
+
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{|l|X|}
+        \hline
+        Numer & Wymaganie \\
+        \hline
+        \hline
+        \req{RU}{c_RU}{Aplikacja powinna być stroną typu \textit{Single Page Application}.}
+        \req{RU}{c_RU}{Jeśli to możliwe aplikacja powinna wykorzystywać sprzętową akcelerację obliczeń graficznych.}
+        \req{RU}{c_RU}{Aplikacja powinna ustawiać i~obsługiwać adres URL w~przeglądarce definiujący wyświetlaną wizualizację.}
+       
+    \end{tabularx}
+    \caption{Wymagania funkcjonalne zdefiniowane dla aplikacji }
+    \label{tab:req_user_nf}
+\end{table}
+
+
+
