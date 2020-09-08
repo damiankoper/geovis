@@ -174,7 +174,7 @@ Wszędzie schematy
 
 # 6. Testy i dokumentacja
 
-- Narzędzia: Jest + Cypress
+- Narzędzia: Jest + Cypress, storybook
 - Natura testów jednostkowych i integracyjnych
 - Przykład i efekt testu jednostkowego i integracyjnego
 - Dynamicznie generowana dokumentacja + przykład
