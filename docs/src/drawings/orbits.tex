@@ -1,0 +1,30 @@
+\newlength{\gRadius}
+\setlength{\gRadius}{3cm}
+\newlength{\lRadius}
+\setlength{\lRadius}{4cm}
+\tikzset{>={Latex[scale=1.5]}}
+
+\begin{tikzpicture}[scale=1.25]
+    \coordinate (G) at (90:\gRadius);
+    \coordinate (G_up) at ($(G) +(0:1)$);
+    \coordinate (L) at ($(G) +(135:2)$);
+    \coordinate (L_up) at ($(L) +(45:1)$);
+    \coordinate (center) at (90:0);
+
+
+    \begin{scope}
+      \clip (-\gRadius,0) rectangle (\gRadius,\gRadius);
+      \draw[thick] circle (\gRadius);
+  \end{scope}
+
+    \draw[->] (center) -- (G) node[midway,left] {$\vec g_v$};
+    \draw[->] (G) -- (G_up) node[midway,above] {$\vec g_{up}$};
+    \draw[fill] (G) circle (1.5pt) node[above] {$c_g$};
+   
+    \draw[->] (G) -- (L) node[midway,above] {$\vec l_v$};
+    \draw[->] (L) -- (L_up) node[midway,above] {$\vec l_{up}$};
+    \draw[fill] (L) circle (1.5pt) node[above] {$c_l$};
+
+
+\end{tikzpicture}
+

@@ -66,6 +66,8 @@ Możliwość ruchu w każdej z nich, a także przybliżania i oddalania.
 - Orientowanie w kierunku północnym - wyliczanie kwaternionu obrotu
 - Inne ustawienia
 
+### Obrót orbity globalnej
+
 ### Animacje - płynność pracy
 
 - Sferyczna interpolacja pomiędzy kwaternionami. Liniowa między wektorami. Funkcje wygładzające.

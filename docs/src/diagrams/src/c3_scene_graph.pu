@@ -1,0 +1,25 @@
+@startuml
+
+
+
+object Scene
+
+object Camera
+
+object "Light" as Light1
+object "Light" as Light2
+
+object "Object3D" as Object3D_1
+object "Object3D" as Object3D_2
+
+object OrbitGroup
+
+Scene *-- "0..*" Light1
+Scene *-- "1" OrbitGroup
+Scene *-- "0..*" Object3D_1
+Scene *-- "1" Camera
+
+OrbitGroup *-- "0..*" Object3D_2
+OrbitGroup *-- "0..*" Light2
+
+@enduml

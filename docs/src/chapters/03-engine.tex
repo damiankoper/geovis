@@ -134,13 +134,82 @@ mvPosition = modelViewMatrix * mvPosition;
 gl_Position = projectionMatrix * mvPosition;
 \end{lstlisting}
 
-Three.js dostarcza również wiele narzędzi ułatwiających operacje matematyczne na wektorach oraz macierzach. Pozwala między innymi na interpolację liniową i sferyczną wektorów, generowanie macierzy transformacji, czy reprezentowanie obrotów za pomocą kątów Eulera lub kwaternionów.
+Three.js dostarcza również wiele narzędzi ułatwiających operacje matematyczne na wektorach oraz macierzach. Pozwala między innymi na interpolację liniową i~sferyczną wektorów, generowanie macierzy transformacji, czy reprezentowanie obrotów za pomocą kątów Eulera lub kwaternionów.
 
 \section{Praca kamery}
 
+Komponent Silnika wyświetla scenę, w~której kamera orbituje wokół jednego punktu. Dodatkowo użytkownik może zmienić orientację kamery względem punktu na powierzchni sfery. Opis pracy kamery odnosić się będzie do obiektu sfery i~jej powierzchni, jednak nic nie stoi na przeszkodzie, aby kamera orbitowała wokół innego obiektu. W tym podrozdziale opis mechanizmów jest przedstawiony w~oderwaniu od ich implementacji w~projekcie. Finalnie, pozycję kamery relatywnie do środka sfery opisują dwie orbity. Orbitą, w~kontekście pracy kamery, nazwana została para wektorów określająca obrót od wektora odniesienia i~odległość od punktu jego zaczepienia.
+
+Wspomniane orbity nazwano orbitą lokalną i~orbitą globalną. Orbita globalna odpowiedzialna jest za pozycję kamery nad punktem obiektu sfery. Orbita lokalna określa orientacją kamery względem punktu, nad którym się znajduje. Taki podział sceny wprowadza również dwa układy odniesienia.
+
+\begin{enumerate}
+    \item Układ obserwatora - układ, w~którym znajduje się obserwator i~wszystkie obiekty są pozycjonowane relatywnie do obiektu kamery. Jest to domyślny układ renderowanej sceny.
+    \item Układ wizualizacji - układ, w~którym obiekty pozycjonowane są relatywnie do mogącej obracać się sfery. Obiekty umieszczane są w~obracającej się grupie.
+\end{enumerate}
+
+Żeby przybliżyć zależności pomiędzy tymi układami, można posłużyć się przykładem. Aby symulować cykl dnia i~nocy, światło musi być pozycjonowane w~układzie wizualizacji, ponieważ jest niezależne od ruchu kamery. Aby światło oświetlało zawsze widoczną stronę planety, musi być ono pozycjonowane w~układzie obserwatora. Ogólny graf sceny przedstawiono na diagramie \ref{fig:c3_scene_graph}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[height=5.5cm]{diagrams/out/c3_scene_graph.png}
+    \caption{Ogólny graf sceny wizualizacji}
+    \label{fig:c3_scene_graph}
+\end{figure}
+
 \subsection{Orbita globalna}
 
+Orbitę globalną definiują dwa wektory - $g_v$ i $g_{up}$ na rysunku \ref{fig:orbits}. Pierwszy rozciągnięty jest od środka sfery do punktu, wokół którego orbituje kamera. Drugi jest wektorem jednostkowym do niego prostopadłym określającym orientację sfery w osi pierwszego wektora. W późniejszym opisie działanie \textit{na orbicie}, na przykład obrót orbity, oznacza wykonanie tej samej transformacji na obu wektorach. W ten sposób oba wektory nigdy nie zmienią swojej wzajemnej orientacji.
+
+Użytkownik za pomocą myszy lub klawiatury może obrócić sferę, a konkretnie grupę obrotu (\texttt{OrbitGroup} na diagramie \ref{fig:c3_scene_graph}) i zawierane przez nie obiekty. Jest to efektywnie zmianą punktu, nad którym znajduje się kamera, pomimo tego, że jej pozycja się nie zmienia. Jako, że obrót sfery definiowany jest abstrakcję orbity, cała operacja sprowadza się do jej odpowiedniego obrócenia. 
+
+Parametrami specyficznymi dla orbity globalnej są:
+\begin{enumerate}
+    \item tryb pracy orbity - określa czy podczas przesuwania orbity ma ona zachowywać swoją orientację w kierunku północnym. Wydzielono tryb \textit{swobodny} i \textit{kompas}.
+\end{enumerate}
+
 \subsection{Orbita lokalna}
+
+Orbitę lokalną, podobnie jak globalną, definiują dwa wektory - $l_v$ i $l_{up}$ na rysunku \ref{fig:orbits}. Pierwszy rozciągnięty jest od punktu, wokół którego orbituje kamera, do kamery. Drugi jest wektorem jednostkowym do niego prostopadłym określającym orientację kamery w osi pierwszego wektora.
+
+Użytkownik za pomocą myszy lub klawiatury może zmienić punkt orbitowania kamery. Jest to efektywnie zmianą położenia kamery w układzie obserwatora. Jako, że pozycja kamery definiowany jest przez abstrakcję orbity, cała operacja sprowadza się do jej odpowiedniego obrócenia.
+
+Pierwszy wektor orbity lokalnej może mieć zmienną długość. Reprezentuje ona odległość obserwatora do punktu na powierzchni sfery. 
+
+Parametrami specyficznymi dla orbity lokalnej są:
+\begin{enumerate}
+    \item współczynnik przybliżenia - jak powinna zmienić się odległość kamery od punktu na powierzchni sfery podczas jednej akcji przybliżenia.
+    \item granice przybliżenia - minimalna i maksymalna odległość kamery od punktu na powierzchni sfery.
+\end{enumerate}
+
+\subsection{Parametry wspólne dla obu orbit}
+
+Dla obu orbit wyróżniono wspólne parametry. Są nimi:
+\begin{enumerate}
+    \item granice - wyrażony w radianach zakres współrzędnych geograficznych definiujący fragment sfery, nad którym kamera może się znaleźć. Może służyć na przykład do ograniczenia obszaru poruszania się użytkownika tylko do jednej półkuli lub jednego miasta.
+    \item prędkość obrotu - współczynnik sterujący prędkością obrotu danej orbity.
+\end{enumerate}
+
+Wszystkie parametry, ogólne i te specyficzne dla każdej z orbit mogą być konfigurowane przez wizualizację.
+
+\begin{figure}[]
+    \centering
+    \input{drawings/orbits.tex}
+    \caption{Schemat orbit w specyficznym przypadku dwóch wymiarów}
+    \label{fig:orbits}
+\end{figure}
+
+
+
+\subsection{Obrót orbity globalnej}
+
+Algorytm obrotu orbity globalnej wykonywany jest dla każdego zdarzenia przesunięcia myszy użytkownika podczas gestu chwycenia, przeciągnięcia i upuszczenia wygenerowanym przez element \texttt{Canvas}. Obrót wymaga obliczenia jego chwilowej osi i kąta.
+
+\subsubsection{Kwaterniony}
+%TODO:Opisać
+
+%TODO: wyliczanie osi i kąta obrotu + korekcja + korekcja trybu
+
+\subsection{Obrót orbity lokalnej}
 
 \subsection{Animacje - płynność ruchów}
 
