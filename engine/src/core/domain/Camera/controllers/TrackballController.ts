@@ -246,7 +246,7 @@ export default class TrackballController implements TrackballCamera {
   private handleLocalOrbitRotate(delta: THREE.Vector2) {
     const qHorizontal = new THREE.Quaternion().setFromAxisAngle(
       new THREE.Vector3(0, 0, 1),
-      -delta.x * this.localOrbit.slowFactor * 0.008
+      delta.x * this.localOrbit.slowFactor * -0.008
     );
 
     const horizontalAxis = new THREE.Vector3()
@@ -257,10 +257,7 @@ export default class TrackballController implements TrackballCamera {
       horizontalAxis,
       delta.y * this.localOrbit.slowFactor * 0.004
     );
-    const panMotionQuaternion = new THREE.Quaternion().multiplyQuaternions(
-      qHorizontal,
-      qVertical
-    );
+    const panMotionQuaternion = qHorizontal.multiply(qVertical);
     this.localOrbit.applyQuaternion(panMotionQuaternion);
     this.localOrbit.correctToBounds(TrackballMode.Free);
 

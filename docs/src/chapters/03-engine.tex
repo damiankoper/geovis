@@ -158,43 +158,43 @@ Wspomniane orbity nazwano orbitą lokalną i~orbitą globalną. Orbita globalna 
 
 \subsection{Orbita globalna}
 
-Orbitę globalną definiują dwa wektory - $g_v$ i $g_{up}$ na rysunku \ref{fig:orbits}. Pierwszy rozciągnięty jest od środka sfery do punktu, wokół którego orbituje kamera. Drugi jest wektorem jednostkowym do niego prostopadłym określającym orientację sfery w osi pierwszego wektora. W późniejszym opisie działanie \textit{na orbicie}, na przykład obrót orbity, oznacza wykonanie tej samej transformacji na obu wektorach. W ten sposób oba wektory nigdy nie zmienią swojej wzajemnej orientacji.
+Orbitę globalną definiują dwa wektory - $\vv{g_v}$ i~$\vv{g_{up}}$ na rysunku \ref{fig:orbits}. Pierwszy rozciągnięty jest od środka $s$ sfery do punktu $c_g$, wokół którego orbituje kamera. Drugi jest wektorem jednostkowym do niego prostopadłym określającym orientację sfery w~osi pierwszego wektora. W późniejszym opisie działanie \textit{na orbicie}, na przykład obrót orbity, oznacza wykonanie tej samej transformacji na obu wektorach. W ten sposób oba wektory nigdy nie zmienią swojej wzajemnej orientacji.
 
-Użytkownik za pomocą myszy lub klawiatury może obrócić sferę, a konkretnie grupę obrotu (\texttt{OrbitGroup} na diagramie \ref{fig:c3_scene_graph}) i zawierane przez nie obiekty. Jest to efektywnie zmianą punktu, nad którym znajduje się kamera, pomimo tego, że jej pozycja się nie zmienia. Jako, że obrót sfery definiowany jest abstrakcję orbity, cała operacja sprowadza się do jej odpowiedniego obrócenia. 
+Użytkownik za pomocą myszy lub klawiatury może obrócić sferę, a~konkretnie grupę obrotu (\texttt{OrbitGroup} na diagramie \ref{fig:c3_scene_graph}) i~zawierane przez nie obiekty. Jest to efektywnie zmianą punktu, nad którym znajduje się kamera, pomimo tego, że jej pozycja się nie zmienia. Jako, że obrót sfery definiowany jest abstrakcję orbity, cała operacja sprowadza się do jej odpowiedniego obrócenia. 
 
 Parametrami specyficznymi dla orbity globalnej są:
 \begin{enumerate}
-    \item tryb pracy orbity - określa czy podczas przesuwania orbity ma ona zachowywać swoją orientację w kierunku północnym. Wydzielono tryb \textit{swobodny} i \textit{kompas}.
+    \item tryb pracy orbity - określa czy podczas przesuwania orbity ma ona zachowywać swoją orientację w~kierunku północnym. Wydzielono tryb \textit{swobodny} i~\textit{kompas}.
 \end{enumerate}
 
 \subsection{Orbita lokalna}
 
-Orbitę lokalną, podobnie jak globalną, definiują dwa wektory - $l_v$ i $l_{up}$ na rysunku \ref{fig:orbits}. Pierwszy rozciągnięty jest od punktu, wokół którego orbituje kamera, do kamery. Drugi jest wektorem jednostkowym do niego prostopadłym określającym orientację kamery w osi pierwszego wektora.
+Orbitę lokalną, podobnie jak globalną, definiują dwa wektory - $\vv{l_v}$ i~$\vv{l_{up}}$ na rysunku \ref{fig:orbits}. Pierwszy rozciągnięty jest od punktu $c_g$, wokół którego orbituje kamera, do kamery (punkt $c_l$). Drugi jest wektorem jednostkowym do niego prostopadłym określającym orientację kamery w~osi pierwszego wektora.
 
-Użytkownik za pomocą myszy lub klawiatury może zmienić punkt orbitowania kamery. Jest to efektywnie zmianą położenia kamery w układzie obserwatora. Jako, że pozycja kamery definiowany jest przez abstrakcję orbity, cała operacja sprowadza się do jej odpowiedniego obrócenia.
+Użytkownik za pomocą myszy lub klawiatury może zmienić punkt orbitowania kamery. Jest to efektywnie zmianą położenia kamery w~układzie obserwatora. Jako, że pozycja kamery definiowany jest przez abstrakcję orbity, cała operacja sprowadza się do jej odpowiedniego obrócenia.
 
 Pierwszy wektor orbity lokalnej może mieć zmienną długość. Reprezentuje ona odległość obserwatora do punktu na powierzchni sfery. 
 
 Parametrami specyficznymi dla orbity lokalnej są:
 \begin{enumerate}
     \item współczynnik przybliżenia - jak powinna zmienić się odległość kamery od punktu na powierzchni sfery podczas jednej akcji przybliżenia.
-    \item granice przybliżenia - minimalna i maksymalna odległość kamery od punktu na powierzchni sfery.
+    \item granice przybliżenia - minimalna i~maksymalna odległość kamery od punktu na powierzchni sfery.
 \end{enumerate}
 
 \subsection{Parametry wspólne dla obu orbit}
 
 Dla obu orbit wyróżniono wspólne parametry. Są nimi:
 \begin{enumerate}
-    \item granice - wyrażony w radianach zakres współrzędnych geograficznych definiujący fragment sfery, nad którym kamera może się znaleźć. Może służyć na przykład do ograniczenia obszaru poruszania się użytkownika tylko do jednej półkuli lub jednego miasta.
+    \item granice - wyrażony w~radianach zakres współrzędnych geograficznych definiujący fragment sfery, nad którym kamera może się znaleźć. Może służyć na przykład do ograniczenia obszaru poruszania się użytkownika tylko do jednej półkuli lub jednego miasta.
     \item prędkość obrotu - współczynnik sterujący prędkością obrotu danej orbity.
 \end{enumerate}
 
-Wszystkie parametry, ogólne i te specyficzne dla każdej z orbit mogą być konfigurowane przez wizualizację.
+Wszystkie parametry, ogólne i~te specyficzne dla każdej z~orbit mogą być konfigurowane przez wizualizację.
 
 \begin{figure}[]
     \centering
     \input{drawings/orbits.tex}
-    \caption{Schemat orbit w specyficznym przypadku dwóch wymiarów}
+    \caption{Schemat orbit w~specyficznym przypadku dwóch wymiarów}
     \label{fig:orbits}
 \end{figure}
 
@@ -202,15 +202,256 @@ Wszystkie parametry, ogólne i te specyficzne dla każdej z orbit mogą być kon
 
 \subsection{Obrót orbity globalnej}
 
-Algorytm obrotu orbity globalnej wykonywany jest dla każdego zdarzenia przesunięcia myszy użytkownika podczas gestu chwycenia, przeciągnięcia i upuszczenia wygenerowanym przez element \texttt{Canvas}. Obrót wymaga obliczenia jego chwilowej osi i kąta.
+Algorytm obrotu orbity globalnej wykonywany jest dla każdego zdarzenia przesunięcia myszy użytkownika podczas gestu chwycenia, przeciągnięcia i~upuszczenia wygenerowanym przez element \texttt{Canvas}. Obrót wymaga obliczenia jego chwilowej osi i~kąta.
 
 \subsubsection{Kwaterniony}
-%TODO:Opisać
+Kwaterniony są rozszerzeniem liczb zespolonych \cite{Quaternions}. Mają one postać:
+\begin{equation}
+    \label{eq:q_1}
+    q = a~+ bi + cj + dk : a,\,b,\,c,\,d\in\mathbb{R}
+\end{equation}
+gdzie, podobnie jak w~przypadku liczb zespolonych, zachodzi zależność:
+\begin{equation}
+    \label{eq:q_2}
+    i^2 = j^2 = k^2 = ijk =  -1
+\end{equation}
 
-%TODO: wyliczanie osi i kąta obrotu + korekcja + korekcja trybu
+Ich mnożenie następuje, z uwzględnieniem zależności z równania \ref{eq:q_2}, tak jak mnożenie wielomianów.
+
+Kwaternion może być interpretowany jak suma skalaru z~wektorem, gdzie współczynnik $a$ jest skalarem, a~$b$, $c$ i~$d$ są współrzędnymi wektora. Kwaterniony jednostkowe służą między innymi do reprezentacji obrotów w~przestrzeni 3D. Rozwiązują one problemy związane z~reprezentacją obrotów poprzez kąty Eulera. Obrót taki jest zdefiniowany poprzez obroty wokół każdej z~osi układu współrzędnych. Obracanie z~ich użyciem, w~pewnym kombinacjach obrotu może skutkować efektem gimbal-lock, który powoduje zanikiem stopnia swobody obrotu. Dlatego w~tym przypadku ważna jest kolejność obrotów. Stosując kąty Eulera niemożliwa jest bezpośrednia interpolacja sferyczna pomiędzy dwoma zdefiniowanymi obrotami.
+
+Konstrukcja kwaternionu definiującego dany obrót jest następująca:
+\begin{samepage}
+    \begin{equation}
+        \label{eq:q_3}
+        q = \cos{\frac{\theta}{2}} + (u_xi+u_yj+u_zk)\sin{\frac{\theta}{2}}
+    \end{equation}
+    \begin{eqexpl}[25mm]
+        \item {$\theta$} kąt obrotu
+        \item {$u$} wektor jednostkowy definiujący oś obrotu
+        \item {$i, j, k$} jednostki urojone kwaternionu
+    \end{eqexpl}
+    \vspace{\baselineskip}
+\end{samepage}
+
+Obrót wektora jest sprowadzeniem wektora do kwaternionu ze współczynnikiem $a = 0$ i~pomnożeniem kwaternionu $q$, wektora i~sprzężenie tego kwaternionu $q^{-1}$ (równania \ref{eq:q_4} i~\ref{eq:q_5}). 
+
+\begin{samepage}
+    \begin{equation}
+        \label{eq:q_4}
+        q^{-1} = \cos{\frac{\theta}{2}} - (u_xi+u_yj+u_zk)\sin{\frac{\theta}{2}}
+    \end{equation}
+    \begin{eqexpl}[25mm]
+        \item {$\theta$} kąt obrotu
+        \item {$u$} wektor jednostkowy definiujący oś obrotu
+        \item {$i, j, k$} jednostki urojone kwaternionu
+    \end{eqexpl}
+\end{samepage}
+
+\begin{samepage}
+    \begin{equation}
+        \label{eq:q_5}
+        v' = qvq^{-1}
+    \end{equation}
+    \begin{eqexpl}[25mm]
+        \item {$v'$} wektor obrócony
+        \item {$q$} kwaternion definiujący obrót
+        \item {$q^{-1}$} sprzężenie kwaternionu q
+    \end{eqexpl}
+    \vspace{\baselineskip}
+\end{samepage}
+Składanie obrotów w przypadku zapisu macierzowego transformacji następuje poprzez ich pomnożenie. To samo ma miejsce w przypadku kwaternionów, gdzie kolejność mnożenia decyduje o odwrotnej kolejności złożenia obrotów.
+
+\subsubsection{Obrót orbity}
+
+Obrót orbity globalnej odbywa się relatywnie do pozycji kamery na orbicie lokalnej. W wyliczaniu osi obrotu muszą wziąć udział więc wektory obu orbit. Niech $\vv{g_{v}}$ i $\vv{g_{up}}$ oraz $\vv{l_{v}}$ i $\vv{l_{up}}$ będą wektorami orbit kolejno globalnej i lokalnej zgodnymi z rysunkiem \ref{fig:orbits}. Końcowy obrót orbity globalnej jest złożeniem obrotu w kierunku pionowym i poziomym relatywnym do widoku obserwatora. Osie tych obrotów wyrażają wektory:
+
+\begin{samepage}
+    \begin{align}
+        \label{eq:o_1}
+        \vv{h_g} &= \vv{l_{up}} \times \vv {l_{v}}\\
+        \vv{v_g} &= \vv{l_{up}}
+    \end{align}
+    \begin{eqexpl}[25mm]
+        \item {$\vv{h_g}$} oś obrotu zorientowana poziomo
+        \item {$\vv{v_g}$} oś obrotu zorientowana pionowo
+    \end{eqexpl}
+    \vspace{\baselineskip}
+\end{samepage}
+
+Niech $\vv{d} \in \mathbb{R}^2 $ będzie przesunięciem widoku pochodzącym ze zdarzenia wygenerowanego przez użytkownika, wyrażonym w pikselach. Współczynnik warunkujący kąt przesunięcia wyrażony jest wzorem:
+\begin{samepage}
+    \begin{equation}
+        \label{eq:o_2}
+        s = 0.001 \cdot G_s \cdot \Vert\vv{l_v}\Vert \cdot \Vert\vv{g_v}\Vert
+    \end{equation}
+    \begin{eqexpl}[25mm]
+        \item {$G_s$} konfigurowany współczynnik obrotu orbity 
+    \end{eqexpl}
+    \vspace{\baselineskip}
+\end{samepage}
+
+Kąty obrotu wyrażone w radianach wyrażone są wzorami:
+\begin{samepage}
+    \begin{align}
+        \label{eq:o_3}
+        \theta_x &= s \cdot d_x \\
+        \theta_y &= s \cdot d_y
+    \end{align}
+    \begin{eqexpl}[25mm]
+        \item {$\theta_x$} kąt obrotu w osi pionowej, przesuwa widok w osi $OX$
+        \item {$\theta_y$} kąt obrotu w osi poziomej, przesuwa widok w osi $OY$
+    \end{eqexpl}
+    \vspace{\baselineskip}
+\end{samepage}
+
+Niech $Q: (\mathbb{R}, \mathbb{R}^3) \to \mathbb{H}$ będzie funkcją konstruującą kwaternion na podstawie kąta i osi obrotu wyrażoną wektorem jednostkowym. Kwaternion chwilowego obrotu orbity globalnej wyrażony jest wtedy wzorem \ref{eq:o_4}.
+
+\begin{samepage}
+    \begin{equation}
+        \label{eq:o_4}
+        q_g = Q(\theta_x, \frac{\vv{v}}{\Vert\vv{v}\Vert}) \cdot Q(\theta_y, \frac{\vv{h}}{\Vert\vv{h}\Vert})
+    \end{equation}
+    \vspace{\baselineskip}
+\end{samepage}
+
+Dla każdego zdarzenia przeciągnięcia widoku wygenerowane przez użytkownika dostarczany jest nowy wektor $\vv{d}$. Orbita globalna jest obracana na podstawie obliczonego kwaternionu $q_g$. Następnie zachodzi potrzeba korekcji owego obrotu związana z trybem kamery i ustawionymi ograniczeniami jej ruchu. 
 
 \subsection{Obrót orbity lokalnej}
+Obrót orbity lokalnej przebiega podobnie co obrót orbity globalnej. Zmianie ulegają wektory, które biorą udział w wyznaczaniu osi obrotu orbity (równanie \ref{eq:o_5}) oraz współczynniki prędkości obrotu (równanie \ref{eq:o_6})).
+
+\begin{samepage}
+    \begin{align}
+        \label{eq:o_5}
+        \vv{h_l} &= \vv{l_{up}} \times \vv{l_{v}}\\
+        \vv{v_l} &= [0, 0, 1]^T
+    \end{align}
+    \begin{eqexpl}[25mm]
+        \item {$\vv{h_l}$} oś obrotu zorientowana poziomo
+        \item {$\vv{v_l}$} oś obrotu zorientowana pionowo
+    \end{eqexpl}
+    \vspace{\baselineskip}
+\end{samepage}
+
+W przypadku orbity lokalnej konieczne było rozdzielenie współczynników $s$ dla kierunku pionowego i poziomego przesuwania. Obliczane są one według wzorów \ref{eq:o_6} i \ref{eq:o_7}.
+
+\begin{samepage}
+    \begin{align}
+        \label{eq:o_6}
+        s_x &= -0.008 \cdot L_s \\
+        \label{eq:o_7}
+        s_y &= 0.004 \cdot L_s
+    \end{align}
+    \begin{eqexpl}[25mm]
+        \item {$L_s$} konfigurowany współczynnik obrotu orbity 
+    \end{eqexpl}
+    \vspace{\baselineskip}
+\end{samepage}
+
+Przyspieszenia mają inne znaki dlatego, że przeciągnięcie w osi $OX$ skutkować musi obrotem kamery w przeciwną stronę. Różne moduły współczynników mają na celu spowolnienie podnoszenia i opuszczanie kamery względem obracania jej wokół punktu na powierzchni sfery. Z powodu tych zmian kąty obrotu obliczane są następująco:
+\begin{samepage}
+    \begin{align}
+        \label{eq:o_8}
+        \theta_x &= s_x \cdot d_x \\
+        \theta_y &= s_y \cdot d_y
+    \end{align}
+    \begin{eqexpl}[25mm]
+        \item {$\theta_x$} kąt obrotu w osi pionowej, przesuwa widok w osi $OX$
+        \item {$\theta_y$} kąt obrotu w osi poziomej, przesuwa widok w osi $OY$
+    \end{eqexpl}
+    \vspace{\baselineskip}
+\end{samepage}
+
+Tak jak w przypadku orbity globalnej, końcowy kwaternion obrotu obliczany jest według wzoru \ref{eq:o_4}. Potem następuje korekcja obrotu związana z ograniczeniami ruchu kamery zdefiniowanymi dla orbity lokalnej.
+
+\subsection{Ograniczenia ruchu orbit}
+
+\subsubsection{Obliczanie współrzędnych geograficznych na podstawie wektorów orbity.}
+Powiązanie współrzędnych geograficznych z orbitą ma sens tylko w przypadku orbity globalnej, ponieważ reprezentuje ona obrót części ruchomej wizualizacji. Obie orbity jednak współdzielą ustawienia definiowane za pomocą owych współrzędnych.
+
+Niech $P:\,(\mathbb{R}^3, \mathbb{R}^3) \to \mathbb{R}^3$ będzie funkcją rzutującą wektor na płaszczyznę określoną jej wektorem normalnym i normalizującą go, a $A: \mathbb{H} \to \mathbb{R}$ funkcją ekstrahującą kąt obrotu z kwaternionu. Niech $Q:(\mathbb{R}^3, \mathbb{R}^3) \to \mathbb{H}$ będzie funkcją konstruującą kwaternion obrotu na podstawie dwóch wektorów jednostkowych. Obliczenie długości i szerokości geograficznej na podstawie wektorów orbity globalnej wyrażone jest wzorami \ref{eq:o_9} i \ref{eq:o_10}.
+
+\begin{samepage}
+  \begin{align}
+    q &= Q\Big(P(\vv{g_v}, \vv{g_{up}}), P([0, 0, 1]^T, \vv{g_{up}})\Big) \\
+    \label{eq:o_9}
+    long &= A(q) \cdot sgn([q_b, q_c, q_d]^T \cdot [0, 0, 1]^T) \\
+    p &= Q\Big(P(\vv{g_{up}}, [0, 0, 1]^T), [0, 0, 1]^T\Big) \\
+    \label{eq:o_10}
+    lat &= A(p) \cdot sgn([0, 0, 1]^T \cdot \vv{g_{up}})
+  \end{align}
+\begin{eqexpl}[25mm]
+    \item {$long$} długość geograficzna w przedziale $\langle\ang{-180}; \ang{180}\rbrack$
+    \item {$lat$} szerokość geograficzna w przedziale $\langle\ang{-90}; \ang{90}\rbrack$
+\end{eqexpl}
+  \vspace{\baselineskip}
+\end{samepage}
+
+Obliczenie długości i szerokości geograficznej na podstawie wektorów orbity lokalnej wyrażone jest wzorami \ref{eq:o_11} i \ref{eq:o_12}.
+
+\begin{samepage}
+  \begin{align}
+    q &= Q\Big(P(\vv{l_v}, [0, 0, 1]^T), P([0, -1, 0]^T, [0, 0, 1]^T)\Big) \\
+    \label{eq:o_11}
+    long &= A(q) \cdot sgn([q_b, q_c, q_d]^T \cdot [0, 0, 1]^T) \\
+    p &= Q\Big(P(\vv{l_{v}}, [0, 0, 1]^T), \vv{l_{v}}\Big) \\
+    \label{eq:o_12}
+    lat &= A(p) \cdot sgn([0, 0, 1]^T \cdot \vv{l_{v}})
+  \end{align}
+\begin{eqexpl}[25mm]
+    \item {$long$} długość geograficzna w przedziale $\langle\ang{-180}; \ang{180}\rbrack$
+    \item {$lat$} szerokość geograficzna w przedziale $\langle\ang{-90}; \ang{90}\rbrack$
+\end{eqexpl}
+  \vspace{\baselineskip}
+\end{samepage}
+
+Ograniczenia pozycji sprowadza się do skonstruowania kwaternionu, który redukuje nadmiarowy obrót do ostatniej dozwolonej pozycji. Potrzebny obrót musi być złożeniem obrotów w osiach długości i szerokości geograficznej.
+Dla orbity globalnej i lokalnej osie te wyrażone są wektorami:
+\begin{samepage}
+  \begin{align}
+      \vv{lat_g} &= [0, 0, 1]^T \times \vv{g_{up}} \\
+      \vv{long_g} &= \vv{g_{up}} \\
+      \vv{lat_l} &= \vv{l_{up}} \times \vv{l_v} \\
+      \vv{long_l} &= [0, 0, 1]^T
+  \end{align}
+  \begin{eqexpl}[25mm]
+      \item {$\vv{lat_g}$} oś obrotu orbity globalnej dla szerokości geograficznej
+      \item {$\vv{long_g}$} oś obrotu orbity globalnej dla długości geograficznej
+      \item {$\vv{lat_l}$} oś obrotu orbity lokalnej dla szerokości geograficznej
+      \item {$\vv{long_l}$} oś obrotu orbity lokalnej dla długości geograficznej
+  \end{eqexpl}
+  \vspace{\baselineskip}
+\end{samepage}
+
+Podczas korekty ruchu orbita jest obracana wokół wyliczonych osi o kąt, który wynika z różnicy pierwotnych współrzędnych i współrzędnych ograniczających widok.
+
+\subsection{Tryb kompasu}
+
+Tryb kompasu dla orbity globalnej wymaga wykonania jeszcze jednego obrotu korekcyjnego. W momencie włączenia trybu kompasu zapisany zostaje wektor $\vv{c_n}$ wyliczony ze wzoru \ref{eq:compass_1}, który definiuje obecną orientację kierunku północnego.
+
+Niech $P:\,(\mathbb{R}^3, \mathbb{R}^3) \to \mathbb{R}^3$ będzie funkcją rzutującą wektor na płaszczyznę określoną jej wektorem normalnym. Wtedy:
+
+\begin{samepage}
+  \begin{equation}
+    \label{eq:compass_1}
+      \vv{c_n} = P(\vv{g_{up}}, \vv{l_v})
+  \end{equation}
+  \vspace{\baselineskip}
+\end{samepage}
+
+
+
+$Q:(\mathbb{R}^3, \mathbb{R}^3) \to \mathbb{H}$ jest funkcją konstruującą kwaternion obrotu na podstawie dwóch wektorów jednostkowych. Konstrukcja kwaternionu korekcji dla trybu kompasu kamery przedstawiona jest na równaniu \ref{eq:compass_2}.
+\begin{samepage}
+  \begin{equation}
+    \label{eq:compass_2}
+      q = Q\Big(\normalize{\vv c_n}, \normalize{\vv{lat_g}}\Big)
+  \end{equation}
+  \vspace{\baselineskip}
+\end{samepage}
 
 \subsection{Animacje - płynność ruchów}
 
 \section{Implementacja}
+
+\section{Podsumowanie}

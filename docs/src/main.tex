@@ -30,6 +30,8 @@
 %   \renewcommand{\normalsize}{\fontsize{8pt}{10pt}\selectfont}
 
 %\usepackage[cp1250]{inputenc} % for cp1250 file encoding
+\usepackage{amssymb}
+
 \usepackage[utf8]{inputenc} % for UTF8 file encoding
 \usepackage[T1]{fontenc}
 \usepackage[polish]{babel}
@@ -77,7 +79,16 @@
 %%}%{\ \ }{{\ }}1}
 
 % \usepackage{physics}
+
 \usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{physics}
+\usepackage[f]{esvect}
+\newcommand{\normalize}[1]{
+  \ensuremath{\frac{#1}{\Vert#1\Vert}}
+}
+
+
 \usepackage{tikz}
 \usetikzlibrary{quotes,babel,calc,patterns,angles, arrows.meta}
  \usepackage{pdfpages}
