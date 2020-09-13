@@ -1,0 +1,14 @@
+@startuml
+skinparam Linetype ortho
+hide empty members
+component "GeoVisEngine\n"{
+    class GeoVisCoreVue
+    class GeoVisCore
+    class Visualization
+    GeoVisCoreVue *--> GeoVisCore
+    GeoVisCoreVue *--> Visualization
+    GeoVisCore ..> Visualization
+}
+
+
+@enduml

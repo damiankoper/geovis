@@ -1,0 +1,31 @@
+@startuml
+
+
+hide empty members
+class GeoVisCoreVue 
+
+class GeoVisCore {
+    -container: HTMLElement
+    -visualization: Visualization
+    -scene: THREE.Scene
+    -camera: THREE.PerspectiveCamera
+    -renderer: THREE.Renderer
+    -clock: THREE.Clock
+    +cameraController: TrackballController
+    -destroyRequested: boolean
+    
+    +setSize(): void
+    +destroy(): void
+    +run(visualization: Visualization): void
+    -_run(): void
+}
+
+GeoVisCoreVue *--> GeoVisCore
+
+abstract class Visualization {}
+
+GeoVisCore  o---> "0..1" Visualization
+GeoVisCore  *--->  TrackballController
+GeoVisCore  o--->  HTMLElement
+
+@enduml

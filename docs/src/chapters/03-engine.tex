@@ -137,6 +137,7 @@ gl_Position = projectionMatrix * mvPosition;
 Three.js dostarcza również wiele narzędzi ułatwiających operacje matematyczne na wektorach oraz macierzach. Pozwala między innymi na interpolację liniową i~sferyczną wektorów, generowanie macierzy transformacji, czy reprezentowanie obrotów za pomocą kątów Eulera lub kwaternionów.
 
 \section{Praca kamery}
+\label{sec:camera}
 
 Komponent Silnika wyświetla scenę, w~której kamera orbituje wokół jednego punktu. Dodatkowo użytkownik może zmienić orientację kamery względem punktu na powierzchni sfery. Opis pracy kamery odnosić się będzie do obiektu sfery i~jej powierzchni, jednak nic nie stoi na przeszkodzie, aby kamera orbitowała wokół innego obiektu. W tym podrozdziale opis mechanizmów jest przedstawiony w~oderwaniu od ich implementacji w~projekcie. Finalnie, pozycję kamery relatywnie do środka sfery opisują dwie orbity. Orbitą, w~kontekście pracy kamery, nazwana została para wektorów określająca obrót od wektora odniesienia i~odległość od punktu jego zaczepienia.
 
@@ -151,7 +152,7 @@ Wspomniane orbity nazwano orbitą lokalną i~orbitą globalną. Orbita globalna 
 
 \begin{figure}[h]
     \centering
-    \includegraphics[height=5.5cm]{diagrams/out/c3_scene_graph.png}
+    \includegraphics[scale=0.5]{diagrams/out/c3_scene_graph.png}
     \caption{Ogólny graf sceny wizualizacji}
     \label{fig:c3_scene_graph}
 \end{figure}
@@ -216,7 +217,7 @@ gdzie, podobnie jak w~przypadku liczb zespolonych, zachodzi zależność:
     i^2 = j^2 = k^2 = ijk =  -1
 \end{equation}
 
-Ich mnożenie następuje, z uwzględnieniem zależności z równania \ref{eq:q_2}, tak jak mnożenie wielomianów.
+Ich mnożenie następuje, z~uwzględnieniem zależności z~równania \ref{eq:q_2}, tak jak mnożenie wielomianów.
 
 Kwaternion może być interpretowany jak suma skalaru z~wektorem, gdzie współczynnik $a$ jest skalarem, a~$b$, $c$ i~$d$ są współrzędnymi wektora. Kwaterniony jednostkowe służą między innymi do reprezentacji obrotów w~przestrzeni 3D. Rozwiązują one problemy związane z~reprezentacją obrotów poprzez kąty Eulera. Obrót taki jest zdefiniowany poprzez obroty wokół każdej z~osi układu współrzędnych. Obracanie z~ich użyciem, w~pewnym kombinacjach obrotu może skutkować efektem gimbal-lock, który powoduje zanikiem stopnia swobody obrotu. Dlatego w~tym przypadku ważna jest kolejność obrotów. Stosując kąty Eulera niemożliwa jest bezpośrednia interpolacja sferyczna pomiędzy dwoma zdefiniowanymi obrotami.
 
@@ -260,11 +261,11 @@ Obrót wektora jest sprowadzeniem wektora do kwaternionu ze współczynnikiem $a
     \end{eqexpl}
     \vspace{\baselineskip}
 \end{samepage}
-Składanie obrotów w przypadku zapisu macierzowego transformacji następuje poprzez ich pomnożenie. To samo ma miejsce w przypadku kwaternionów, gdzie kolejność mnożenia decyduje o odwrotnej kolejności złożenia obrotów.
+Składanie obrotów w~przypadku zapisu macierzowego transformacji następuje poprzez ich pomnożenie. To samo ma miejsce w~przypadku kwaternionów, gdzie kolejność mnożenia decyduje o~odwrotnej kolejności złożenia obrotów.
 
 \subsubsection{Obrót orbity}
 
-Obrót orbity globalnej odbywa się relatywnie do pozycji kamery na orbicie lokalnej. W wyliczaniu osi obrotu muszą wziąć udział więc wektory obu orbit. Niech $\vv{g_{v}}$ i $\vv{g_{up}}$ oraz $\vv{l_{v}}$ i $\vv{l_{up}}$ będą wektorami orbit kolejno globalnej i lokalnej zgodnymi z rysunkiem \ref{fig:orbits}. Końcowy obrót orbity globalnej jest złożeniem obrotu w kierunku pionowym i poziomym relatywnym do widoku obserwatora. Osie tych obrotów wyrażają wektory:
+Obrót orbity globalnej odbywa się relatywnie do pozycji kamery na orbicie lokalnej. W wyliczaniu osi obrotu muszą wziąć udział więc wektory obu orbit. Niech $\vv{g_{v}}$ i~$\vv{g_{up}}$ oraz $\vv{l_{v}}$ i~$\vv{l_{up}}$ będą wektorami orbit kolejno globalnej i~lokalnej zgodnymi z~rysunkiem \ref{fig:orbits}. Końcowy obrót orbity globalnej jest złożeniem obrotu w~kierunku pionowym i~poziomym relatywnym do widoku obserwatora. Osie tych obrotów wyrażają wektory:
 
 \begin{samepage}
     \begin{align}
@@ -279,7 +280,7 @@ Obrót orbity globalnej odbywa się relatywnie do pozycji kamery na orbicie loka
     \vspace{\baselineskip}
 \end{samepage}
 
-Niech $\vv{d} \in \mathbb{R}^2 $ będzie przesunięciem widoku pochodzącym ze zdarzenia wygenerowanego przez użytkownika, wyrażonym w pikselach. Współczynnik warunkujący kąt przesunięcia wyrażony jest wzorem:
+Niech $\vv{d} \in \mathbb{R}^2 $ będzie przesunięciem widoku pochodzącym ze zdarzenia wygenerowanego przez użytkownika, wyrażonym w~pikselach. Współczynnik warunkujący kąt przesunięcia wyrażony jest wzorem:
 \begin{samepage}
     \begin{equation}
         \label{eq:o_2}
@@ -291,7 +292,7 @@ Niech $\vv{d} \in \mathbb{R}^2 $ będzie przesunięciem widoku pochodzącym ze z
     \vspace{\baselineskip}
 \end{samepage}
 
-Kąty obrotu wyrażone w radianach wyrażone są wzorami:
+Kąty obrotu wyrażone w~radianach wyrażone są wzorami:
 \begin{samepage}
     \begin{align}
         \label{eq:o_3}
@@ -299,13 +300,13 @@ Kąty obrotu wyrażone w radianach wyrażone są wzorami:
         \theta_y &= s \cdot d_y
     \end{align}
     \begin{eqexpl}[25mm]
-        \item {$\theta_x$} kąt obrotu w osi pionowej, przesuwa widok w osi $OX$
-        \item {$\theta_y$} kąt obrotu w osi poziomej, przesuwa widok w osi $OY$
+        \item {$\theta_x$} kąt obrotu w~osi pionowej, przesuwa widok w~osi $OX$
+        \item {$\theta_y$} kąt obrotu w~osi poziomej, przesuwa widok w~osi $OY$
     \end{eqexpl}
     \vspace{\baselineskip}
 \end{samepage}
 
-Niech $Q: (\mathbb{R}, \mathbb{R}^3) \to \mathbb{H}$ będzie funkcją konstruującą kwaternion na podstawie kąta i osi obrotu wyrażoną wektorem jednostkowym. Kwaternion chwilowego obrotu orbity globalnej wyrażony jest wtedy wzorem \ref{eq:o_4}.
+Niech $Q: (\mathbb{R}, \mathbb{R}^3) \to \mathbb{H}$ będzie funkcją konstruującą kwaternion na podstawie kąta i~osi obrotu wyrażoną wektorem jednostkowym. Kwaternion chwilowego obrotu orbity globalnej wyrażony jest wtedy wzorem \ref{eq:o_4}.
 
 \begin{samepage}
     \begin{equation}
@@ -315,10 +316,10 @@ Niech $Q: (\mathbb{R}, \mathbb{R}^3) \to \mathbb{H}$ będzie funkcją konstruuj�
     \vspace{\baselineskip}
 \end{samepage}
 
-Dla każdego zdarzenia przeciągnięcia widoku wygenerowane przez użytkownika dostarczany jest nowy wektor $\vv{d}$. Orbita globalna jest obracana na podstawie obliczonego kwaternionu $q_g$. Następnie zachodzi potrzeba korekcji owego obrotu związana z trybem kamery i ustawionymi ograniczeniami jej ruchu. 
+Dla każdego zdarzenia przeciągnięcia widoku wygenerowane przez użytkownika dostarczany jest nowy wektor $\vv{d}$. Orbita globalna jest obracana na podstawie obliczonego kwaternionu $q_g$. Następnie zachodzi potrzeba korekcji owego obrotu związana z~trybem kamery i~ustawionymi ograniczeniami jej ruchu. 
 
 \subsection{Obrót orbity lokalnej}
-Obrót orbity lokalnej przebiega podobnie co obrót orbity globalnej. Zmianie ulegają wektory, które biorą udział w wyznaczaniu osi obrotu orbity (równanie \ref{eq:o_5}) oraz współczynniki prędkości obrotu (równanie \ref{eq:o_6})).
+Obrót orbity lokalnej przebiega podobnie co obrót orbity globalnej. Zmianie ulegają wektory, które biorą udział w~wyznaczaniu osi obrotu orbity (równanie \ref{eq:o_5}) oraz współczynniki prędkości obrotu (równanie \ref{eq:o_6})).
 
 \begin{samepage}
     \begin{align}
@@ -333,7 +334,7 @@ Obrót orbity lokalnej przebiega podobnie co obrót orbity globalnej. Zmianie ul
     \vspace{\baselineskip}
 \end{samepage}
 
-W przypadku orbity lokalnej konieczne było rozdzielenie współczynników $s$ dla kierunku pionowego i poziomego przesuwania. Obliczane są one według wzorów \ref{eq:o_6} i \ref{eq:o_7}.
+W przypadku orbity lokalnej konieczne było rozdzielenie współczynników $s$ dla kierunku pionowego i~poziomego przesuwania. Obliczane są one według wzorów \ref{eq:o_6} i~\ref{eq:o_7}.
 
 \begin{samepage}
     \begin{align}
@@ -348,7 +349,7 @@ W przypadku orbity lokalnej konieczne było rozdzielenie współczynników $s$ d
     \vspace{\baselineskip}
 \end{samepage}
 
-Przyspieszenia mają inne znaki dlatego, że przeciągnięcie w osi $OX$ skutkować musi obrotem kamery w przeciwną stronę. Różne moduły współczynników mają na celu spowolnienie podnoszenia i opuszczanie kamery względem obracania jej wokół punktu na powierzchni sfery. Z powodu tych zmian kąty obrotu obliczane są następująco:
+Przyspieszenia mają inne znaki dlatego, że przeciągnięcie w~osi $OX$ skutkować musi obrotem kamery w~przeciwną stronę. Różne moduły współczynników mają na celu spowolnienie podnoszenia i~opuszczanie kamery względem obracania jej wokół punktu na powierzchni sfery. Z powodu tych zmian kąty obrotu obliczane są następująco:
 \begin{samepage}
     \begin{align}
         \label{eq:o_8}
@@ -356,20 +357,20 @@ Przyspieszenia mają inne znaki dlatego, że przeciągnięcie w osi $OX$ skutkow
         \theta_y &= s_y \cdot d_y
     \end{align}
     \begin{eqexpl}[25mm]
-        \item {$\theta_x$} kąt obrotu w osi pionowej, przesuwa widok w osi $OX$
-        \item {$\theta_y$} kąt obrotu w osi poziomej, przesuwa widok w osi $OY$
+        \item {$\theta_x$} kąt obrotu w~osi pionowej, przesuwa widok w~osi $OX$
+        \item {$\theta_y$} kąt obrotu w~osi poziomej, przesuwa widok w~osi $OY$
     \end{eqexpl}
     \vspace{\baselineskip}
 \end{samepage}
 
-Tak jak w przypadku orbity globalnej, końcowy kwaternion obrotu obliczany jest według wzoru \ref{eq:o_4}. Potem następuje korekcja obrotu związana z ograniczeniami ruchu kamery zdefiniowanymi dla orbity lokalnej.
+Tak jak w~przypadku orbity globalnej, końcowy kwaternion obrotu obliczany jest według wzoru \ref{eq:o_4}. Potem następuje korekcja obrotu związana z~ograniczeniami ruchu kamery zdefiniowanymi dla orbity lokalnej.
 
 \subsection{Ograniczenia ruchu orbit}
 
 \subsubsection{Obliczanie współrzędnych geograficznych na podstawie wektorów orbity.}
-Powiązanie współrzędnych geograficznych z orbitą ma sens tylko w przypadku orbity globalnej, ponieważ reprezentuje ona obrót części ruchomej wizualizacji. Obie orbity jednak współdzielą ustawienia definiowane za pomocą owych współrzędnych.
+Powiązanie współrzędnych geograficznych z~orbitą ma sens tylko w~przypadku orbity globalnej, ponieważ reprezentuje ona obrót części ruchomej wizualizacji. Obie orbity jednak współdzielą ustawienia definiowane za pomocą owych współrzędnych.
 
-Niech $P:\,(\mathbb{R}^3, \mathbb{R}^3) \to \mathbb{R}^3$ będzie funkcją rzutującą wektor na płaszczyznę określoną jej wektorem normalnym i normalizującą go, a $A: \mathbb{H} \to \mathbb{R}$ funkcją ekstrahującą kąt obrotu z kwaternionu. Niech $Q:(\mathbb{R}^3, \mathbb{R}^3) \to \mathbb{H}$ będzie funkcją konstruującą kwaternion obrotu na podstawie dwóch wektorów jednostkowych. Obliczenie długości i szerokości geograficznej na podstawie wektorów orbity globalnej wyrażone jest wzorami \ref{eq:o_9} i \ref{eq:o_10}.
+Niech $P:\,(\mathbb{R}^3, \mathbb{R}^3) \to \mathbb{R}^3$ będzie funkcją rzutującą wektor na płaszczyznę określoną jej wektorem normalnym i~normalizującą go, a~$A: \mathbb{H} \to \mathbb{R}$ funkcją ekstrahującą kąt obrotu z~kwaternionu. Niech $Q:(\mathbb{R}^3, \mathbb{R}^3) \to \mathbb{H}$ będzie funkcją konstruującą kwaternion obrotu na podstawie dwóch wektorów jednostkowych. Obliczenie długości i~szerokości geograficznej na podstawie wektorów orbity globalnej wyrażone jest wzorami \ref{eq:o_9} i~\ref{eq:o_10}.
 
 \begin{samepage}
   \begin{align}
@@ -381,13 +382,13 @@ Niech $P:\,(\mathbb{R}^3, \mathbb{R}^3) \to \mathbb{R}^3$ będzie funkcją rzutu
     lat &= A(p) \cdot sgn([0, 0, 1]^T \cdot \vv{g_{up}})
   \end{align}
 \begin{eqexpl}[25mm]
-    \item {$long$} długość geograficzna w przedziale $\langle\ang{-180}; \ang{180}\rbrack$
-    \item {$lat$} szerokość geograficzna w przedziale $\langle\ang{-90}; \ang{90}\rbrack$
+    \item {$long$} długość geograficzna w~przedziale $\langle\ang{-180}; \ang{180}\rbrack$
+    \item {$lat$} szerokość geograficzna w~przedziale $\langle\ang{-90}; \ang{90}\rbrack$
 \end{eqexpl}
   \vspace{\baselineskip}
 \end{samepage}
 
-Obliczenie długości i szerokości geograficznej na podstawie wektorów orbity lokalnej wyrażone jest wzorami \ref{eq:o_11} i \ref{eq:o_12}.
+Obliczenie długości i~szerokości geograficznej na podstawie wektorów orbity lokalnej wyrażone jest wzorami \ref{eq:o_11} i~\ref{eq:o_12}.
 
 \begin{samepage}
   \begin{align}
@@ -399,14 +400,14 @@ Obliczenie długości i szerokości geograficznej na podstawie wektorów orbity 
     lat &= A(p) \cdot sgn([0, 0, 1]^T \cdot \vv{l_{v}})
   \end{align}
 \begin{eqexpl}[25mm]
-    \item {$long$} długość geograficzna w przedziale $\langle\ang{-180}; \ang{180}\rbrack$
-    \item {$lat$} szerokość geograficzna w przedziale $\langle\ang{-90}; \ang{90}\rbrack$
+    \item {$long$} długość geograficzna w~przedziale $\langle\ang{-180}; \ang{180}\rbrack$
+    \item {$lat$} szerokość geograficzna w~przedziale $\langle\ang{-90}; \ang{90}\rbrack$
 \end{eqexpl}
   \vspace{\baselineskip}
 \end{samepage}
 
-Ograniczenia pozycji sprowadza się do skonstruowania kwaternionu, który redukuje nadmiarowy obrót do ostatniej dozwolonej pozycji. Potrzebny obrót musi być złożeniem obrotów w osiach długości i szerokości geograficznej.
-Dla orbity globalnej i lokalnej osie te wyrażone są wektorami:
+Ograniczenia pozycji sprowadza się do skonstruowania kwaternionu, który redukuje nadmiarowy obrót do ostatniej dozwolonej pozycji. Potrzebny obrót musi być złożeniem obrotów w~osiach długości i~szerokości geograficznej.
+Dla orbity globalnej i~lokalnej osie te wyrażone są wektorami:
 \begin{samepage}
   \begin{align}
       \vv{lat_g} &= [0, 0, 1]^T \times \vv{g_{up}} \\
@@ -423,7 +424,7 @@ Dla orbity globalnej i lokalnej osie te wyrażone są wektorami:
   \vspace{\baselineskip}
 \end{samepage}
 
-Podczas korekty ruchu orbita jest obracana wokół wyliczonych osi o kąt, który wynika z różnicy pierwotnych współrzędnych i współrzędnych ograniczających widok.
+Podczas korekty ruchu orbita jest obracana wokół wyliczonych osi o~kąt, który wynika z~różnicy pierwotnych współrzędnych i~współrzędnych ograniczających widok.
 
 \subsection{Tryb kompasu}
 
@@ -452,6 +453,99 @@ $Q:(\mathbb{R}^3, \mathbb{R}^3) \to \mathbb{H}$ jest funkcją konstruującą kwa
 
 \subsection{Animacje - płynność ruchów}
 
+Sterowanie kamerą jest przyjemniejsze w~odbiorze i~bardziej intuicyjne, jeśli poszczególne automatyczne operacja zmiany widoku są płynne, a~nie skokowe. Komponent Silnika obsługuje następujące animacje:
+\begin{enumerate}
+    \item Wytracanie prędkości obrotu orbity globalnej. Kiedy użytkownik zwolni przycisk myszy podczas obracania widoku, ruch nie zatrzymuje się od razu.
+    \item Animacja przybliżania i~oddalania kamery.
+    \item Orientowanie kamery w~kierunku północnym.
+\end{enumerate}
+
+Animacje posiadają konfigurowalny czas trwania i~w celu wyliczenia pozycji pośredniej orbit korzystają z~interpolacji liniowej i~sferycznej\cite{Slerp} wektorów (równanie \ref{eq:q_1}).
+\begin{samepage}
+    \begin{equation}
+      \label{eq:q_1}
+        Slerp (q_0, q_1, t) = q_0(q_0^{-1} q_1)^t
+    \end{equation}
+    \begin{eqexpl}[25mm]
+        \item {$q_0$} kwaternion początkowy
+        \item {$q_1$} kwaternion końcowy
+        \item {$t$} postęp interpolacji w~przedziale $\lbrack0;1\rbrack$
+    \end{eqexpl}
+    \vspace{\baselineskip}
+\end{samepage}
+\begin{multicols}{2}
+    
+    Postęp interpolacji $t$ modyfikowany jest przez konfigurowalną funkcję wygładzającą \mbox{$f: X \to Y$} gdzie \mbox{$X, Y \in \lbrack0;1\rbrack$}. Domyślnie używaną funkcją jest \textit{cubicOut}, której wzór i~wykres przedstawiony jest na rysunku \ref{fig:ease_1}.
+    
+    \columnbreak
+
+    \begin{figure}[H]
+        \centering
+        \begin{tikzpicture}[scale=0.7]
+            \begin{axis}[domain=0:1,xmin=0,xmax=1.1,ymin=0,ymax=1.1,xlabel=$t$, ylabel=$f(t)$, legend pos=south east]
+                \addplot[blue, ultra thick] {1-(1-x)^3)};
+                \addlegendentry{$f(t) = 1 - (1-t)^3$};
+            \end{axis}
+        \end{tikzpicture}
+        \caption{Funkcja wygładzająca \textit{cubicOut}}
+        \label{fig:ease_1}
+    \end{figure}
+    
+\end{multicols}
+
+\subsection{Macierze transformacji obiektów na podstawie orbit}
+
+Niech $T : \mathbb{R}^3 \to \mathbb{R}^{4\times4}$ będzie funkcją konstruującą macierz translacji na podstawie wektora w~przestrzeni trójwymiarowej. Niech $R : (\mathbb{R}^3, \mathbb{R}^3, \mathbb{R}^3) \to \mathbb{R}^{4\times4}$ będzie funkcją konstruującą macierz obrotu obserwatora, aby patrzył na dany punkt w~odpowiedniej orientacji. Macierz transformacji grupy obrotu, czyli ruchomej części wizualizacji, wyrażona jest równaniem \ref{eq:t_1}. Macierz transformacji obiektu kamery wyrażone jest równaniem \ref{eq:t_2}.
+
+\begin{align}
+    \label{eq:t_1}
+      M_g &= T([0, 0, -\Vert\vv{g_v}\Vert]^T) \cdot R([0, 0, 0]^T, -\vv{g_v}, \vv{g_{up}}) \\
+    \label{eq:t_2}
+      M_l &= T(\vv{l_v}) \cdot R(\vv{l_v}, [0, 0, 0]^T, \vv{l_{up}})
+\end{align}
+
 \section{Implementacja}
+
+Komponent Silnika zaimplementowany został w~języku TypeScript\cite{TypeScript}. Jest on nadzbiorem języka JavaScript i~umożliwia korzystanie ze statycznego typowania, które w~JavaScripcie nie jest możliwe. Udostępnia tworzenie unii typów, zawiera mechanizmy ich wnioskowania. Wprowadza wzorzec dekoratorów, zawiera obsługę formatu JSX i~dodaje zmienne wyliczeniowe. Przed uruchomieniem musi być transpilowany do języka JavaScript. Walidacja utworzonego kodu pod względem poprawności typowania następuje w~momencie transpilacji i~nie jest dokonywana podczas wykonywania kodu. 
+
+Zaletą stosowania statycznego typowania jest zniwelowanie możliwości pomyłek programisty związanych z~nieznajomością interfejsów używanych klas i~modułów. Statycznie typowany kod sam w~sobie stanowi źródło swojej dokumentacji, a~mechanizmy refleksji pozwalają na jeszcze bardziej rozległą walidację typów i~dynamiczne generowanie dokumentacji.
+
+Systemu wizualizacji danych geograficznych jako całość nazwany został \textit{GeoVis}, co jest skrótem wyrażenia \textit{\textbf{Geo}graphic \textbf{Vis}ualization}. Komponent Silnika przyjął nazwę \mbox{\textit{GeoVisEngine}} i~składa się z~modułu \mbox{\textit{GeoVisCore}}, który osadzony jest w~eksportowanym komponencie \mbox{\textit{GeoVisCoreVue}}. Relację pomiędzy ogólnymi komponentami przedstawiona jest na diagramie \ref{fig:c3_geo_vis_engine}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{diagrams/out/c3_geo_vis_engine.png}
+    \caption{Zależności głównych komponentów Silnika}
+    \label{fig:c3_geo_vis_engine}
+\end{figure}
+
+\subsection{GeoVisCore}
+
+\textit{GeoVisCore} jest komponentem odpowiedzialnym za dostarczenie elementu Canvas, który następnie osadzony jest w~komponencie \textit{GeoVisCoreVue}. Obsługuje on zdarzenia wygenerowane przez użytkownika pochodzące z~elementu Canvas oraz realizuje on cykl życia wizualizacji, wyświetlając opisane przez nią obiekty i~przekazując do niej zdarzenia pochodzące od użytkownika. To w~tym komponencie osadzone jest środowisko biblioteki Three.js.
+W opisie implementacji najpierw zostanie przedstawiona struktura i~zależności każdej z~klas i~komponentów, a~następnie opisany zostanie cykl życia wizualizacji.
+
+Klasa \texttt{GeoVisCore}, której zależności przedstawia diagram \ref{fig:c3_geo_vis_core}, jest głównym elementem komponentu Silnika. Inicjalizuje one zależności ekosystemu biblioteki Three.js, odpowiada za obsługę elementu Canvas oraz za uruchamianie i~aktualizowanie wizualizacji.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{diagrams/out/c3_geo_vis_core.png}
+    \caption{Diagram klas dla klasy \texttt{GeoVisCore}}
+    \label{fig:c3_geo_vis_core}
+\end{figure}
+
+Najważniejszą klasą, odpowiedzialną za sterowanie kamerą, jest klasa \texttt{TrackballController}. Implementuje ona interfejs \texttt{TrackballCamera}, który definiuje metody dostępne dla twórcy wizualizacji. W języku TypeScript interfejs może również definiować atrybuty obiektu. Interfejs \texttt{TrackballCamera} definiuje atrybuty zawierające obiekty z~interfejsem \texttt{IEvent}, które służą do definiowania procedur obsługi zdarzeń. Wywołuje je klasa \texttt{TrackballController}. Mechanizm obsługi zdarzeń w~języku JavaScript identyfikują zdarzenie jako ciąg znaków. Aby wykorzystać statyczne typowanie, które umożliwia TypeScript, do obsługi zdarzeń użyto biblioteki \texttt{Strongly Typed Events} \cite{Events}.
+
+\texttt{TrackballController} realizuje operacje obrotów orbit opisane w~rozdziale \ref{sec:camera}. Orbity reprezentowane są przez obiekty \texttt{GlobalOrbit} i~\texttt{LocalOrbit} dziedziczącące po klasie \texttt{Orbit}, które realizuje wspólne operacja dla obu z nich. Są to między innymi wykonywanie obrotów korekcyjnych dla pozycji kamery i~orientacji w~kierunku północnym. Wspólną funkcjonalność różni układ odniesienia obu orbit i~dlatego wydzielono metody abstrakcyjne klasy \texttt{Orbit}, które jej klasy pochodne implementują inaczej. Klasa \texttt{AnimatedTransition} reprezentuje animację pojedynczego obiektu. Zawiera ona swój własny zegar i~pozwala zdefiniować długość oraz funkcję wygładzającą. Diagram najważniejszych zależności klasy \texttt{TrackballController} pokazano na rysunku \ref{fig:c3_trackball}.
+
+Ukrycie faktycznej implementacji kontrolera kamery za interfejsem \texttt{TrackballCamera} daje późniejszą możliwość zastąpienia jej inną. Realizując ten sam interfejs, nie będzie ona wpływać na już utworzone wizualizacje i~pozostałą część aplikacji. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\linewidth]{diagrams/out/c3_trackball.png}
+    \caption{Diagram klas dla klasy \texttt{TrackballController} i~najważniejszych zależności}
+    \label{fig:c3_trackball}
+\end{figure}
+
+
 
 \section{Podsumowanie}
