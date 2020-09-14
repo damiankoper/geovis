@@ -4,3 +4,4 @@ find $(dirname $0)/chapters -regex '.*\(tex\)$' -exec sed -i -e 's/ o / o~/g' {}
 find $(dirname $0)/chapters -regex '.*\(tex\)$' -exec sed -i -e 's/ u / u~/g' {} \;
 find $(dirname $0)/chapters -regex '.*\(tex\)$' -exec sed -i -e 's/ w / w~/g' {} \;
 find $(dirname $0)/chapters -regex '.*\(tex\)$' -exec sed -i -e 's/ z / z~/g' {} \;
+find $(dirname $0)/chapters -regex '.*\(tex\)$' -exec sed -i -e 's/ z / z~/g' {} \;

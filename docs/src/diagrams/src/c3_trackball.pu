@@ -1,177 +1,51 @@
 @startuml
 skinparam Linetype ortho
-class GeoPosMapper {
-    +{static} toRotationMatrix(pos: GeoPosition): THREE.Matrix4
+hide empty members
+class GeoPosMapper 
+
+class GeoPosition 
+
+abstract class Orbit 
+
+class GlobalOrbit 
+class LocalOrbit  
+
+class AnimatedTransition<T extends Clonable<T>>
+interface IEvent<T, K> <<external>>
+
+class Range<T>
+enum TrackballMode{
+    Free
+    Compass
 }
 
-class GeoPosition {
-    +lat: number
-    +long: number
-    +latDeg: number
-    +latDMS: { dir: string; d: number; m: number; s: number; }
-    +longDMS: { dir: string; d: number; m: number; s: number; }
-    -getDMS(v: number, max: string, min: string):\n\t{ dir: string; d: number; m: number; s: number; }
-    +longDeg: number
-    +{static} fromRad(lat: number, long: number): GeoPosition
-    +{static} fromDeg(lat: number, long: number): GeoPosition
-}
+abstract class Visualization
 
-abstract class Orbit {
-    +v: THREE.Vector3
-    +up: THREE.Vector3
-    +bounds: Range<GeoPosition>
-    +slowFactor: number
-    #compassNorth: THREE.Vector3
-    #{abstract} getLatPlane(): THREE.Vector3
-    #{abstract} getLatV(): THREE.Vector3
-    #{abstract} getLatVP(): THREE.Vector3
-    #{abstract} getLongPlane(): THREE.Vector3
-    #{abstract} getLongOrigin(): THREE.Vector3
-    +{abstract} clone(): Orbit
-    +copy(orbit: Orbit): void
-    +getGeoPosition(): GeoPosition
-    +setGeoPosition(position: GeoPosition): this
-    +getRadius(): number
-    +setRadius(radius: number): this
-    +correctToBounds(mode: TrackballMode): void
-    +latchCompassNorth(plane: THREE.Vector3): void
-    #boundAxisQ(\n\tangle: number, \n\tfrom: number, \n\tto: number, \n\taxis: THREE.Vector3\n): THREE.Quaternion
-    +getVectorPointingAt(pos: GeoPosition): THREE.Vector3
-    +applyQuaternion(q: THREE.Quaternion): this
-    +{static} calcUp(v: THREE.Vector3): THREE.Vector3
-}
+interface TrackballCamera 
 
-class GlobalOrbit {
-    #getLatPlane(): Vector3
-    #getLatV(): Vector3
-    #getLatVP(): Vector3
-    #getLongPlane(): Vector3
-    #getLongOrigin(): Vector3
-    +clone(): GlobalOrbit
-}
-class LocalOrbit  {
-    #getLatPlane(): Vector3
-    #getLatV(): Vector3
-    #getLatVP(): Vector3
-    #getLongPlane(): Vector3
-    #getLongOrigin(): Vector3
-    +clone(): LocalOrbit
-}
-
-class AnimatedTransition<T extends Clonable<T>> {
-    -clock: Clock
-    +from: T
-    +to: T
-    +duration: number
-    +easeFn: (t: number) => number
-    +start(): void
-    +stop(): void
-    +isRunning(): boolean
-    +update(actionFn: (f: number, from: T, to: T) => void): void
-}
-
-
-interface TrackballCamera {
-    +getGlobalOrbit(): Orbit
-    +refreshGlobalOrbit(): void
-    +getLocalOrbit(): Orbit
-    +refreshLocalOrbit(): void
-    +setGlobalOrbitRadius(radius: number): TrackballCamera
-    +getGlobalOrbitRadius(): number
-    +setGlobalOrbitPosition(position: GeoPosition): TrackballCamera
-    +getGlobalOrbitPosition(): GeoPosition
-    +setLocalOrbitRadius(radius: number): TrackballCamera
-    +getLocalOrbitRadius(): number
-    +setLocalOrbitPosition(position: GeoPosition): TrackballCamera
-    +getLocalOrbitPosition(): GeoPosition
-    +setGlobalOrbitBounds(bounds: Range<GeoPosition>): TrackballCamera
-    +getGlobalOrbitBounds(): Range<GeoPosition>
-    +setLocalOrbitBounds(bounds: Range<GeoPosition>): TrackballCamera
-    +getLocalOrbitBounds(): Range<GeoPosition>
-    +setMode(mode: TrackballMode): TrackballCamera
-    +getMode(): TrackballMode
-    +setGlobalOrbitSlowFactor(factor: number): TrackballCamera
-    +getGlobalOrbitSlowFactor(): number
-    +setLocalOrbitSlowFactor(factor: number): TrackballCamera
-    +getLocalOrbitSlowFactor(): number
-    +setGlobalOrbitEaseFn(fn: (t: number) => number): TrackballCamera
-    +getGlobalOrbitEaseFn(): (t: number) => number
-    +setZoomEaseFn(fn: (t: number) => number): TrackballCamera
-    +getZoomEaseFn(): (t: number) => number
-    +setZoomFactor(factor: number): TrackballCamera
-    +getZoomFactor(): number
-    +setZoomBounds(bounds: Range<number>): TrackballCamera
-    +getZoomBounds(): Range<number>
-    +setZoomTime(time: number): TrackballCamera
-    +getZoomTime(): number
-    +setPanBreakTime(time: number): TrackballCamera
-    +getPanBreakTime(): number
-    +setRotateNorthTime(time: number): void
-    +getRotateNorthTime(): number
-    +getNorthAngle(): number
-    +stopMovement(): void
-    +rotateNorth(): void
-    +zoomIn(times: number): void
-    +zoomOut(times: number): void
-    +onNorthAngleChange: IEvent<TrackballCamera, number>
-    +onGlobalOrbitChange: IEvent<TrackballCamera, Orbit>
-    +onLocalOrbitChange: IEvent<TrackballCamera, Orbit>
-    +onZoomChange: IEvent<TrackballCamera, number>
-}
-
-class TrackballController  {
-    -keyboardBaseSpeed: 4
-    -pressedKeys: Record<string, boolean>
-    -pointerCaptured: boolean
-    -lastPanPosition: Vector2
-    -mode: TrackballMode
-    -globalOrbit: GlobalOrbit
-    -localOrbit: LocalOrbit
-    -zoomFactor: number
-    -zoomBounds: Range<number>
-    -lastPanDelta: Vector2
-    -panAnim: AnimatedTransition<Vector2>
-    -zoomAnim: AnimatedTransition<Vector3>
-    -localOrbitAnim: AnimatedTransition<LocalOrbit>
-    -group: Group
-    -camera: Camera
-    -eventSource: HTMLCanvasElement
-    +setGroup(group: Group): void
-    +update(deltaFactor: number): void
-    +destroy(): void
-    -handleKeyboardControl(deltaFactor: number): void
-    -setCameraTransformMatrix(): void
-    -setEvents(): void
-    -onKeyDown(e: KeyboardEvent): void
-    -onKeyUp(e: KeyboardEvent): void
-    -onWheel(e: WheelEvent): void
-    -zoom(factor: number): void
-    -onPointerDown(e: PointerEvent): void
-    -onPointerUp(e: PointerEvent): void
-    -onPointerMove(e: PointerEvent): void
-    -handleLocalOrbitRotate(delta: Vector2): void
-    -handleGlobalOrbitRotate(delta: Vector2): void
-    -calcAndDispatchNorth(): void
-    -setGroupTransformMatrix(): void
-    -_onGlobalOrbitChange: EventDispatcher<TrackballCamera, Orbit>
-    -_onLocalOrbitChange: EventDispatcher<TrackballCamera, Orbit>
-    -_onZoomChange: EventDispatcher<TrackballCamera, number>
-    -_onNorthAngleChange: EventDispatcher<TrackballCamera, number>
-}
+class TrackballController  
 
 TrackballController .|> TrackballCamera
 
 TrackballCamera ..> Orbit
 TrackballCamera ...> GeoPosition
 
-TrackballController *--> AnimatedTransition
+TrackballController *---> AnimatedTransition
 TrackballController *--> LocalOrbit
 TrackballController *--> GlobalOrbit
-TrackballController ..> Orbit
 
-Orbit --> GeoPosMapper
-Orbit -> GeoPosition
-GeoPosition <.. GeoPosMapper
+TrackballCamera .up.> TrackballMode
+TrackballController *-up-> TrackballMode
+TrackballCamera .up..> Range
+TrackballController *-up-> Range
+TrackballCamera .up...> IEvent
+TrackballController *-up---> IEvent
+
+Orbit .> GeoPosMapper
+Orbit ..> GeoPosition
+GeoPosition <. GeoPosMapper
 LocalOrbit --|> Orbit
 GlobalOrbit --|> Orbit
+
+TrackballCamera <. Visualization
 @enduml

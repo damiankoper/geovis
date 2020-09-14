@@ -39,7 +39,7 @@ W grafice 3D każdy model reprezentowany jest przez zbiór punktów i~informacji
 
 Przekształcenia związane z~pozycją modelu i~kamery w~świecie wyrażane są za pomocą macierzy. Macierzowy opis przekształceń możliwy jest dzięki zastosowaniu współrzędnych jednorodnych\cite{Homogeneous}. Transformacja pozycji modelu odbywa się z~pomocą macierzy $M$, a~transformacja pozycji związana z~położeniem kamery z~pomocą macierzy widoku $V$. Wyliczanie współrzędnych wierzchołka w~układzie współrzędnych świata pokazano w~równaniu \ref{eq:MV}.
 
-Aby uzyskać wyjściową pozycję piksela na ekranie konieczne jest pomnożenie macierzy projekcji i~wektora pozycji wierzchołka w~układzie współrzędnych świata (równanie \ref{eq:MVP}). Macierz projekcji odpowiada za transformację współrzędnych wierzchołka do sześcianu o~wymiarach 2x2x2 i~środku w~punkcie $(0, 0, 0)$. Transformacja ta może być perspektywiczna, gdzie przekształceniu ulega przestrzeń w~kształcie ostrosłupa ściętego. Może być też ortograficzna, gdzie przekształceniu ulega przestrzeń w~kształcie prostopadłościanu. Punkty leżące poza tą przestrzenią nie są rysowane. Współrzędne $(x, y)$ transformowanych wierzchołków są współrzędnymi \textit{NDC} (ang. Normalized Device Coordinates), niezależnymi od urządzenia. Dzięki temu mogą być one łatwo przekształcone na piksele elementu Canvas, gdzie punkt $(0, 0)$ znajduje się w~lewem górnym rogu. Podejście to uniezależnia generowanie pikseli od elementu wyświetlającego, do którego trzeba dostosować tylko sposób przekształcenia współrzędnych \textit{NDC}.
+Aby uzyskać wyjściową pozycję piksela na ekranie konieczne jest pomnożenie macierzy projekcji i~wektora pozycji wierzchołka w~układzie współrzędnych świata (równanie \ref{eq:MVP}). Macierz projekcji odpowiada za transformację współrzędnych wierzchołka do sześcianu o~wymiarach 2x2x2 i~środku w~punkcie $(0, 0, 0)$. Transformacja ta może być perspektywiczna, gdzie przekształceniu ulega przestrzeń w~kształcie ostrosłupa ściętego. Może być też ortograficzna, gdzie przekształceniu ulega przestrzeń w~kształcie prostopadłościanu. Punkty leżące poza tą przestrzenią nie są rysowane. Współrzędne $(x, y)$ transformowanych wierzchołków są współrzędnymi \textit{NDC} (ang. Normalized Device Coordinates), niezależnymi od urządzenia. Dzięki temu mogą być one łatwo przekształcone na piksele elementu \texttt{Canvas}, gdzie punkt $(0, 0)$ znajduje się w~lewem górnym rogu. Podejście to uniezależnia generowanie pikseli od elementu wyświetlającego, do którego trzeba dostosować tylko sposób przekształcenia współrzędnych \textit{NDC}.
 
 \begin{equation}
     \label{eq:MV}
@@ -152,7 +152,7 @@ Wspomniane orbity nazwano orbitą lokalną i~orbitą globalną. Orbita globalna 
 
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.5]{diagrams/out/c3_scene_graph.png}
+    \includegraphics[scale=0.6]{diagrams/out/c3_scene_graph.png}
     \caption{Ogólny graf sceny wizualizacji}
     \label{fig:c3_scene_graph}
 \end{figure}
@@ -506,36 +506,65 @@ Niech $T : \mathbb{R}^3 \to \mathbb{R}^{4\times4}$ będzie funkcją konstruując
 
 \section{Implementacja}
 
-Komponent Silnika zaimplementowany został w~języku TypeScript\cite{TypeScript}. Jest on nadzbiorem języka JavaScript i~umożliwia korzystanie ze statycznego typowania, które w~JavaScripcie nie jest możliwe. Udostępnia tworzenie unii typów, zawiera mechanizmy ich wnioskowania. Wprowadza wzorzec dekoratorów, zawiera obsługę formatu JSX i~dodaje zmienne wyliczeniowe. Przed uruchomieniem musi być transpilowany do języka JavaScript. Walidacja utworzonego kodu pod względem poprawności typowania następuje w~momencie transpilacji i~nie jest dokonywana podczas wykonywania kodu. 
+Komponent Silnika zaimplementowany został w~języku TypeScript\cite{TypeScript}. Jest on nadzbiorem języka JavaScript i~umożliwia korzystanie ze statycznego typowania, które w~JavaScripcie nie jest możliwe. Udostępnia tworzenie unii typów, zawiera mechanizmy ich inferencji. Wprowadza wzorzec dekoratorów, zawiera obsługę formatu JSX i~dodaje zmienne wyliczeniowe. Rozszerza możliwości programowania obiektowego o~typy generyczne. Przed uruchomieniem musi być transpilowany do języka JavaScript. Walidacja utworzonego kodu pod względem poprawności typowania następuje w~momencie transpilacji i~nie jest dokonywana podczas jego wykonywania. 
 
-Zaletą stosowania statycznego typowania jest zniwelowanie możliwości pomyłek programisty związanych z~nieznajomością interfejsów używanych klas i~modułów. Statycznie typowany kod sam w~sobie stanowi źródło swojej dokumentacji, a~mechanizmy refleksji pozwalają na jeszcze bardziej rozległą walidację typów i~dynamiczne generowanie dokumentacji.
+Zaletą stosowania statycznego typowania jest zniw elowanie możliwości pomyłek programisty związanych z~nieznajomością interfejsów używanych klas i~modułów. Statycznie typowany kod sam w~sobie stanowi źródło swojej dokumentacji, a~mechanizmy refleksji pozwalają na jeszcze bardziej rozległą walidację typów i~dynamiczne generowanie dokumentacji.
 
-Systemu wizualizacji danych geograficznych jako całość nazwany został \textit{GeoVis}, co jest skrótem wyrażenia \textit{\textbf{Geo}graphic \textbf{Vis}ualization}. Komponent Silnika przyjął nazwę \mbox{\textit{GeoVisEngine}} i~składa się z~modułu \mbox{\textit{GeoVisCore}}, który osadzony jest w~eksportowanym komponencie \mbox{\textit{GeoVisCoreVue}}. Relację pomiędzy ogólnymi komponentami przedstawiona jest na diagramie \ref{fig:c3_geo_vis_engine}.
+Systemu wizualizacji danych geograficznych jako całość nazwany został \textit{GeoVis}, co jest skrótem wyrażenia \textit{\textbf{Geo}graphic \textbf{Vis}ualization}. Komponent Silnika przyjął nazwę \mbox{\textit{GeoVisEngine}} i~składa się z~modułu \mbox{\textit{GeoVisCore}}, który osadzony jest w~eksportowanym komponencie \mbox{\textit{GeoVisCoreVue}}. Relację pomiędzy ogólnymi komponentami przedstawiona jest na diagramie~\ref{fig:c3_geo_vis_engine}. Kod silnika podzielony został na domeny, które realizują zadania według odkreślonej odpowiedzialności. Są to:
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[scale=0.5]{diagrams/out/c3_geo_vis_engine.png}
+\begin{enumerate}
+    \item \texttt{Animation} - obsługuje animacje, udostępnia mechanizmy definiowania transformacji pomiędzy dwoma obiektami z~użyciem wybranej funkcji wygładzającej i~zdefiniowanym czasem.
+    \item \texttt{Camera} - zarządza ruchami kamery, udostępnia interfejs \texttt{TrackballCamera} dostępny od strony wizualizacji.
+    \item \texttt{GeoPosition} - zawiera definicję obiektów orbit i~współrzędnych geograficznych. Odpowiedzialna jest również za transformacje pomiędzy współrzędnymi geograficznymi, a~trójwymiarową sceną.
+    \item \texttt{Utils} - zawiera funkcje pomocnicze.
+    \item \texttt{Visualization} - zawiera klasy bazowe definiujące wizualizację oraz ich przykłady.
+\end{enumerate}
+
+\begin{figure}
+    \centering 
+    \includegraphics[scale=0.6]{diagrams/out/c3_geo_vis_engine.png}
     \caption{Zależności głównych komponentów Silnika}
     \label{fig:c3_geo_vis_engine}
 \end{figure}
 
 \subsection{GeoVisCore}
 
-\textit{GeoVisCore} jest komponentem odpowiedzialnym za dostarczenie elementu Canvas, który następnie osadzony jest w~komponencie \textit{GeoVisCoreVue}. Obsługuje on zdarzenia wygenerowane przez użytkownika pochodzące z~elementu Canvas oraz realizuje on cykl życia wizualizacji, wyświetlając opisane przez nią obiekty i~przekazując do niej zdarzenia pochodzące od użytkownika. To w~tym komponencie osadzone jest środowisko biblioteki Three.js.
+\textit{GeoVisCore} jest komponentem odpowiedzialnym za dostarczenie elementu \texttt{Canvas}, który następnie osadzony jest w~komponencie \textit{GeoVisCoreVue} opisanym w dalszej części pracy. \textit{GeoVisCore} obsługuje zdarzenia wygenerowane przez użytkownika pochodzące z~elementu \texttt{Canvas}. Zdarzeniami tymi są te, związane z myszką i klawiaturą. Komponent realizuje cykl życia wizualizacji, wyświetlając opisane przez nią obiekty i~propagując zdarzenia pochodzące od użytkownika. To w~tym komponencie osadzone jest środowisko biblioteki Three.js.
 W opisie implementacji najpierw zostanie przedstawiona struktura i~zależności każdej z~klas i~komponentów, a~następnie opisany zostanie cykl życia wizualizacji.
 
-Klasa \texttt{GeoVisCore}, której zależności przedstawia diagram \ref{fig:c3_geo_vis_core}, jest głównym elementem komponentu Silnika. Inicjalizuje one zależności ekosystemu biblioteki Three.js, odpowiada za obsługę elementu Canvas oraz za uruchamianie i~aktualizowanie wizualizacji.
+Klasa \texttt{GeoVisCore}, której despośrednie zależności przedstawia diagram \ref{fig:c3_geo_vis_core}, jest głównym elementem komponentu Silnika. Inicjalizuje one zależności ekosystemu biblioteki Three.js, odpowiada za obsługę elementu \texttt{Canvas} oraz za uruchamianie i~aktualizowanie wizualizacji. Sterowanie wyświetlaną wizualizacją odbywa się za pomocą metody \mbox{\texttt{GeoVisCore.run(v: Visualization)}}. Przy kolejnych jej wywołaniach instancje obiektów starej wizualizacji są usuwane. Ma to miejsce również podczas wywołania metody \mbox{\texttt{GeoVisCore.destroy()}}, która powoduje wyjście z głównej pętli animacji i zamknięcie instancji komponentu.
 
-\begin{figure}[h]
+\begin{figure}
     \centering
-    \includegraphics[scale=0.5]{diagrams/out/c3_geo_vis_core.png}
+    \includegraphics[scale=0.6]{diagrams/out/c3_geo_vis_core.png}
     \caption{Diagram klas dla klasy \texttt{GeoVisCore}}
     \label{fig:c3_geo_vis_core}
 \end{figure}
 
-Najważniejszą klasą, odpowiedzialną za sterowanie kamerą, jest klasa \texttt{TrackballController}. Implementuje ona interfejs \texttt{TrackballCamera}, który definiuje metody dostępne dla twórcy wizualizacji. W języku TypeScript interfejs może również definiować atrybuty obiektu. Interfejs \texttt{TrackballCamera} definiuje atrybuty zawierające obiekty z~interfejsem \texttt{IEvent}, które służą do definiowania procedur obsługi zdarzeń. Wywołuje je klasa \texttt{TrackballController}. Mechanizm obsługi zdarzeń w~języku JavaScript identyfikują zdarzenie jako ciąg znaków. Aby wykorzystać statyczne typowanie, które umożliwia TypeScript, do obsługi zdarzeń użyto biblioteki \texttt{Strongly Typed Events} \cite{Events}.
+Najważniejszą klasą, odpowiedzialną za sterowanie kamerą, jest klasa \texttt{TrackballController}. Implementuje ona interfejs \texttt{TrackballCamera}, który definiuje metody sterowania kamerą dostępne dla twórcy wizualizacji. Diagram najważniejszych zależności klasy \texttt{TrackballController} pokazano na rysunku \ref{fig:c3_trackball}. W celu zachowania czytelności, na diagramie nie uwzględniono metod i atrybutów klas in interfejsów.
 
-\texttt{TrackballController} realizuje operacje obrotów orbit opisane w~rozdziale \ref{sec:camera}. Orbity reprezentowane są przez obiekty \texttt{GlobalOrbit} i~\texttt{LocalOrbit} dziedziczącące po klasie \texttt{Orbit}, które realizuje wspólne operacja dla obu z nich. Są to między innymi wykonywanie obrotów korekcyjnych dla pozycji kamery i~orientacji w~kierunku północnym. Wspólną funkcjonalność różni układ odniesienia obu orbit i~dlatego wydzielono metody abstrakcyjne klasy \texttt{Orbit}, które jej klasy pochodne implementują inaczej. Klasa \texttt{AnimatedTransition} reprezentuje animację pojedynczego obiektu. Zawiera ona swój własny zegar i~pozwala zdefiniować długość oraz funkcję wygładzającą. Diagram najważniejszych zależności klasy \texttt{TrackballController} pokazano na rysunku \ref{fig:c3_trackball}.
+Ze względów bezpieczeństwa kod wykonujący się w przeglądarce nie ma dostępu do niczego, poza obsługiwaną stroną. Wykonuje się on również tylko na jednym wątku, aby uniknąć typowych problemów programów wielowątkowych takich jak wyścigi czy trudniejsze zarządzenie i współdzielenie pamięci. W typowych przypadkach aplikacje webowe przez większość czasu są bezczynne i większość kodu, który wykonuje się na stronie, wyzwalany jest za pomocą zdarzeń wysyłanych przez przeglądarkę. Dlatego JavaScript opiera swoje działania na tak zwanym EventLoop. Jest to pętla, która, w dużym uproszczeniu, obsługuje zdarzenia z określonym priorytetem, kładąc nacisk na responsywność interfejsu użytkownika. Przykładem takich zdarzeń może być naciśnięcie przycisku myszy, ale też żądanie wygenerowanie klatki animacji. Wszystko sprowadza się do asynchronicznego wykonania zdefiniowanej procedury obsługi takiego zdarzenia. JavaScript definiuje zaimplementowany w obiektach DOM interfejs EventTarget\cite{JsEvents}, który umożliwia zdefiniowanie funkcji wykonywanej po zajściu zdarzenia. Zdarzenia identyfikowane są jako ciąg znaków. Wykorzystując przewagę języka TypeScript możemy tworzyć, emitować i obsługiwać zdarzenia, gdzie każdy aspekt będzie posiadał statyczne typowanie. W tym celu wykorzystano bibliotekę o nazwie \texttt{strongly-typed-events}\cite{Events} implementującą to podejście. Interface \texttt{TrackballCamera} korzysta z interfejsu \texttt{IEvent} dostarczonego przez tę bibliotekę (diagram \ref{fig:c3_trackball}). Różnica pomiędzy obsługą zdarzeń w JavaScripcie i z możliwościami TypeScriptu przedstawiają listingi \ref{lst:events_1} i \ref{lst:events_2}.
+
+\begin{lstlisting}[language=javascript, label={lst:events_1}, caption={Obsługa zdarzenia \texttt{"event"} w języku JavaScript}]
+const event = new Event('event');
+event['payload'] = "testData";
+elem.addEventListener('event', (data) => {
+    console.log(data.payload) 
+}, false);
+
+elem.dispatchEvent(event); // prints: testData
+\end{lstlisting}
+
+\begin{lstlisting}[language=javascript, label={lst:events_2}, caption={Obsługa zdarzenia \texttt{"event"} w języku TypeScript z wykorzystaniem biblioteki \texttt{strongly-typed-events}}]
+const onEvent = new SimpleEventDispatcher<{payload: string}>();
+onEvent.asEvent().sub((data) => {
+    console.log(data.payload); 
+})
+
+onEvent.dispatch({payload: 'testData'});  // prints: testData
+\end{lstlisting}
+
+\texttt{TrackballController} realizuje operacje obrotów orbit opisane w~rozdziale \ref{sec:camera}. Orbity reprezentowane są przez obiekty \texttt{GlobalOrbit} i~\texttt{LocalOrbit} dziedziczące po klasie \texttt{Orbit}, które realizuje wspólne operacja dla obu z~nich. Są to między innymi wykonywanie obrotów korekcyjnych dla pozycji kamery i~orientacji w~kierunku północnym. Wspólną funkcjonalność różni układ odniesienia obu orbit i~dlatego wydzielono metody abstrakcyjne klasy \texttt{Orbit}. Jej klasy pochodne implementują je inaczej, zwracając różne wektory. Klasa \texttt{AnimatedTransition} reprezentuje animację pojedynczego obiektu. Zawiera ona swój własny zegar i~pozwala zdefiniować długość oraz funkcję wygładzającą.
 
 Ukrycie faktycznej implementacji kontrolera kamery za interfejsem \texttt{TrackballCamera} daje późniejszą możliwość zastąpienia jej inną. Realizując ten sam interfejs, nie będzie ona wpływać na już utworzone wizualizacje i~pozostałą część aplikacji. 
 
@@ -545,7 +574,5 @@ Ukrycie faktycznej implementacji kontrolera kamery za interfejsem \texttt{Trackb
     \caption{Diagram klas dla klasy \texttt{TrackballController} i~najważniejszych zależności}
     \label{fig:c3_trackball}
 \end{figure}
-
-
 
 \section{Podsumowanie}

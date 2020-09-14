@@ -1,14 +1,28 @@
 @startuml
-skinparam Linetype ortho
+skinparam linetype ortho
 hide empty members
-component "GeoVisEngine\n"{
-    class GeoVisCoreVue
-    class GeoVisCore
-    class Visualization
+
+    component "GeoVisEngine\n"{
+    component GeoVisCoreVue
+    component GeoVisCore 
+     
+    
+
+    component Animation
+    component Camera
+    component GeoPosition
+    component Utils
+    component Visualization
+
+    Camera - TrackballCamera
+
+    Visualization ..> TrackballCamera : use
+    Visualization --> GeoPosition
+    Camera --> GeoPosition
+    Camera --> Utils
+    Camera --> Animation
+
     GeoVisCoreVue *--> GeoVisCore
-    GeoVisCoreVue *--> Visualization
-    GeoVisCore ..> Visualization
-}
-
-
+    GeoVisCore *--> Camera
+    }
 @enduml
