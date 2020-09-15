@@ -545,7 +545,7 @@ Najważniejszą klasą, odpowiedzialną za sterowanie kamerą, jest klasa \textt
 
 Ze względów bezpieczeństwa kod wykonujący się w przeglądarce nie ma dostępu do niczego, poza obsługiwaną stroną. Wykonuje się on również tylko na jednym wątku, aby uniknąć typowych problemów programów wielowątkowych takich jak wyścigi czy trudniejsze zarządzenie i współdzielenie pamięci. W typowych przypadkach aplikacje webowe przez większość czasu są bezczynne i większość kodu, który wykonuje się na stronie, wyzwalany jest za pomocą zdarzeń wysyłanych przez przeglądarkę. Dlatego JavaScript opiera swoje działania na tak zwanym EventLoop. Jest to pętla, która, w dużym uproszczeniu, obsługuje zdarzenia z określonym priorytetem, kładąc nacisk na responsywność interfejsu użytkownika. Przykładem takich zdarzeń może być naciśnięcie przycisku myszy, ale też żądanie wygenerowanie klatki animacji. Wszystko sprowadza się do asynchronicznego wykonania zdefiniowanej procedury obsługi takiego zdarzenia. JavaScript definiuje zaimplementowany w obiektach DOM interfejs EventTarget\cite{JsEvents}, który umożliwia zdefiniowanie funkcji wykonywanej po zajściu zdarzenia. Zdarzenia identyfikowane są jako ciąg znaków. Wykorzystując przewagę języka TypeScript możemy tworzyć, emitować i obsługiwać zdarzenia, gdzie każdy aspekt będzie posiadał statyczne typowanie. W tym celu wykorzystano bibliotekę o nazwie \texttt{strongly-typed-events}\cite{Events} implementującą to podejście. Interface \texttt{TrackballCamera} korzysta z interfejsu \texttt{IEvent} dostarczonego przez tę bibliotekę (diagram \ref{fig:c3_trackball}). Różnica pomiędzy obsługą zdarzeń w JavaScripcie i z możliwościami TypeScriptu przedstawiają listingi \ref{lst:events_1} i \ref{lst:events_2}.
 
-\begin{lstlisting}[language=javascript, label={lst:events_1}, caption={Obsługa zdarzenia \texttt{"event"} w języku JavaScript}]
+\begin{lstlisting}[language=javascript, label={lst:events_1}, caption={Obsługa zdarzenia w języku JavaScript}]
 const event = new Event('event');
 event['payload'] = "testData";
 elem.addEventListener('event', (data) => {
@@ -555,7 +555,7 @@ elem.addEventListener('event', (data) => {
 elem.dispatchEvent(event); // prints: testData
 \end{lstlisting}
 
-\begin{lstlisting}[language=javascript, label={lst:events_2}, caption={Obsługa zdarzenia \texttt{"event"} w języku TypeScript z wykorzystaniem biblioteki \texttt{strongly-typed-events}}]
+\begin{lstlisting}[language=javascript, label={lst:events_2}, caption={Obsługa zdarzenia w języku TypeScript z wykorzystaniem biblioteki \texttt{strongly-typed-events}}]
 const onEvent = new SimpleEventDispatcher<{payload: string}>();
 onEvent.asEvent().sub((data) => {
     console.log(data.payload); 
