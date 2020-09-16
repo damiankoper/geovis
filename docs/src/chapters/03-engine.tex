@@ -543,7 +543,14 @@ Klasa \texttt{GeoVisCore}, której despośrednie zależności przedstawia diagra
 
 Najważniejszą klasą, odpowiedzialną za sterowanie kamerą, jest klasa \texttt{TrackballController}. Implementuje ona interfejs \texttt{TrackballCamera}, który definiuje metody sterowania kamerą dostępne dla twórcy wizualizacji. Diagram najważniejszych zależności klasy \texttt{TrackballController} pokazano na rysunku \ref{fig:c3_trackball}. W celu zachowania czytelności, na diagramie nie uwzględniono metod i atrybutów klas in interfejsów.
 
-Ze względów bezpieczeństwa kod wykonujący się w przeglądarce nie ma dostępu do niczego, poza obsługiwaną stroną. Wykonuje się on również tylko na jednym wątku, aby uniknąć typowych problemów programów wielowątkowych takich jak wyścigi czy trudniejsze zarządzenie i współdzielenie pamięci. W typowych przypadkach aplikacje webowe przez większość czasu są bezczynne i większość kodu, który wykonuje się na stronie, wyzwalany jest za pomocą zdarzeń wysyłanych przez przeglądarkę. Dlatego JavaScript opiera swoje działania na tak zwanym EventLoop. Jest to pętla, która, w dużym uproszczeniu, obsługuje zdarzenia z określonym priorytetem, kładąc nacisk na responsywność interfejsu użytkownika. Przykładem takich zdarzeń może być naciśnięcie przycisku myszy, ale też żądanie wygenerowanie klatki animacji. Wszystko sprowadza się do asynchronicznego wykonania zdefiniowanej procedury obsługi takiego zdarzenia. JavaScript definiuje zaimplementowany w obiektach DOM interfejs EventTarget\cite{JsEvents}, który umożliwia zdefiniowanie funkcji wykonywanej po zajściu zdarzenia. Zdarzenia identyfikowane są jako ciąg znaków. Wykorzystując przewagę języka TypeScript możemy tworzyć, emitować i obsługiwać zdarzenia, gdzie każdy aspekt będzie posiadał statyczne typowanie. W tym celu wykorzystano bibliotekę o nazwie \texttt{strongly-typed-events}\cite{Events} implementującą to podejście. Interface \texttt{TrackballCamera} korzysta z interfejsu \texttt{IEvent} dostarczonego przez tę bibliotekę (diagram \ref{fig:c3_trackball}). Różnica pomiędzy obsługą zdarzeń w JavaScripcie i z możliwościami TypeScriptu przedstawiają listingi \ref{lst:events_1} i \ref{lst:events_2}.
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{diagrams/out/c3_trackball.png}
+    \caption{Diagram klas dla klasy \texttt{TrackballController} i~najważniejszych zależności}
+    \label{fig:c3_trackball}
+\end{figure}
+
+Ze względów bezpieczeństwa kod wykonujący się w przeglądarce nie ma dostępu do niczego, poza obsługiwaną stroną. Wykonuje się on również tylko na jednym wątku, aby uniknąć typowych problemów programów wielowątkowych takich jak wyścigi czy trudniejsze zarządzenie i współdzielenie pamięci. W typowych przypadkach aplikacje webowe przez większość czasu są bezczynne i większość kodu, który wykonuje się na stronie, wyzwalany jest za pomocą zdarzeń wysyłanych przez przeglądarkę. Dlatego JavaScript opiera swoje działania na tak zwanym EventLoop. Jest to pętla, która, w dużym uproszczeniu, obsługuje zdarzenia z określonym priorytetem, kładąc nacisk na responsywność interfejsu użytkownika. Przykładem takich zdarzeń może być naciśnięcie przycisku myszy, ale też żądanie wygenerowanie klatki animacji. Wszystko sprowadza się do asynchronicznego wykonania zdefiniowanej procedury obsługi takiego zdarzenia. JavaScript definiuje zaimplementowany w obiektach DOM interfejs EventTarget\cite{JsEvents}, który umożliwia zdefiniowanie funkcji wykonywanej po zajściu zdarzenia. Zdarzenia identyfikowane są jako ciąg znaków. Wykorzystując przewagę języka TypeScript możemy tworzyć, emitować i obsługiwać zdarzenia, gdzie każdy aspekt będzie posiadał statyczne typowanie, włączając w to samą abstrakcję zdarzenia i dane jakie są z nim powiązane. W tym celu wykorzystano bibliotekę o nazwie \texttt{strongly-typed-events}\cite{Events} implementującą to podejście. Interface \texttt{TrackballCamera} korzysta z interfejsu \texttt{IEvent} dostarczonego przez tę bibliotekę (diagram \ref{fig:c3_trackball}). Różnica pomiędzy obsługą zdarzeń w JavaScripcie i z możliwościami TypeScriptu przedstawiają listingi \ref{lst:events_1} i \ref{lst:events_2}.
 
 \begin{lstlisting}[language=javascript, label={lst:events_1}, caption={Obsługa zdarzenia w języku JavaScript}]
 const event = new Event('event');
@@ -568,11 +575,87 @@ onEvent.dispatch({payload: 'testData'});  // prints: testData
 
 Ukrycie faktycznej implementacji kontrolera kamery za interfejsem \texttt{TrackballCamera} daje późniejszą możliwość zastąpienia jej inną. Realizując ten sam interfejs, nie będzie ona wpływać na już utworzone wizualizacje i~pozostałą część aplikacji. 
 
-\begin{figure}[h]
+\section{Wizualizacja}
+
+Kwestia definiowana wizualizacji wyświetlanych przez złożony system, poruszona we wstępie, jest ważna z punktu widzenia twórcy wizualizacji. Projektowany system proponuje definicję wizualizacji jako obiektu implementującego dostarczony interfejs. Abstrakcyjna klasa \texttt{Visualization} definiuje metody niezbędne do osadzenia obiektów sceny, definicję metadanych, aktualizacji i usuwania. Jest to najważniejsza klasa przy definiowaniu wizualizacji, więc każda jej część wymaga dokładnego opisu. Klasa i jej najważniejsze zależności zostały przedstawione na diagramie \ref{fig:c3_vis}.
+
+\begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{diagrams/out/c3_trackball.png}
-    \caption{Diagram klas dla klasy \texttt{TrackballController} i~najważniejszych zależności}
-    \label{fig:c3_trackball}
+    \includegraphics[scale=0.6]{diagrams/out/c3_vis.png}
+    \caption{Diagram klas dla klasy \texttt{Visualization} i~najważniejszych zależności}
+    \label{fig:c3_vis}
 \end{figure}
+
+Wizualizacje, mogą zawierać osadzone inne wizualizacje tworząc strukturę drzewiastą zależnych wizualizacji. Przykładem może być prosta wizualizacja przestrzeni kosmicznej, która może być rodzicem dla wizualizacji Ziemi, ale też innych planet.
+\begin{samepage}
+    Pola klasy \texttt{Visualization} dzielą się na abstrakcyjne i te definiowane przez klasę basową, wywoływane wewnętrznie:
+    \begin{itemize}
+        \item \texttt{parents} - tablica mieszcząca obiekty wizualizacji - rodziców,
+        \item \texttt{meta} - obiekt typu \texttt{VisualizationMeta} przechowujący informacje o wizualizacji widoczne w panelu kontrolnym aplikacji i dostępnym z zewnątrz,
+        \item \texttt{name} - identyfikator wizualizacji, używany do jednoznacznej identyfikacji obiektu wizualizacji,
+        \item \texttt{setupOwnMeta} - metoda umożliwiająca wizualizacji ustawienie swoich metadanych,
+        \item \texttt{setupScene} - metoda umożliwiająca wizualizacji osadzenie na scenie i w grupie obiektów 3D,
+        \item \texttt{setupCamera} - metoda umożliwiająca wizualizacji modyfikację domyślnym ustawień kamery,
+        \item \texttt{update} - metoda wywoływana przy co każdą klatkę animacji, służy do aktualizacji obiektów wizualizacji,
+        \item \texttt{destroy} - metoda wykorzystywana do usuwania obiektów i czyszczenia pamięci,
+        \item \texttt{addParent} - metoda umożliwiająca dodanie wizualizacji - rodzica, wywoływana typowo w konstruktorze,
+        \item \texttt{getControls} - metoda umożliwiająca wizualizacji zdefiniowanie swojego panelu kontrolnego w postaci komponenty frameworka Vue,
+        \item \texttt{\_setupMeta} - metoda wywoływana wewnętrznie obsługująca ustawianie metadanych dla wizualizacji razem z jej rodzicami,
+        \item \texttt{\_setup} - metoda wywoływana wewnętrznie dla całego drzewa wizualizacji, odpowiedzialna wywołanie metod \texttt{setupCamera} i \texttt{setupScene},
+        \item \texttt{\_update} - metoda odpowiedzialna za aktualizowanie całego drzewa wizualizacji,
+        \item \texttt{\_destroy} metoda odpowiedzialna za niszczenie całego drzewa wizualizacji.
+    \end{itemize}
+\end{samepage}
+
+\begin{samepage}
+    \begin{lstlisting}[float, language=javascript, label={lst:vis}, caption={Pusta  klasa wizualizacji \texttt{EmptyVis} rozszerzająca klasę \texttt{Visualization}}]
+import { VueConstructor } from "vue/types/umd";
+import * as THREE from "three";
+import TrackballCamera from "../../../../../core/domain/Camera/interfaces/TrackballCamera";
+import Visualization from "../../../../../core/domain/Visualization/models/Visualization";
+import VisualizationMeta from "../../../../../core/domain/Visualization/models/VisualizationMeta";
+
+/**
+ * Example of empty visualization
+ * @category VisualizationExamples
+ */
+export default class EmptyVis extends Visualization {
+  constructor() {
+    super("emptyVis");
+    Object.seal(this);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public setupCamera(camera: TrackballCamera): void {
+    //
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public setupScene(scene: THREE.Scene, group: THREE.Group): void {
+    //
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public update(deltaFactor: number): void {
+    //
+  }
+
+  public destroy(): void {
+    //
+  }
+
+  public getControls(): Vue | VueConstructor<Vue> | null {
+    return null;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public setupOwnMeta(meta: VisualizationMeta): void {
+    //
+  }
+}
+    \end{lstlisting}
+\end{samepage}
+
+%TODO cykl życia + wstęp - mając już wszystko omówione możemy prześledzić blabla...
 
 \section{Podsumowanie}

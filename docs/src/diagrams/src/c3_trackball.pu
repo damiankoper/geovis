@@ -5,6 +5,8 @@ class GeoPosMapper
 
 class GeoPosition 
 
+class GeoVisCore
+
 abstract class Orbit 
 
 class GlobalOrbit 
@@ -33,6 +35,8 @@ TrackballCamera ...> GeoPosition
 TrackballController *---> AnimatedTransition
 TrackballController *--> LocalOrbit
 TrackballController *--> GlobalOrbit
+
+GeoVisCore *-> TrackballController
 
 TrackballCamera .up.> TrackballMode
 TrackballController *-up-> TrackballMode

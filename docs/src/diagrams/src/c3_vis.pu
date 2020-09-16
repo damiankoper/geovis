@@ -1,0 +1,65 @@
+@startuml
+skinparam Linetype ortho
+hide empty members
+
+class GeoVisCore{
+    - visualization: Visualization
+    + run(v: Visualization): void
+    + destroy(): void
+    - _run(): void
+}
+interface TrackballCamera
+class TrackballController implements TrackballCamera
+abstract class Visualization{
+    +parents: Visualization[]
+    +meta: VisualizationMeta
+    +name: string
+    +{abstract} setupOwnMeta(meta: VisualizationMeta): void
+    +{abstract} setupScene(scene: Scene, group: Group): void
+    +{abstract} setupCamera(controller: TrackballCamera): void
+    +{abstract} update(deltaFactor: number): void
+    +{abstract} destroy(): void
+    #addParent(visualization: Visualization): void
+    +{abstract} getControls(): Vue | VueConstructor<Vue>
+    +_setupMeta(meta?: VisualizationMeta): void
+    +_setup(\n\tscene: Scene, \n\tgroup: Group, \n\tcameraController: TrackballCamera\n): void
+    +_update(deltaFactor: number): void
+    +_destroy(): void
+}
+
+GeoVisCore *--> TrackballController
+
+GeoVisCore o--> "0..1" Visualization
+Visualization ..> TrackballCamera
+
+
+class THREE.Group
+class THREE.Scene
+
+interface IVisualizationMeta{
+    +title: string
+    +description: string
+    +author: string
+    +keywords: string[]
+    +thumbnailB64?: string
+}
+class VisualizationMeta implements IVisualizationMeta {
+    #title: string
+    #description: string
+    #author: string
+    #keywords: string[]
+    #thumbnailB64?: string
+    +setTitle(s: string): void
+    +setDescription(s: string): void
+    +setAuthor(s: string): void
+    +setKeywords(s: string[]): void
+    +addKeywords(s: string[]): void
+    +setThumbnail(base64: string): void
+    +getData(): IVisualizationMeta
+}
+
+Visualization *->  VisualizationMeta
+
+Visualization ..> THREE.Scene
+Visualization ..> THREE.Group
+@enduml
