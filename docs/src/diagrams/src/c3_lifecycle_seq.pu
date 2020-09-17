@@ -1,0 +1,89 @@
+@startuml
+actor Application
+boundary GeoVisCore
+participant Visualization
+control "cameraController:TrackballController" as TrackballController
+control "renderer:THREE.Renderer" as Renderer
+activate Application
+
+create Visualization
+Application -> Visualization : new
+activate Visualization
+Visualization -> Visualization : setupOwnMeta(meta)
+alt vis has parents
+    loop for each parent
+        Visualization -> Visualization : parents.push(parent)
+        Visualization -> Visualization : _setupMeta()
+    end
+end
+
+activate TrackballController
+activate GeoVisCore
+activate Renderer
+Application -> GeoVisCore : run(vis)
+alt old vis exists
+    GeoVisCore -> Visualization : vis._destroy()
+    loop for each vis.parents as parent
+        Visualization -> Visualization : parent._destroy()
+        activate Visualization
+
+        Visualization -> Visualization : vis.destroy()
+        deactivate Visualization
+        deactivate Visualization
+    end
+end
+
+note over GeoVisCore
+    scene.dispose()
+    scene = new THREE.Scene()
+    group = new THREE.Group()
+end note
+
+GeoVisCore -> TrackballController : setGroup(group)
+
+GeoVisCore -> Visualization : _setup(scene, group, cameraController)
+activate Visualization
+
+loop for each vis.parents as parent
+    Visualization -> Visualization : parent._setup(scene, group, cameraController)
+    activate Visualization
+
+    Visualization -> Visualization : vis.setupCamera(cameraController)
+    Visualization -> Visualization : vis.setupScene(scene, group)
+end
+deactivate Visualization
+
+activate Visualization
+GeoVisCore -> GeoVisCore : _run()
+activate GeoVisCore
+
+loop main loop triggered with requestAnimationFrame
+    alt is destroy requested
+        GeoVisCore -> GeoVisCore : this.destroyRequested = false
+    else
+        GeoVisCore -> GeoVisCore : requestAnimationFrame(()=>this._run())
+    end
+
+
+GeoVisCore -> TrackballController : update(deltaFactor)
+GeoVisCore -> Visualization : _update(deltaFactor)
+loop for each vis.parents as parent
+    Visualization -> Visualization : parent._update(deltaFactor)
+    activate Visualization
+
+    Visualization -> Visualization : vis.update(cameraController)
+end
+deactivate Visualization
+GeoVisCore -> Renderer : render(scene, camera)
+end   
+deactivate GeoVisCore
+GeoVisCore -> Visualization : vis._destroy()
+loop for each vis.parents as parent
+    Visualization -> Visualization : parent._destroy()
+    activate Visualization
+
+    Visualization -> Visualization : vis.destroy()
+deactivate Visualization
+deactivate Visualization
+end
+@enduml

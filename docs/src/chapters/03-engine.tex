@@ -529,10 +529,10 @@ Systemu wizualizacji danych geograficznych jako całość nazwany został \texti
 
 \subsection{GeoVisCore}
 
-\textit{GeoVisCore} jest komponentem odpowiedzialnym za dostarczenie elementu \texttt{Canvas}, który następnie osadzony jest w~komponencie \textit{GeoVisCoreVue} opisanym w dalszej części pracy. \textit{GeoVisCore} obsługuje zdarzenia wygenerowane przez użytkownika pochodzące z~elementu \texttt{Canvas}. Zdarzeniami tymi są te, związane z myszką i klawiaturą. Komponent realizuje cykl życia wizualizacji, wyświetlając opisane przez nią obiekty i~propagując zdarzenia pochodzące od użytkownika. To w~tym komponencie osadzone jest środowisko biblioteki Three.js.
+\textit{GeoVisCore} jest komponentem odpowiedzialnym za dostarczenie elementu \texttt{Canvas}, który następnie osadzony jest w~komponencie \textit{GeoVisCoreVue} opisanym w~dalszej części pracy. \textit{GeoVisCore} obsługuje zdarzenia wygenerowane przez użytkownika pochodzące z~elementu \texttt{Canvas}. Zdarzeniami tymi są te, związane z~myszką i~klawiaturą. Komponent realizuje cykl życia wizualizacji, wyświetlając opisane przez nią obiekty i~propagując zdarzenia pochodzące od użytkownika. To w~tym komponencie osadzone jest środowisko biblioteki Three.js.
 W opisie implementacji najpierw zostanie przedstawiona struktura i~zależności każdej z~klas i~komponentów, a~następnie opisany zostanie cykl życia wizualizacji.
 
-Klasa \texttt{GeoVisCore}, której despośrednie zależności przedstawia diagram \ref{fig:c3_geo_vis_core}, jest głównym elementem komponentu Silnika. Inicjalizuje one zależności ekosystemu biblioteki Three.js, odpowiada za obsługę elementu \texttt{Canvas} oraz za uruchamianie i~aktualizowanie wizualizacji. Sterowanie wyświetlaną wizualizacją odbywa się za pomocą metody \mbox{\texttt{GeoVisCore.run(v: Visualization)}}. Przy kolejnych jej wywołaniach instancje obiektów starej wizualizacji są usuwane. Ma to miejsce również podczas wywołania metody \mbox{\texttt{GeoVisCore.destroy()}}, która powoduje wyjście z głównej pętli animacji i zamknięcie instancji komponentu.
+Klasa \texttt{GeoVisCore}, której despośrednie zależności przedstawia diagram \ref{fig:c3_geo_vis_core}, jest głównym elementem komponentu Silnika. Inicjalizuje one zależności ekosystemu biblioteki Three.js, odpowiada za obsługę elementu \texttt{Canvas} oraz za uruchamianie i~aktualizowanie wizualizacji. Sterowanie wyświetlaną wizualizacją odbywa się za pomocą metody \mbox{\texttt{GeoVisCore.run(v: Visualization)}}. Przy kolejnych jej wywołaniach instancje obiektów starej wizualizacji są usuwane. Ma to miejsce również podczas wywołania metody \mbox{\texttt{GeoVisCore.destroy()}}, która powoduje wyjście z~głównej pętli animacji i~zamknięcie instancji komponentu.
 
 \begin{figure}
     \centering
@@ -541,7 +541,7 @@ Klasa \texttt{GeoVisCore}, której despośrednie zależności przedstawia diagra
     \label{fig:c3_geo_vis_core}
 \end{figure}
 
-Najważniejszą klasą, odpowiedzialną za sterowanie kamerą, jest klasa \texttt{TrackballController}. Implementuje ona interfejs \texttt{TrackballCamera}, który definiuje metody sterowania kamerą dostępne dla twórcy wizualizacji. Diagram najważniejszych zależności klasy \texttt{TrackballController} pokazano na rysunku \ref{fig:c3_trackball}. W celu zachowania czytelności, na diagramie nie uwzględniono metod i atrybutów klas in interfejsów.
+Najważniejszą klasą, odpowiedzialną za sterowanie kamerą, jest klasa \texttt{TrackballController}. Implementuje ona interfejs \texttt{TrackballCamera}, który definiuje metody sterowania kamerą dostępne dla twórcy wizualizacji. Diagram najważniejszych zależności klasy \texttt{TrackballController} pokazano na rysunku \ref{fig:c3_trackball}. W celu zachowania czytelności, na diagramie nie uwzględniono metod i~atrybutów klas in interfejsów.
 
 \begin{figure}
     \centering
@@ -550,9 +550,9 @@ Najważniejszą klasą, odpowiedzialną za sterowanie kamerą, jest klasa \textt
     \label{fig:c3_trackball}
 \end{figure}
 
-Ze względów bezpieczeństwa kod wykonujący się w przeglądarce nie ma dostępu do niczego, poza obsługiwaną stroną. Wykonuje się on również tylko na jednym wątku, aby uniknąć typowych problemów programów wielowątkowych takich jak wyścigi czy trudniejsze zarządzenie i współdzielenie pamięci. W typowych przypadkach aplikacje webowe przez większość czasu są bezczynne i większość kodu, który wykonuje się na stronie, wyzwalany jest za pomocą zdarzeń wysyłanych przez przeglądarkę. Dlatego JavaScript opiera swoje działania na tak zwanym EventLoop. Jest to pętla, która, w dużym uproszczeniu, obsługuje zdarzenia z określonym priorytetem, kładąc nacisk na responsywność interfejsu użytkownika. Przykładem takich zdarzeń może być naciśnięcie przycisku myszy, ale też żądanie wygenerowanie klatki animacji. Wszystko sprowadza się do asynchronicznego wykonania zdefiniowanej procedury obsługi takiego zdarzenia. JavaScript definiuje zaimplementowany w obiektach DOM interfejs EventTarget\cite{JsEvents}, który umożliwia zdefiniowanie funkcji wykonywanej po zajściu zdarzenia. Zdarzenia identyfikowane są jako ciąg znaków. Wykorzystując przewagę języka TypeScript możemy tworzyć, emitować i obsługiwać zdarzenia, gdzie każdy aspekt będzie posiadał statyczne typowanie, włączając w to samą abstrakcję zdarzenia i dane jakie są z nim powiązane. W tym celu wykorzystano bibliotekę o nazwie \texttt{strongly-typed-events}\cite{Events} implementującą to podejście. Interface \texttt{TrackballCamera} korzysta z interfejsu \texttt{IEvent} dostarczonego przez tę bibliotekę (diagram \ref{fig:c3_trackball}). Różnica pomiędzy obsługą zdarzeń w JavaScripcie i z możliwościami TypeScriptu przedstawiają listingi \ref{lst:events_1} i \ref{lst:events_2}.
+Ze względów bezpieczeństwa kod wykonujący się w~przeglądarce nie ma dostępu do niczego, poza obsługiwaną stroną. Wykonuje się on również tylko na jednym wątku, aby uniknąć typowych problemów programów wielowątkowych takich jak wyścigi czy trudniejsze zarządzenie i~współdzielenie pamięci. W typowych przypadkach aplikacje webowe przez większość czasu są bezczynne i~większość kodu, który wykonuje się na stronie, wyzwalany jest za pomocą zdarzeń wysyłanych przez przeglądarkę. Dlatego JavaScript opiera swoje działania na tak zwanym EventLoop. Jest to pętla, która, w~dużym uproszczeniu, obsługuje zdarzenia z~określonym priorytetem, kładąc nacisk na responsywność interfejsu użytkownika. Przykładem takich zdarzeń może być naciśnięcie przycisku myszy, ale też żądanie wygenerowanie klatki animacji. Wszystko sprowadza się do asynchronicznego wykonania zdefiniowanej procedury obsługi takiego zdarzenia. JavaScript definiuje zaimplementowany w~obiektach DOM interfejs EventTarget\cite{JsEvents}, który umożliwia zdefiniowanie funkcji wykonywanej po zajściu zdarzenia. Zdarzenia identyfikowane są jako ciąg znaków. Wykorzystując przewagę języka TypeScript możemy tworzyć, emitować i~obsługiwać zdarzenia, gdzie każdy aspekt będzie posiadał statyczne typowanie, włączając w~to samą abstrakcję zdarzenia i~dane jakie są z~nim powiązane. W tym celu wykorzystano bibliotekę o~nazwie \texttt{strongly-typed-events}\cite{Events} implementującą to podejście. Interface \texttt{TrackballCamera} korzysta z~interfejsu \texttt{IEvent} dostarczonego przez tę bibliotekę (diagram \ref{fig:c3_trackball}). Różnica pomiędzy obsługą zdarzeń w~JavaScripcie i~z możliwościami TypeScriptu przedstawiają listingi \ref{lst:events_1} i~\ref{lst:events_2}.
 
-\begin{lstlisting}[language=javascript, label={lst:events_1}, caption={Obsługa zdarzenia w języku JavaScript}]
+\begin{lstlisting}[language=javascript, label={lst:events_1}, caption={Obsługa zdarzenia w~języku JavaScript}]
 const event = new Event('event');
 event['payload'] = "testData";
 elem.addEventListener('event', (data) => {
@@ -562,7 +562,7 @@ elem.addEventListener('event', (data) => {
 elem.dispatchEvent(event); // prints: testData
 \end{lstlisting}
 
-\begin{lstlisting}[language=javascript, label={lst:events_2}, caption={Obsługa zdarzenia w języku TypeScript z wykorzystaniem biblioteki \texttt{strongly-typed-events}}]
+\begin{lstlisting}[language=javascript, label={lst:events_2}, caption={Obsługa zdarzenia w~języku TypeScript z~wykorzystaniem biblioteki \texttt{strongly-typed-events}}]
 const onEvent = new SimpleEventDispatcher<{payload: string}>();
 onEvent.asEvent().sub((data) => {
     console.log(data.payload); 
@@ -577,7 +577,7 @@ Ukrycie faktycznej implementacji kontrolera kamery za interfejsem \texttt{Trackb
 
 \section{Wizualizacja}
 
-Kwestia definiowana wizualizacji wyświetlanych przez złożony system, poruszona we wstępie, jest ważna z punktu widzenia twórcy wizualizacji. Projektowany system proponuje definicję wizualizacji jako obiektu implementującego dostarczony interfejs. Abstrakcyjna klasa \texttt{Visualization} definiuje metody niezbędne do osadzenia obiektów sceny, definicję metadanych, aktualizacji i usuwania. Jest to najważniejsza klasa przy definiowaniu wizualizacji, więc każda jej część wymaga dokładnego opisu. Klasa i jej najważniejsze zależności zostały przedstawione na diagramie \ref{fig:c3_vis}.
+Kwestia definiowana wizualizacji wyświetlanych przez złożony system, poruszona we wstępie, jest ważna z~punktu widzenia twórcy wizualizacji. Projektowany system proponuje definicję wizualizacji jako obiektu implementującego dostarczony interfejs. Abstrakcyjna klasa \texttt{Visualization} definiuje metody niezbędne do osadzenia obiektów sceny, definicję metadanych, aktualizacji wizualizacji i~jej usuwania. Jest to najważniejsza klasa przy definiowaniu wizualizacji, więc każda jej część wymaga dokładnego opisu. Klasa i~jej najważniejsze zależności zostały przedstawione na diagramie \ref{fig:c3_vis}.
 
 \begin{figure}
     \centering
@@ -588,20 +588,23 @@ Kwestia definiowana wizualizacji wyświetlanych przez złożony system, poruszon
 
 Wizualizacje, mogą zawierać osadzone inne wizualizacje tworząc strukturę drzewiastą zależnych wizualizacji. Przykładem może być prosta wizualizacja przestrzeni kosmicznej, która może być rodzicem dla wizualizacji Ziemi, ale też innych planet.
 \begin{samepage}
-    Pola klasy \texttt{Visualization} dzielą się na abstrakcyjne i te definiowane przez klasę basową, wywoływane wewnętrznie:
+    Pola klasy \texttt{Visualization} dzielą się na abstrakcyjne i~te definiowane przez klasę basową, wywoływane wewnętrznie:
+
+    %TODO: Pytanko: Przerobić to na tabelę?
+
     \begin{itemize}
         \item \texttt{parents} - tablica mieszcząca obiekty wizualizacji - rodziców,
-        \item \texttt{meta} - obiekt typu \texttt{VisualizationMeta} przechowujący informacje o wizualizacji widoczne w panelu kontrolnym aplikacji i dostępnym z zewnątrz,
+        \item \texttt{meta} - obiekt typu \texttt{VisualizationMeta} przechowujący informacje o~wizualizacji widoczne w~panelu kontrolnym aplikacji, i~dostępnym z~poziomu interfejsu użytkownika,
         \item \texttt{name} - identyfikator wizualizacji, używany do jednoznacznej identyfikacji obiektu wizualizacji,
         \item \texttt{setupOwnMeta} - metoda umożliwiająca wizualizacji ustawienie swoich metadanych,
-        \item \texttt{setupScene} - metoda umożliwiająca wizualizacji osadzenie na scenie i w grupie obiektów 3D,
+        \item \texttt{setupScene} - metoda umożliwiająca wizualizacji osadzenie na scenie i~w grupie obiektów~3D,
         \item \texttt{setupCamera} - metoda umożliwiająca wizualizacji modyfikację domyślnym ustawień kamery,
-        \item \texttt{update} - metoda wywoływana przy co każdą klatkę animacji, służy do aktualizacji obiektów wizualizacji,
-        \item \texttt{destroy} - metoda wykorzystywana do usuwania obiektów i czyszczenia pamięci,
-        \item \texttt{addParent} - metoda umożliwiająca dodanie wizualizacji - rodzica, wywoływana typowo w konstruktorze,
-        \item \texttt{getControls} - metoda umożliwiająca wizualizacji zdefiniowanie swojego panelu kontrolnego w postaci komponenty frameworka Vue,
-        \item \texttt{\_setupMeta} - metoda wywoływana wewnętrznie obsługująca ustawianie metadanych dla wizualizacji razem z jej rodzicami,
-        \item \texttt{\_setup} - metoda wywoływana wewnętrznie dla całego drzewa wizualizacji, odpowiedzialna wywołanie metod \texttt{setupCamera} i \texttt{setupScene},
+        \item \texttt{update} - metoda wywoływana co każdą klatkę animacji, służy do aktualizacji obiektów wizualizacji,
+        \item \texttt{destroy} - metoda wykorzystywana do usuwania obiektów i~czyszczenia pamięci,
+        \item \texttt{addParent} - metoda umożliwiająca dodanie wizualizacji - rodzica, wywoływana typowo w~konstruktorze,
+        \item \texttt{getControls} - metoda umożliwiająca wizualizacji zdefiniowanie swojego panelu kontrolnego w~postaci komponenty frameworka Vue,
+        \item \texttt{\_setupMeta} - metoda wywoływana wewnętrznie dla całego drzewa wizualizacji obsługująca ustawianie metadanych,
+        \item \texttt{\_setup} - metoda wywoływana wewnętrznie dla całego drzewa wizualizacji, odpowiedzialna za wywołanie metod \texttt{setupCamera} i~\texttt{setupScene},
         \item \texttt{\_update} - metoda odpowiedzialna za aktualizowanie całego drzewa wizualizacji,
         \item \texttt{\_destroy} metoda odpowiedzialna za niszczenie całego drzewa wizualizacji.
     \end{itemize}
@@ -655,6 +658,22 @@ export default class EmptyVis extends Visualization {
 }
     \end{lstlisting}
 \end{samepage}
+
+Opisane wcześniej klasy i interfejsy obsługują cykl życia wizualizacji. Składają się na niego utworzenie obiektu wizualizacji i umieszczenie jej w komponencie \texttt{GeoVisCore}. Komponent ten dalej zajmuje się inicjalizacją wszystkich obiektów sceny definiowanych przez wizualizację, modyfikacją ustawień kamery. Podczas każdej iteracji pętli głównej animacji aktualizowane są położenie kamery oraz sama wizualizacja. Biblioteką obsługiwaną w głównej pętli animacji, ułatwiającą tworzenie animacji jest Tween.js~\cite{TWEEN}. Po zmianie wizualizacji na inną lub po wyłączeniu komponentu, stara wizualizacja jest niszczona. Uogólniony diagram cyklu życia animacje przedstawiono na rysunku~\ref{fig:c3_lifecycle}. Szczegółowy diagram sekwencji przedstawiono na rysunku~\ref{fig:c3_lifecycle_seq}.
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.6]{diagrams/out/c3_lifecycle.png}
+    \caption{Diagram cyklu życia wizualizacji}
+    \label{fig:c3_lifecycle}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{diagrams/out/c3_lifecycle_seq.png}
+    \caption{Diagram cyklu życia wizualizacji}
+    \label{fig:c3_lifecycle_seq}
+\end{figure}
 
 %TODO cykl życia + wstęp - mając już wszystko omówione możemy prześledzić blabla...
 

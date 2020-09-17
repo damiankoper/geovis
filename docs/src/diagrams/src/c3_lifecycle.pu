@@ -1,0 +1,28 @@
+@startuml
+start
+
+if(Old visualization exists) then (yes)
+:Destroy old visualization;
+else (no)
+endif
+:Remove all objects from Scene;
+:Create new Group and add it to Scene;
+:Set group in camera controller;
+
+:Setup visualization tree;
+
+while(is destroy requested) is (yes)
+
+:Update camera;
+:Update visualization;
+:Update TWEEN;
+:Render scene;
+
+endwhile (no)
+
+:Destroy visualization;
+:Destroy camera;
+:Destroy Scene;
+
+stop
+@enduml
