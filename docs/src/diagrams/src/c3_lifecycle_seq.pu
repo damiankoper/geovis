@@ -64,6 +64,9 @@ loop main loop triggered with requestAnimationFrame
         GeoVisCore -> GeoVisCore : requestAnimationFrame(()=>this._run())
     end
 
+note over GeoVisCore
+    TWEEN.update(TWEEN.now())
+end note
 
 GeoVisCore -> TrackballController : update(deltaFactor)
 GeoVisCore -> Visualization : _update(deltaFactor)

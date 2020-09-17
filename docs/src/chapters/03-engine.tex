@@ -659,22 +659,20 @@ export default class EmptyVis extends Visualization {
     \end{lstlisting}
 \end{samepage}
 
-Opisane wcześniej klasy i interfejsy obsługują cykl życia wizualizacji. Składają się na niego utworzenie obiektu wizualizacji i umieszczenie jej w komponencie \texttt{GeoVisCore}. Komponent ten dalej zajmuje się inicjalizacją wszystkich obiektów sceny definiowanych przez wizualizację, modyfikacją ustawień kamery. Podczas każdej iteracji pętli głównej animacji aktualizowane są położenie kamery oraz sama wizualizacja. Biblioteką obsługiwaną w głównej pętli animacji, ułatwiającą tworzenie animacji jest Tween.js~\cite{TWEEN}. Po zmianie wizualizacji na inną lub po wyłączeniu komponentu, stara wizualizacja jest niszczona. Uogólniony diagram cyklu życia animacje przedstawiono na rysunku~\ref{fig:c3_lifecycle}. Szczegółowy diagram sekwencji przedstawiono na rysunku~\ref{fig:c3_lifecycle_seq}.
+Opisane wcześniej klasy i interfejsy obsługują cykl życia wizualizacji. Składają się na niego utworzenie obiektu wizualizacji i umieszczenie jej w komponencie \texttt{GeoVisCore}. Komponent ten dalej zajmuje się inicjalizacją wszystkich obiektów sceny definiowanych przez wizualizację oraz modyfikacją ustawień kamery. Podczas każdej iteracji pętli głównej animacji aktualizowane są położenie kamery oraz sama wizualizacja. Biblioteką obsługiwaną w głównej pętli animacji, ułatwiającą tworzenie animacji, jest Tween.js~\cite{TWEEN}. Po zmianie wizualizacji na inną lub po wyłączeniu komponentu, stara wizualizacja jest niszczona. Uogólniony diagram cyklu życia animacje przedstawiono na rysunku~\ref{fig:c3_lifecycle}. Szczegółowy diagram sekwencji przedstawiono na rysunku~\ref{fig:c3_lifecycle_seq}. 
 
 \begin{figure}
     \centering
     \includegraphics[scale=0.6]{diagrams/out/c3_lifecycle.png}
-    \caption{Diagram cyklu życia wizualizacji}
+    \caption{Diagram aktywności cyklu życia wizualizacji}
     \label{fig:c3_lifecycle}
 \end{figure}
 
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{diagrams/out/c3_lifecycle_seq.png}
-    \caption{Diagram cyklu życia wizualizacji}
+    \caption{Diagram sekwencji cyklu życia wizualizacji}
     \label{fig:c3_lifecycle_seq}
 \end{figure}
-
-%TODO cykl życia + wstęp - mając już wszystko omówione możemy prześledzić blabla...
 
 \section{Podsumowanie}
