@@ -495,7 +495,7 @@ Animacje posiadają konfigurowalny czas trwania i~w celu wyliczenia pozycji poś
 
 \subsection{Macierze transformacji obiektów na podstawie orbit}
 
-Niech $T : \mathbb{R}^3 \to \mathbb{R}^{4\times4}$ będzie funkcją konstruującą macierz translacji na podstawie wektora w~przestrzeni trójwymiarowej. Niech $R : (\mathbb{R}^3, \mathbb{R}^3, \mathbb{R}^3) \to \mathbb{R}^{4\times4}$ będzie funkcją konstruującą macierz obrotu obserwatora, aby patrzył na dany punkt w~odpowiedniej orientacji. Macierz transformacji grupy obrotu, czyli ruchomej części wizualizacji, wyrażona jest równaniem \ref{eq:t_1}. Macierz transformacji obiektu kamery wyrażone jest równaniem \ref{eq:t_2}.
+Niech $T : \mathbb{R}^3 \to \mathbb{R}^{4\times4}$ będzie funkcją konstruującą macierz translacji na podstawie wektora w~przestrzeni trójwymiarowej. Niech $R : (\mathbb{R}^3, \mathbb{R}^3, \mathbb{R}^3) \to \mathbb{R}^{4\times4}$ będzie funkcją konstruującą macierz obrotu obserwatora, aby patrzył na dany punkt w~odpowiedniej orientacji. Macierz transformacji grupy obrotu, czyli ruchomej części wizualizacji, wyrażona jest równaniem \ref{eq:t_1}. Macierz transformacji obiektu kamery wyrażona jest równaniem \ref{eq:t_2}.
 
 \begin{align}
     \label{eq:t_1}
@@ -611,6 +611,21 @@ Wizualizacje, mogą zawierać osadzone inne wizualizacje tworząc strukturę drz
 \end{samepage}
 
 \begin{samepage}
+Metadane wizualizacji przechowywane są w~obiekcie typu \texttt{VisualizationMeta} implementującego interfejs \texttt{IVisualizationMeta}, który to dostępny jest od strony aplikacji. Interfejs metadanych definiuje następujące pola:
+
+\begin{itemize}
+    \item \texttt{title} - tytuł wizualizacji,
+    \item \texttt{description} - opis wizualizacji,
+    \item \texttt{author} - autor wizualizacji,
+    \item \texttt{keywords} - słowa kluczowe zapisane w~tablicy,
+    \item \texttt{thumbnailB64} - miniaturka wizualizacji zapisana jako ciąg znaków kodujący obraz kodowaniem Base64~\cite{Base64}.
+\end{itemize}
+
+Wszystkie pola, poza polem \texttt{keywords}, są nadpisywane przez dziedziczące wizualizacje. Tablica \texttt{keywords} za każdym wywołaniem metody \texttt{addKeywords} jest rozszerzana o~nowe słowa kluczowe, a~ich ewentualne duplikaty są usuwane.
+ 
+\end{samepage} 
+
+\begin{samepage}
     \begin{lstlisting}[float, language=javascript, label={lst:vis}, caption={Pusta  klasa wizualizacji \texttt{EmptyVis} rozszerzająca klasę \texttt{Visualization}}]
 import { VueConstructor } from "vue/types/umd";
 import * as THREE from "three";
@@ -659,7 +674,7 @@ export default class EmptyVis extends Visualization {
     \end{lstlisting}
 \end{samepage}
 
-Opisane wcześniej klasy i interfejsy obsługują cykl życia wizualizacji. Składają się na niego utworzenie obiektu wizualizacji i umieszczenie jej w komponencie \texttt{GeoVisCore}. Komponent ten dalej zajmuje się inicjalizacją wszystkich obiektów sceny definiowanych przez wizualizację oraz modyfikacją ustawień kamery. Podczas każdej iteracji pętli głównej animacji aktualizowane są położenie kamery oraz sama wizualizacja. Biblioteką obsługiwaną w głównej pętli animacji, ułatwiającą tworzenie animacji, jest Tween.js~\cite{TWEEN}. Po zmianie wizualizacji na inną lub po wyłączeniu komponentu, stara wizualizacja jest niszczona. Uogólniony diagram cyklu życia animacje przedstawiono na rysunku~\ref{fig:c3_lifecycle}. Szczegółowy diagram sekwencji przedstawiono na rysunku~\ref{fig:c3_lifecycle_seq}. 
+Opisane wcześniej klasy i~interfejsy obsługują cykl życia wizualizacji. Składają się na niego utworzenie obiektu wizualizacji i~umieszczenie jej w~komponencie \texttt{GeoVisCore}. Komponent ten dalej zajmuje się inicjalizacją wszystkich obiektów sceny definiowanych przez wizualizację oraz modyfikacją ustawień kamery. Podczas każdej iteracji pętli głównej animacji aktualizowane są położenie kamery oraz sama wizualizacja. Biblioteką obsługiwaną w~głównej pętli animacji, ułatwiającą tworzenie animacji, jest Tween.jyrażone jest równaniems~\cite{TWEEN}. Po zmianie wizualizacji na inną lub po wyłączeniu komponentu, stara wizualizacja jest niszczona. Uogólniony diagram cyklu życia animacje przedstawiono na rysunku~\ref{fig:c3_lifecycle}. Szczegółowy diagram sekwencji przedstawiono na rysunku~\ref{fig:c3_lifecycle_seq}. 
 
 \begin{figure}
     \centering
@@ -674,5 +689,17 @@ Opisane wcześniej klasy i interfejsy obsługują cykl życia wizualizacji. Skł
     \caption{Diagram sekwencji cyklu życia wizualizacji}
     \label{fig:c3_lifecycle_seq}
 \end{figure}
+
+\subsection{Vue.js i~Webpack}
+
+Dotychczas opisane elementy służyły tylko i~wyłącznie do obsługi grafiki wyświetlanej za pomocą elementu \texttt{Canvas}. Oprócz tego Silnik nakłada na niego komponenty odpowiedzialne za obsługę sterowania kamery oraz wyświetlające informacje o~jej położeniu. Wyświetlają one również metadane wizualizacji oraz obsługują dostarczony przez nią komponent sterujący. 
+
+Vue.js jest frameworkiem języka JavaScript skupiający się w~dużej mierze na wyświetlaniu i~aktualizowaniu zdefiniowanych widoków~\cite{Vue}. Określany jest przez twórców jako \textit{priogresywny}, ponieważ posiada wysokie zdolności to adaptacji i~integracji z~innymi bibliotekami. Inne funkcjonalności, takie jak obsługa routera, czy przechowywanie globalnego stanu aplikacji, oferują oficjalne biblioteki poboczne. W tworzeniu interfejsu użytkownika, tak jak inne popularne biblioteki, proponuje podejście oparte na komponentach. Gdzie rozwój i~testowanie skupia się na zawartych w~pojedynczych plikach, w~pełni funkcjonalnych części interfejsu. Podejście to pozwala na izolację testowanych komponentów oraz ułatwia zarządzenie ich ponowne użycie w~innych miejscach projektów. Vue.js nie oferuje jednoznacznie zdefiniowanego monolitycznego środowiska uruchomieniowego. Nie stoi to na przeszkodzie, aby takie zdefiniowane środowisko powstało. Przykładem jest takiego środowiska jest framework Nuxt.js oparty na Vue.js~\cite{Nuxt}. Vue.js w~wersji drugiej nie był pisany tak, aby w~pełni wspierać język TypeScript, choć mimo to typy dostarczonych obiektów są eksportowane razem z~nimi. Brak kompatybilności jest widoczny między innymi w~przypadku eksportu typów podczas budowania biblioteki komponentu oraz w~samej konfiguracji projektu i~oficjalnych bibliotek pobocznych. Wersja trzecia frameworka została kompletnie oparta na języku TypeScript. 
+
+Komponent Silnika eksportowany jest jako komponent Vue.js, który posiada osadzony element \texttt{Canvas} razem z~modułem \texttt{GeoVisCore}. Eksportowane są również przykładowe wizualizacje i~wszystkie potrzebne użytkownikowi Silnika klasy i~interfejsy. Komponent ten może być póżniej zaimportowany i~osadzony w~dowolnym innym komponencie apliakcji chcących wyświetlać wizualizacje. Konstrukcja struktury projektu w~taki sposób daje wszystkie korzyści, jakie daje rozwój aplikacji opartej na komponentach. Są to między innymi opisane wcześniej izolowane testowanie i~wielokrotne ich użycie. 
+
+
+% Webpack i budowanie
+
 
 \section{Podsumowanie}

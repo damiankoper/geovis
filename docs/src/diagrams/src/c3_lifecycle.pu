@@ -11,14 +11,14 @@ endif
 
 :Setup visualization tree;
 
-while(is destroy requested) is (yes)
+while(is destroy requested) is (no)
 
 :Update camera;
 :Update visualization;
 :Update TWEEN;
 :Render scene;
 
-endwhile (no)
+endwhile (yes)
 
 :Destroy visualization;
 :Destroy camera;
