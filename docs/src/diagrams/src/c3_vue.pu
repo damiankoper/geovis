@@ -1,0 +1,12 @@
+@startuml
+class GeoVisCoreVue
+class Compass
+class VizualizationInfo
+class VizualizationControls
+class CoreControls
+hide empty members
+GeoVisCoreVue --> CoreControls
+CoreControls --> VizualizationInfo
+CoreControls --> Compass
+CoreControls --> VizualizationControls
+@enduml

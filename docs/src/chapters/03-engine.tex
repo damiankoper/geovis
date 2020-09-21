@@ -508,7 +508,7 @@ Niech $T : \mathbb{R}^3 \to \mathbb{R}^{4\times4}$ będzie funkcją konstruując
 
 Komponent Silnika zaimplementowany został w~języku TypeScript\cite{TypeScript}. Jest on nadzbiorem języka JavaScript i~umożliwia korzystanie ze statycznego typowania, które w~JavaScripcie nie jest możliwe. Udostępnia tworzenie unii typów, zawiera mechanizmy ich inferencji. Wprowadza wzorzec dekoratorów, zawiera obsługę formatu JSX i~dodaje zmienne wyliczeniowe. Rozszerza możliwości programowania obiektowego o~typy generyczne. Przed uruchomieniem musi być transpilowany do języka JavaScript. Walidacja utworzonego kodu pod względem poprawności typowania następuje w~momencie transpilacji i~nie jest dokonywana podczas jego wykonywania. 
 
-Zaletą stosowania statycznego typowania jest zniw elowanie możliwości pomyłek programisty związanych z~nieznajomością interfejsów używanych klas i~modułów. Statycznie typowany kod sam w~sobie stanowi źródło swojej dokumentacji, a~mechanizmy refleksji pozwalają na jeszcze bardziej rozległą walidację typów i~dynamiczne generowanie dokumentacji.
+Zaletą stosowania statycznego typowania jest zniwelowanie możliwości pomyłek programisty związanych z~nieznajomością interfejsów używanych klas i~modułów. Statycznie typowany kod sam w~sobie stanowi źródło swojej dokumentacji, a~mechanizmy refleksji pozwalają na jeszcze bardziej rozległą walidację typów i~dynamiczne generowanie dokumentacji.
 
 Systemu wizualizacji danych geograficznych jako całość nazwany został \textit{GeoVis}, co jest skrótem wyrażenia \textit{\textbf{Geo}graphic \textbf{Vis}ualization}. Komponent Silnika przyjął nazwę \mbox{\textit{GeoVisEngine}} i~składa się z~modułu \mbox{\textit{GeoVisCore}}, który osadzony jest w~eksportowanym komponencie \mbox{\textit{GeoVisCoreVue}}. Relację pomiędzy ogólnymi komponentami przedstawiona jest na diagramie~\ref{fig:c3_geo_vis_engine}. Kod silnika podzielony został na domeny, które realizują zadania według odkreślonej odpowiedzialności. Są to:
 
@@ -696,10 +696,59 @@ Dotychczas opisane elementy służyły tylko i~wyłącznie do obsługi grafiki w
 
 Vue.js jest frameworkiem języka JavaScript skupiający się w~dużej mierze na wyświetlaniu i~aktualizowaniu zdefiniowanych widoków~\cite{Vue}. Określany jest przez twórców jako \textit{priogresywny}, ponieważ posiada wysokie zdolności to adaptacji i~integracji z~innymi bibliotekami. Inne funkcjonalności, takie jak obsługa routera, czy przechowywanie globalnego stanu aplikacji, oferują oficjalne biblioteki poboczne. W tworzeniu interfejsu użytkownika, tak jak inne popularne biblioteki, proponuje podejście oparte na komponentach. Gdzie rozwój i~testowanie skupia się na zawartych w~pojedynczych plikach, w~pełni funkcjonalnych części interfejsu. Podejście to pozwala na izolację testowanych komponentów oraz ułatwia zarządzenie ich ponowne użycie w~innych miejscach projektów. Vue.js nie oferuje jednoznacznie zdefiniowanego monolitycznego środowiska uruchomieniowego. Nie stoi to na przeszkodzie, aby takie zdefiniowane środowisko powstało. Przykładem jest takiego środowiska jest framework Nuxt.js oparty na Vue.js~\cite{Nuxt}. Vue.js w~wersji drugiej nie był pisany tak, aby w~pełni wspierać język TypeScript, choć mimo to typy dostarczonych obiektów są eksportowane razem z~nimi. Brak kompatybilności jest widoczny między innymi w~przypadku eksportu typów podczas budowania biblioteki komponentu oraz w~samej konfiguracji projektu i~oficjalnych bibliotek pobocznych. Wersja trzecia frameworka została kompletnie oparta na języku TypeScript. 
 
-Komponent Silnika eksportowany jest jako komponent Vue.js, który posiada osadzony element \texttt{Canvas} razem z~modułem \texttt{GeoVisCore}. Eksportowane są również przykładowe wizualizacje i~wszystkie potrzebne użytkownikowi Silnika klasy i~interfejsy. Komponent ten może być póżniej zaimportowany i~osadzony w~dowolnym innym komponencie apliakcji chcących wyświetlać wizualizacje. Konstrukcja struktury projektu w~taki sposób daje wszystkie korzyści, jakie daje rozwój aplikacji opartej na komponentach. Są to między innymi opisane wcześniej izolowane testowanie i~wielokrotne ich użycie. 
+Komponent Silnika eksportowany jest jako komponent Vue.js, który posiada osadzony element \texttt{Canvas} razem z~modułem \texttt{GeoVisCore}. Eksportowane są również przykładowe wizualizacje i~wszystkie potrzebne użytkownikowi Silnika klasy i~interfejsy. Komponent ten może być póżniej zaimportowany i~osadzony w~dowolnym innym komponencie apliakcji chcących wyświetlać wizualizacje. Konstrukcja struktury projektu w~taki sposób daje wszystkie korzyści, jakie daje rozwój aplikacji opartej na komponentach. Są to między innymi opisane wcześniej izolowane testowanie i~możliwość wielokrotnego użycia komponentów. 
+
+Vue proponuje format plików komponentów zwany SFC (ang. Single File Component). Jeden taki plik w~pełni definiuje zachowanie i~wygląd komponentu. Zawiera on trzy sekcje: \texttt{template}, przechowującą kod HTML komponentu opatrzony nieraz specjalnymi dyrektywami frameworka, \texttt{script}, przechowującą właściwą definicję obiektu komponentu i~model jego danych, oraz \texttt{style}, gdzie umieszczany jest kod kaskadowych arkuszy stylów, których zakres może być globalny lub ograniczony tylko do właściwego sobie komponentu. Pliki w~takiej formie nie są rozumiane przez przeglądarkę i~przed uruchomieniem muszą być odpowiednio przetworzone. Sposobem na przetworzenie tych plików jest użycie tzw. \textit{module bundlera}, który potrafi zebrać wiele plików w~różnych formatach do zasobów rozumianych przez przeglądarkę - Kodu HTML, JavaScript i~CSS. W ekosystemie Vue.js tego typu rozwiązanie oferuje \mbox{Webpack~\cite{Webpack}.} Opiera się on na koncepcji \textit{loaderów}, skryptów, które z~użyciem właściwych sobie bibliotek tworzą łańcuch kolejnych transformacji dla plików konkretnych formatów. Dzięki temu aplikacja może być zbudowana z~wielu plików źródłowych, które mogą pisane być w~różnych formatach i~mieć różne odpowiedzialności, a~i~tak finalnie złożonych do jednego skryptu wynikowego. 
+
+Przykładem są opisane pliki \texttt{*.vue}, gdzie uproszczony łańcuch transformacji, właściwy dla konfiguracji komponentu Silnika, przedstawiony jest na rysunku~\ref{fig:c3_webpack}. Loader \texttt{vue-loader} rozdziela pliki \texttt{*.vue} na trzy wcześniej opisane części i~każdą z~nich traktuje jako odzielny moduł wymagający własnego przetworzenia. Loader \texttt{ts-loader} dokonuje transpilacji kodu z~języka TypeScript na JavsScript, a~\texttt{sass-loader} transpiluje style z~notacji SCSS i~SASS na CSS.
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.6]{diagrams/out/c3_webpack.png}
+    \caption{Uproszczony łańcuch transformacji plików \texttt{*.vue}}
+    \label{fig:c3_webpack}
+\end{figure}
+
+\subsubsection{Komponenty Vue.js interfejsu użytkownika}
+
+Struktura komponentów przedstawiona została na rysunku~\ref{fig:c3_vue}. Komponent \texttt{GeoVisCoreVue} jest komponentem eksportowanym i~przeznaczonym do osadzenia w~używającej aplikacji używającej Silnik. Zarządza on elementem Canvas oraz instancją klasy \texttt{GeoVisCore} i~zagnieżdża pozostałe komponenty interfejsu użytkownika.
+
+Komponenty tworzą strukturę drzewiastą. Przekazywanie danych pomiędzy nimi może zachodzić w~dwie strony. Od góry do dołu dane - zmienne i~stałe mogą być przekazywane poprzez tzw. \textit{properties}, definiowane w~szablonie tak jak atrybuty znacznika HTML. W górę drzewa dane przekazywane są za pomocą zdarzeń, które to komponent musi wyemitować, a~komponent go zagnieżdżający może je obsłużyć. Komponent \texttt{GeoVisCoreVue} do poprawnego działania potrzebuje obiektu wyświetlanej wizualizacji, który jest przekazywany przez \textit{property} \texttt{visualization}.
+
+Do podstawowych komponentów, takich jak przyciski, czy też komponenty siatki, użyty został framework Vuetify~\cite{Vuetify}. Dostarcza on komponenty w~stylu \texttt{Material Design}, oznaczone przedrostkiem \texttt{v}, na przykład \texttt{v-btn}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.6]{diagrams/out/c3_vue.png}
+    \caption{Struktura komponentów Vue.js Silnika}
+    \label{fig:c3_vue}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{img/c3_controls.png}
+    \caption{Elementy kontrolne wizualizacji}
+    \label{fig:c3_controls}
+\end{figure}
 
 
-% Webpack i budowanie
+Komponent \texttt{CoreControls}, nałożony na element \texttt{Canvas}, pokazany na rysunku \ref{fig:c3_controls}, odpowiedzialny jest głównie za pracę prawego panelu kontrolnego. Zagnieżdża on komponent \texttt{Compass}, po którego kliknięciu wywoływana jest metoda \texttt{rotateNorth} kontrolera kamery. Przyciski poniżej odpowiedzialne są za przybliżanie i~oddalanie kamery - metody \texttt{zoomIn} i~\texttt{zoomOut} kontrolera kamery. Kompas oraz współrzędne geograficzne widoczne na lewo od skrajnego prawego panelu aktualizowane są na skutek wyemitowania zdarzenia \texttt{onNorthAngleChange} i~\texttt{onGlobalOrbitChange} przez kontroler kamery. Aktualizacja wyświetlanych danych z~każdą emisją odpowiadającym im zdarzeń nie jest potrzebna i~powodowałaby straty wydajności. Wykorzystywany jest tutaj mechanizm \texttt{throttle}, który dostarcza biblioteka Lodash~\cite{lodash}. Zdarzenia obsługiwane są maksymalnie do  $142,85$~ms. 
+\texttt{CoreControls} zagnieżdża też panel wyświetlający metadane oraz panel kontrolny dostarczany przez wizualizację. Po lewej stronie ekranu znajduje się przycisk pokazujący i~ukrywający dodatkowy panel (rysunki~\ref{fig:c3_controls} i~\ref{fig:c3_controls_open}). Po kliknięciu na zakładkę \textit{Controls}, ukazuje się panel kontrolny wizualizacji (rysunek~\ref{fig:c3_controls_earth}).
 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{img/c3_controls_open.png}
+    \caption{Elementy kontrolne wizualizacji - otwarty panel dodatkowy}
+    \label{fig:c3_controls_open}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=2.1]{img/c3_controls_earth.png}
+    \caption{Elementy kontrolne wizualizacji - panel kontrolny wizualizacji}
+    \label{fig:c3_controls_earth} 
+\end{figure}
 
 \section{Podsumowanie}
+

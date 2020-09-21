@@ -1,0 +1,49 @@
+@startuml
+'left to right direction
+'skinparam Linetype ortho
+
+object input.vue
+
+object "vue-loader" as vueloader{
+    ***.vue**
+}
+
+input.vue --> vueloader
+
+object "sass-loader" as sassloader{
+    ***.scss** 
+    ***.sass**
+}
+
+object "postcss-loader" as postloader{
+    ***.css** 
+}
+
+object "css-loader" as cssloader{
+    ***.css** 
+}
+
+object "vue-style-loader" as vuestyleloader{
+    ***.css**
+}
+object "ts-loader" as tsloader {
+    ***.ts**
+}
+object "babel-loader" as babelloader{
+    ***.js**
+}
+vueloader --> sassloader : **style**
+sassloader --> postloader
+postloader --> cssloader
+cssloader --> vuestyleloader
+object output.js
+
+vuestyleloader --> output.js
+
+vueloader --> tsloader : **script**
+tsloader --> babelloader
+babelloader ----> output.js
+
+vueloader ---> output.js : **template**
+
+@enduml
