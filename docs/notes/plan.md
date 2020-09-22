@@ -107,8 +107,8 @@ Możliwość ruchu w każdej z nich, a także przybliżania i oddalania.
 ## Ograniczenia, możliwości optymalizacji i rozwoju
 
 - Ograniczenia wynikające z użycia Webpacka razem z Vue do budowania całej biblioteki.
-  - eksport typów TypeScriptu nie jest domyślnie wspierany. Wymaga modyfikacji.
-  - użycie przykładowych wizualizacji wymaga ręcznego przekopiowania dodatkowych assetów i workerów
+- eksport typów TypeScriptu nie jest domyślnie wspierany. Wymaga modyfikacji.
+- użycie przykładowych wizualizacji wymaga ręcznego przekopiowania dodatkowych assetów i workerów
 
 # 4. Wizualizacje
 
