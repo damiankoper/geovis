@@ -48,3 +48,64 @@ export default class StarsVis extends Visualization {
 Obiekt 3D \texttt{THREE.Mesh} w metodzie \texttt{update} obracany jest w osi $OY$ o pewien kąt. Kąt ten wynika z czasu słonecznego, ponieważ wizualizacja ta domyślnie ma stanowić tło dla wizualizacji Ziemi w czasie rzeczywistym. Może być ona również rozszerzona, aby obsługiwać każdy inny dowolny czas. Kiedy kamera jest nieruchowa względem punktu na Ziemi, jej obrót w okół własnej osi widoczny jest jako obrót tła w przeciwnym kierunku. Klasa TimeService, dokładniej opisana w dalszej części pracy, zawiera metodę \texttt{getHourAngle}, która dla danej strefy czasowej oblicza kąt obrotu słońca od danej długości geograficznej o danym czasie~\cite{SolarTime}. Punktem odniesienia jest południk $\ang{0}$ i strefa czasowa \textit{+00:00}. 
 
 \section{Atmosfera}
+
+Wizualizacja atmosfery stanowi wizualną dekorację dla innych wizualizacji. Składa się ona z dwóch osobno generowanych części. Wizualnie atmosfera to poświata widoczna nad powierzchnią planety, która zanika wraz ze wzrostem wysokości punktu nad powierzchnią. Na efekt też wpływa sama grubość atmosfery, jej skład chemiczny, oraz gęstość w poszczególnych jej partiach.
+
+Utworzona wizualizacja nie posiada rozbudowanych możliwości konfiguracji i została stworzona do współpracy z wizualizacją Ziemi w dużej skali. Na efekt poświaty składają się dwa obiekty. Pierwszym jest kula, której średnica odpowiada średnicy planety razem z grubością atmosfery. Wyświetlana jest jej wewnętrzna część i znając pozycje obserwatora, wyświetlana jest właściwie zanikająca poświata. Drugim obiektem jest kula rozmiarów planety, która zawsze generowana jest przed nią i odpowiada za poświatę widoczną bezpośrednio nad planetą. Na rysunku~\ref{fig:c4_atmosphereVis} przedstawiono efekt atmosfery bez planety. Istotne są tutaj jedynie krawędzie widocznego okręgu, ponieważ jego środek ukryty będzie za planetą. Dla obserwatora Na rysunku~\ref{fig:atmosphere} przedstawiono schemat elementów kluczowych dla wyliczenia parametrów atmosfery. Kamera znajduje się w punkcie $c_l$. Okrąg rysowany linią ciągłą symbolizuje powierzchnię planety, a linią przerywaną, zasięg atmosfery. Wektor $\vv t$ stanowi przedłużenie wektora $\vv{g_v}$ o grubość atmosfery.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{img/c4_atmosphereVis.png}
+  \caption{Wizualizacja atmosfery - klasa \texttt{AtmosphereVis}}
+  \label{fig:c4_atmosphereVis} 
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \input{drawings/atmosphere.tex}
+  \caption{Schemat elementów kluczowych dla wyliczenia parametrów atmosfery}
+  \label{fig:atmosphere}
+\end{figure}
+
+\begin{lstlisting}[float, language=javascript, label={lst:atmosphereVis}, caption={
+  Fragmenty klasy \texttt{StarsVis}}
+]
+public atmosphereMaterial = new THREE.ShaderMaterial({
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    start: { value: 1 },
+    stop: { value: 0.6 },
+    fadeOut: { value: 0 },
+    light: { value: 0 },
+    power: { value: 1.25 },
+    glowColor: { value: new THREE.Color(0x87ceeb) },
+    viewVector: { value: new THREE.Vector3() },
+    ...THREE.UniformsLib.lights,
+  },
+  depthFunc: THREE.NeverDepth,
+  lights: true,
+  transparent: true,
+  side: THREE.BackSide,
+  depthWrite: false,
+});
+\end{lstlisting}
+
+Na listingu~\ref{lst:atmosphereVis} przedstawiono inicjalizację materiału odpowiedzialnego za poświatę nad planetą. Klasa \texttt{THREE.ShaderMaterial} pozwala kontrolować cały proces rysowania punktów, ponieważ wymaga dostarczenia obydwu typów shaderów. Tak jak w przypadku materiału w wizualizacji \texttt{StarsVis}, materiał definiuje też ustawienia modyfikacji z-bufora i strony wyświetlanego trójkąta. Materiał definiuje również stałe dla jednego procesu rysowania (\texttt{uniforms}). 
+W procesie rysowania poświata generowana jest w zależności od kąta pomiędzy wektorem normalnym płaszczyzny dla wierzchołka, a wektorem określającym kierunek obserwacji. Niżej opisano stałe przekazywane do materiału.
+
+\begin{enumerate}
+
+  \item \texttt{start} - ułamek liczby $\pi$ w zakresie $\lbrack0; 1\rbrack$, która stanowi kąt wektora obserwatora z normalną wierzchołka, od którego rozpoczyna się rysowanie poświaty. Wartość ta zawsze wynosi $1$, co oznacza, że poświata rysowana jest od wierzchołków najdalej od kamery. Jego normalna na rysunku \ref{fig:atmosphere} oznaczona została wektorem $\vv n$. Kąt między nią, a wektorem $\vv{g_v} + \vv{l_v}$ wynosi $\ang{180}$, czyli $1 \cdot \pi$.
+  \item \texttt{stop} - ułamek liczby $\pi$ w zakresie $\lbrack0; 1\rbrack$, która stanowi kąt wektora obserwatora z normalną wierzchołka, od którego kończy się rysowanie poświaty o pełnej przezroczystości. Ostatnim widocznym z kamery punktem jest punkt $c_{gtb}$. Dalsza część schowana jest za planetą. Kąt ten wyliczany jest z zależności $\beta+\gamma$. Sposób wyliczenia poszczególnych kątów pokazano na równaniach~\ref{eq:atm_beta}~i~\ref{eq:atm_gamma}.
+  \item TODO: NEXT
+\end{enumerate}
+
+\begin{align}
+  \label{eq:atm_alfa}
+  \alpha &= acos(\frac{\length{\vv{g_v}+\vv{t}}}{\length{\vv{g_v}+\vv{l_v}}}) \\
+  \label{eq:atm_beta}
+  \beta &= acos(\frac{\length{\vv{g_v}}}{\length{\vv{g_v}+\vv{l_v}}}) \\
+  \label{eq:atm_gamma}
+  \gamma &= acos(\frac{\length{\vv{g_v}}}{\length{\vv{g_v}+\vv{t}}})
+\end{align}

@@ -1,11 +1,12 @@
-\newlength{\gRadius}
 \setlength{\gRadius}{3cm}
 \newlength{\atmThickness}
 \setlength{\atmThickness}{1cm}
 
-\begin{tikzpicture}[scale=1]
+\begin{tikzpicture}[scale=1.5]
     \coordinate (G) at (65:\gRadius);
     \coordinate (GT) at (65:\gRadius+\atmThickness);
+    \coordinate (N) at (-90:\gRadius+\atmThickness);
+    \coordinate (NE) at (-90:\gRadius+\atmThickness+0.5cm);
     \coordinate (camera) at (90:\gRadius + \atmThickness + 1cm);
     \coordinate (center) at (90:0);
     \coordinate (atmTangent) at (126.869897646:\gRadius + \atmThickness);
@@ -14,30 +15,33 @@
 
     \draw[thick] circle (\gRadius);
     \draw[thick,dashed] circle (\gRadius+\atmThickness);
-    \draw[fill] (camera) circle (1pt) node[above,right] {$C$};
-    \draw[->] (center) -- (camera) node[midway,above,sloped] {\tiny$\vec G + \vec L$};
-    \draw[->] (center) -- (G) node[midway,above,sloped] {\tiny$\vec G$};
-    \draw[->] (G) -- (GT) node[midway,above,sloped] {\tiny$\vec T$};
-    \draw[->] (G) -- (camera) node[midway,above,sloped] {\tiny$\vec L$};
+    \draw[fill] (camera) circle (1pt) node[above,right] {$c_l$};
+    \draw[->] (center) -- (camera) node[midway,above,sloped] {$\vv {g_v} + \vv{ l_v}$};
+    \draw[->] (center) -- (G) node[midway,above,sloped] {$\vv {g_v}$};
+    \draw[->] (G) -- (GT) node[midway,above,sloped] {$\vv t$};
+    \draw[->] (G) -- (camera) node[midway,above,sloped] {$\vv{ l_v}$};
     \draw[dashed] (camera) -- (atmTangent);
     \draw[dashed] (camera) -- (gTangent);
 
-    \draw[fill] (gTangent) circle (1pt) node[above,left] {$C_g$};
-    \draw[fill] (atmTangent) circle (1pt) node[above,left] {$C_{gt}$};
-    \draw[fill] (atmBackTangent) circle (1pt) node[above,left] {$C_{gtb}$};
+    \draw[fill] (gTangent) circle (1pt) node[above,left] {$c'_g$};
+    \draw[fill] (atmTangent) circle (1pt) node[above,left] {$c_{gt}$};
+    \draw[fill] (atmBackTangent) circle (1pt) node[above,left] {$c_{gtb}$};
 
-    \draw[->] (center) -- (atmTangent) node[midway,below,sloped] {\tiny$\vec G + \vec T$ };
+    \draw[->] (center) -- (atmTangent) node[midway,below,sloped] {$\vv {g'_v} + \vv {t'}$ };
     \draw pic["$\alpha$",draw=blue,thick,blue, ->, angle eccentricity=1.2, angle radius = 1.3cm]  {angle=camera--center--atmTangent};
     \draw pic["$\cdot$",draw, -, angle eccentricity=0.5, angle radius = 0.4cm]  {angle=center--atmTangent--camera};
 
-    \draw[->] (center) -- (gTangent) node[midway,below,sloped] {\tiny$\vec G$ };
+    \draw[->] (center) -- (gTangent) node[midway,below,sloped] {$\vv {g'''_v}$ };
     \draw pic["$\beta$",draw=orange,thick,orange, ->, angle eccentricity=1.2, angle radius = 1.8cm]  {angle=camera--center--gTangent};
     \draw pic["$\cdot$",draw, -, angle eccentricity=0.5, angle radius = 0.4cm]  {angle=center--gTangent--camera};
 
     \draw[dashed] (gTangent) -- (atmBackTangent);
     \draw pic["$\cdot$",draw, -, angle eccentricity=0.5, angle radius = 0.4cm]  {angle=atmBackTangent--gTangent--center};
     \draw pic["$\gamma$",draw=red,thick,red, ->, angle eccentricity=1.2, angle radius = 1cm]  {angle=gTangent--center--atmBackTangent};
-    \draw[->] (center) -- (atmBackTangent) node[midway,below,sloped] {\tiny$\vec G + \vec T$ };
+    \draw[->] (center) -- (atmBackTangent) node[midway,below,sloped] {$\vv {g''_v} + \vv {t''}$ };
+    \draw[fill] (0,0) circle (1pt) node[right] {$s$};
+    \draw[fill] (G) circle (1pt) node[right] {$c_g$};
+    \draw[->] (N) -- (NE) node[midway,above,sloped] {$\vv n$};
 
 \end{tikzpicture}
 
