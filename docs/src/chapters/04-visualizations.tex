@@ -1,105 +1,104 @@
 \chapter{Wizualizacje}
 
-Rozdział ten opisuje obiekty wizualizacji, które powstały podczas rozwoju komponentu Silnika. Ich opis będzie postępował w kolejności od najprostszych, do tych bardziej skomplikowanych, których te prostsze stanową podstawę. Opisane zostaną również bardziej złożone aspekty renderowania grafiki, jeśli wizualizacje z takich korzystają.
-Wizualizacje te są po części demonstracją możliwości Silnika i nie były tworzone z zachowaniem stuprocentowej dokładności odwzorowania zjawisk.
+Rozdział ten opisuje obiekty wizualizacji, które powstały podczas rozwoju komponentu Silnika. Ich opis będzie postępował w~kolejności od najprostszych, do tych bardziej skomplikowanych, których te prostsze stanową podstawę. Opisane zostaną również bardziej złożone aspekty renderowania grafiki, jeśli wizualizacje z~takich korzystają.
+Wizualizacje te są po części demonstracją możliwości Silnika i~nie były tworzone z~zachowaniem stuprocentowej dokładności odwzorowania zjawisk.
 
 \section{Gwiazdy}
 
-Wizualizacja ta wyświetla teksturę kosmosu nałożoną na wewnętrzną część kuli - rysunek~\ref{fig:c4_starsVis}. Kamera znajduje się w jej środku, więc przeciągnięcie widoku w jedną stronę skutkuje przesunięciem się tekstury kosmosu w przeciwną. Wizualizacja ta nie modyfikuje ustawień kamery oraz nie definiuje swojego panelu kontrolnego. Tekstura gwiazd pochodzi ze strony \url{https://www.solarsystemscope.com/}~\cite{SolarTextures}. 
+Wizualizacja ta wyświetla teksturę kosmosu nałożoną na wewnętrzną część kuli - rysunek~\ref{fig:c4_starsVis}. Kamera znajduje się w~jej środku, więc przeciągnięcie widoku w~jedną stronę skutkuje przesunięciem się tekstury kosmosu w~przeciwną. Wizualizacja ta nie modyfikuje ustawień kamery oraz nie definiuje swojego panelu kontrolnego. Tekstura gwiazd pochodzi ze strony \url{https://www.solarsystemscope.com/}~\cite{SolarTextures}. 
 
 \begin{figure}[h]
-    \centering
-    \includegraphics[width=\linewidth]{img/c4_starsVis.png}
-    \caption{Wizualizacja gwiazd - klasa \texttt{StarsVis}}
-    \label{fig:c4_starsVis} 
+  \centering
+  \includegraphics[width=\linewidth]{img/c4_starsVis.png}
+  \caption{Wizualizacja gwiazd - klasa \texttt{StarsVis}}
+  \label{fig:c4_starsVis} 
 \end{figure}
 
-Na listingu~\ref{lst:starsVis} pokazano część klasy \texttt{StarsVis} definiującą tę wizualizację. Kula tworzona jest z użyciem klasy \texttt{THREE.SphereGeometry}, a jej materiał \texttt{THREE.MeshBasicMaterial} zawiera ustawienia definiujące jej wyświetlanie. Ustawienie \mbox{\texttt{side:THREE.BackSide}} sprawia, że teksturowane są odwrotna niż zwykle strona rysowanego trójkąta. Ustawienia \mbox{\texttt{depthWrite:false}} oraz \mbox{\texttt{depthFunc:THREE.NeverDepth}} sprawiają, że obiekt nie będzie wpływał na wartość z-bufora, oraz będzie rysowany zawsze za innymi obiektami, co jest oczekiwane od obiektu tła. 
+Na listingu~\ref{lst:starsVis} pokazano część klasy \texttt{StarsVis} definiującą tę wizualizację. Kula tworzona jest z~użyciem klasy \texttt{THREE.SphereGeometry}, a~jej materiał \texttt{THREE.MeshBasicMaterial} zawiera ustawienia definiujące jej wyświetlanie. Ustawienie \mbox{\texttt{side:THREE.BackSide}} sprawia, że teksturowane są odwrotna niż zwykle strona rysowanego trójkąta. Ustawienia \mbox{\texttt{depthWrite:false}} oraz \mbox{\texttt{depthFunc:THREE.NeverDepth}} sprawiają, że obiekt nie będzie wpływał na wartość z-bufora, oraz będzie rysowany zawsze za innymi obiektami, co jest oczekiwane od obiektu tła. 
 
 
 \begin{lstlisting}[float, language=javascript, label={lst:starsVis}, caption={
-    Fragmenty klasy \texttt{StarsVis}}
+  Fragmenty klasy \texttt{StarsVis}}
 ]
 /* ... */
 export default class StarsVis extends Visualization {
-  private stars = new THREE.SphereGeometry(40000, 10, 10);
-  private starsMaterial = new THREE.MeshBasicMaterial({
-    side: THREE.BackSide,
-    map: new THREE.TextureLoader().load(starsMap),
-    depthWrite: false,
-    depthFunc: THREE.NeverDepth,
-  });
-  private mesh = new THREE.Mesh(this.stars, this.starsMaterial);
-  /* ... */
-  public setupCamera(camera: TrackballCamera): void {
-    //
-  }
-  public setupScene(scene: THREE.Scene, group: THREE.Group): void {
-    this.mesh.renderOrder = 0;
-    group.add(this.mesh);
-  }
-  public update(deltaFactor: number): void {
-    this.mesh.rotation.y = TimeService.getHourAngle();
-  }
-  /* ... */
+private stars = new THREE.SphereGeometry(40000, 10, 10);
+private starsMaterial = new THREE.MeshBasicMaterial({
+  side: THREE.BackSide,
+  map: new THREE.TextureLoader().load(starsMap),
+  depthWrite: false,
+  depthFunc: THREE.NeverDepth,
+});
+private mesh = new THREE.Mesh(this.stars, this.starsMaterial);
+/* ... */
+public setupCamera(camera: TrackballCamera): void {
+  //
+}
+public setupScene(scene: THREE.Scene, group: THREE.Group): void {
+  this.mesh.renderOrder = 0;
+  group.add(this.mesh);
+}
+public update(deltaFactor: number): void {
+  this.mesh.rotation.y = TimeService.getHourAngle();
+}
+/* ... */
 }
 \end{lstlisting}
 
-Obiekt 3D \texttt{THREE.Mesh} w metodzie \texttt{update} obracany jest w osi $OY$ o pewien kąt. Kąt ten wynika z czasu słonecznego, ponieważ wizualizacja ta domyślnie ma stanowić tło dla wizualizacji Ziemi w czasie rzeczywistym. Może być ona również rozszerzona, aby obsługiwać każdy inny dowolny czas. Kiedy kamera jest nieruchowa względem punktu na Ziemi, jej obrót w okół własnej osi widoczny jest jako obrót tła w przeciwnym kierunku. Klasa TimeService, dokładniej opisana w dalszej części pracy, zawiera metodę \texttt{getHourAngle}, która dla danej strefy czasowej oblicza kąt obrotu słońca od danej długości geograficznej o danym czasie~\cite{SolarTime}. Punktem odniesienia jest południk $\ang{0}$ i strefa czasowa \textit{+00:00}. 
+Obiekt 3D \texttt{THREE.Mesh} w~metodzie \texttt{update} obracany jest w~osi $OY$ o~pewien kąt. Kąt ten wynika z~czasu słonecznego, ponieważ wizualizacja ta domyślnie ma stanowić tło dla wizualizacji Ziemi w~czasie rzeczywistym. Może być ona również rozszerzona, aby obsługiwać każdy inny dowolny czas. Kiedy kamera jest nieruchowa względem punktu na Ziemi, jej obrót w~okół własnej osi widoczny jest jako obrót tła w~przeciwnym kierunku. Klasa TimeService, dokładniej opisana w~dalszej części pracy, zawiera metodę \texttt{getHourAngle}, która dla danej strefy czasowej oblicza kąt obrotu słońca od danej długości geograficznej o~danym czasie~\cite{SolarTime}. Punktem odniesienia jest południk $\ang{0}$ i~strefa czasowa \textit{+00:00}. 
 
 \section{Atmosfera}
 
-Wizualizacja atmosfery stanowi wizualną dekorację dla innych wizualizacji. Składa się ona z dwóch osobno generowanych części. Wizualnie atmosfera to poświata widoczna nad powierzchnią planety, która zanika wraz ze wzrostem wysokości punktu nad powierzchnią. Na efekt też wpływa sama grubość atmosfery, jej skład chemiczny, oraz gęstość w poszczególnych jej partiach.
+Wizualizacja atmosfery stanowi wizualną dekorację dla innych wizualizacji. Składa się ona z~dwóch osobno generowanych części. Wizualnie atmosfera to poświata widoczna nad powierzchnią planety, która zanika wraz ze wzrostem wysokości punktu nad powierzchnią. Na efekt też wpływa sama grubość atmosfery, jej skład chemiczny, oraz gęstość w~poszczególnych jej partiach.
 
-Utworzona wizualizacja nie posiada rozbudowanych możliwości konfiguracji i została stworzona do współpracy z wizualizacją Ziemi w dużej skali. Na efekt poświaty składają się dwa obiekty. Pierwszym jest kula, której średnica odpowiada średnicy planety razem z grubością atmosfery. Wyświetlana jest jej wewnętrzna część i znając pozycje obserwatora, wyświetlana jest właściwie zanikająca poświata. Drugim obiektem jest kula rozmiarów planety, która zawsze generowana jest przed nią i odpowiada za poświatę widoczną bezpośrednio nad planetą. Na rysunku~\ref{fig:c4_atmosphereVis} przedstawiono efekt atmosfery bez planety. Istotne są tutaj jedynie krawędzie widocznego okręgu, ponieważ jego środek ukryty będzie za planetą. Dla obserwatora Na rysunku~\ref{fig:atmosphere} przedstawiono schemat elementów kluczowych dla wyliczenia parametrów atmosfery. Kamera znajduje się w punkcie $c_l$. Okrąg rysowany linią ciągłą symbolizuje powierzchnię planety, a linią przerywaną, zasięg atmosfery. Wektor $\vv t$ stanowi przedłużenie wektora $\vv{g_v}$ o grubość atmosfery.
+Utworzona wizualizacja nie posiada rozbudowanych możliwości konfiguracji i~została stworzona do współpracy z~wizualizacją Ziemi w~dużej skali. Na efekt poświaty składają się dwa obiekty. Pierwszym jest kula, której średnica odpowiada średnicy planety razem z~grubością atmosfery. Wyświetlana jest jej wewnętrzna część i~znając pozycje obserwatora, wyświetlana jest właściwie zanikająca poświata. Drugim obiektem jest kula rozmiarów planety, która zawsze generowana jest przed nią i~odpowiada za poświatę widoczną bezpośrednio nad planetą. Na rysunku~\ref{fig:c4_atmosphereVis} przedstawiono efekt atmosfery bez planety. Istotne są tutaj jedynie krawędzie widocznego okręgu, ponieważ jego środek ukryty będzie za planetą. Na rysunku~\ref{fig:atmosphere} przedstawiono schemat elementów kluczowych dla wyliczenia parametrów atmosfery. Kamera znajduje się w~punkcie $c_l$. Okrąg rysowany linią ciągłą symbolizuje powierzchnię planety, a~linią przerywaną, zasięg atmosfery. Wektor $\vv t$ stanowi przedłużenie wektora $\vv{g_v}$ o~grubość atmosfery. Widoczny dla obserwatora fragment atmosfery jest łukiem pomiędzy punktami $c_{gtb}$~i~$c_{gt}$.
 
 \begin{figure}
-  \centering
-  \includegraphics[width=\linewidth]{img/c4_atmosphereVis.png}
-  \caption{Wizualizacja atmosfery - klasa \texttt{AtmosphereVis}}
-  \label{fig:c4_atmosphereVis} 
+\centering
+\includegraphics[width=\linewidth]{img/c4_atmosphereVis.png}
+\caption{Wizualizacja atmosfery - klasa \texttt{AtmosphereVis}}
+\label{fig:c4_atmosphereVis} 
 \end{figure}
 
 \begin{figure}[h]
-  \centering
-  \input{drawings/atmosphere.tex}
-  \caption{Schemat elementów kluczowych dla wyliczenia parametrów atmosfery}
-  \label{fig:atmosphere}
+\centering
+\input{drawings/atmosphere.tex}
+\caption{Schemat elementów kluczowych dla wyliczenia parametrów atmosfery}
+\label{fig:atmosphere}
 \end{figure}
 
 \begin{lstlisting}[float, language=javascript, label={lst:atmosphereVis}, caption={
-  Fragmenty klasy \texttt{StarsVis}}
+Fragmenty klasy \texttt{StarsVis}}
 ]
 public atmosphereMaterial = new THREE.ShaderMaterial({
-  vertexShader: vertexShader,
-  fragmentShader: fragmentShader,
-  uniforms: {
-    start: { value: 1 },
-    stop: { value: 0.6 },
-    fadeOut: { value: 0 },
-    light: { value: 0 },
-    power: { value: 1.25 },
-    glowColor: { value: new THREE.Color(0x87ceeb) },
-    viewVector: { value: new THREE.Vector3() },
-    ...THREE.UniformsLib.lights,
-  },
-  depthFunc: THREE.NeverDepth,
-  lights: true,
-  transparent: true,
-  side: THREE.BackSide,
-  depthWrite: false,
+vertexShader: vertexShader,
+fragmentShader: fragmentShader,
+uniforms: {
+  start: { value: 1 },
+  stop: { value: 0.6 },
+  fadeOut: { value: 0 },
+  light: { value: 0 },
+  power: { value: 1.25 },
+  glowColor: { value: new THREE.Color(0x87ceeb) },
+  viewVector: { value: new THREE.Vector3() },
+  ...THREE.UniformsLib.lights,
+},
+depthFunc: THREE.NeverDepth,
+lights: true,
+transparent: true,
+side: THREE.BackSide,
+depthWrite: false,
 });
 \end{lstlisting}
 
-Na listingu~\ref{lst:atmosphereVis} przedstawiono inicjalizację materiału odpowiedzialnego za poświatę nad planetą. Klasa \texttt{THREE.ShaderMaterial} pozwala kontrolować cały proces rysowania punktów, ponieważ wymaga dostarczenia obydwu typów shaderów. Tak jak w przypadku materiału w wizualizacji \texttt{StarsVis}, materiał definiuje też ustawienia modyfikacji z-bufora i strony wyświetlanego trójkąta. Materiał definiuje również stałe dla jednego procesu rysowania (\texttt{uniforms}). 
-W procesie rysowania poświata generowana jest w zależności od kąta pomiędzy wektorem normalnym płaszczyzny dla wierzchołka, a wektorem określającym kierunek obserwacji. Niżej opisano stałe przekazywane do materiału.
+Na listingu~\ref{lst:atmosphereVis} przedstawiono inicjalizację materiału odpowiedzialnego za poświatę nad planetą. Klasa \texttt{THREE.ShaderMaterial} pozwala kontrolować cały proces rysowania punktów, ponieważ wymaga dostarczenia obydwu typów shaderów. Tak jak w~przypadku materiału w~wizualizacji \texttt{StarsVis}, materiał definiuje też ustawienia modyfikacji z-bufora i~strony wyświetlanego trójkąta. Materiał definiuje również stałe dla jednego procesu rysowania (\texttt{uniforms}). Stałe te są aktualizaowane w~każdym cyklu animacji. 
+W procesie rysowania poświata generowana jest w~zależności od kąta pomiędzy wektorem normalnym płaszczyzny dla wierzchołka, a~wektorem określającym kierunek obserwacji. Niżej opisano stałe przekazywane do materiału.
 
-\begin{enumerate}
+\subsubsection{Uniform \texttt{start}}
+Uniform \texttt{start} to ułamek liczby $\pi$ w~zakresie $\lbrack0; 1\rbrack$, który stanowi kąt wektora obserwatora z~wektorem normalnym wierzchołka, od którego rozpoczyna się rysowanie poświaty. Wartość ta zawsze wynosi $1$, co oznacza, że poświata rysowana jest od wierzchołków najdalej od kamery. Jego wektor normalny na rysunku \ref{fig:atmosphere} oznaczony został symbolem $\vv n$. Kąt między nim, a~wektorem $\vv{g_v} + \vv{l_v}$ wynosi $\ang{180}$, czyli $1 \cdot \pi$.
 
-  \item \texttt{start} - ułamek liczby $\pi$ w zakresie $\lbrack0; 1\rbrack$, która stanowi kąt wektora obserwatora z normalną wierzchołka, od którego rozpoczyna się rysowanie poświaty. Wartość ta zawsze wynosi $1$, co oznacza, że poświata rysowana jest od wierzchołków najdalej od kamery. Jego normalna na rysunku \ref{fig:atmosphere} oznaczona została wektorem $\vv n$. Kąt między nią, a wektorem $\vv{g_v} + \vv{l_v}$ wynosi $\ang{180}$, czyli $1 \cdot \pi$.
-  \item \texttt{stop} - ułamek liczby $\pi$ w zakresie $\lbrack0; 1\rbrack$, która stanowi kąt wektora obserwatora z normalną wierzchołka, od którego kończy się rysowanie poświaty o pełnej przezroczystości. Ostatnim widocznym z kamery punktem jest punkt $c_{gtb}$. Dalsza część schowana jest za planetą. Kąt ten wyliczany jest z zależności $\beta+\gamma$. Sposób wyliczenia poszczególnych kątów pokazano na równaniach~\ref{eq:atm_beta}~i~\ref{eq:atm_gamma}.
-  \item TODO: NEXT
-\end{enumerate}
+\subsubsection{Uniform \texttt{stop}}
+Uniform \texttt{stop} to ułamek liczby $\pi$ w~zakresie $\lbrack0; 1\rbrack$, który stanowi kąt wektora obserwatora z~wektorem normalnym wierzchołka, od którego kończy się rysowanie poświaty o~pełnej przezroczystości. Ostatnim widocznym z~kamery punktem jest punkt $c_{gtb}$. Dalsza część schowana jest za planetą. Kąt ten wyliczany jest z~zależności $\beta+\gamma$. Sposób wyliczenia poszczególnych kątów pokazano na równaniach~\ref{eq:atm_beta}~i~\ref{eq:atm_gamma}.
 
 \begin{align}
   \label{eq:atm_alfa}
@@ -109,3 +108,80 @@ W procesie rysowania poświata generowana jest w zależności od kąta pomiędzy
   \label{eq:atm_gamma}
   \gamma &= acos(\frac{\length{\vv{g_v}}}{\length{\vv{g_v}+\vv{t}}})
 \end{align}
+
+
+\subsubsection{Uniform \texttt{fadeOut}}
+Uniform \texttt{fadeOut} to ułamek liczby $\pi$ w~zakresie $\lbrack0; 1\rbrack$, który stanowi kąt wektora obserwatora z~wektorem normalnym wierzchołka, od którego kończy się rysowanie poświaty o~zanikającej przezroczystości. Jest ona interpolowana z~wykorzystaniem funkcji wygładzającej \texttt{expoIn}, którą pokazano na wykresie na rysunku~\ref{fig:c4_expoIn}. Kąt ten wyliczany jest z~zależności $\beta+\gamma-\alpha$.
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}[scale=0.7]
+      \begin{axis}[domain=0:1,xmin=0,xmax=1.1,ymin=0,ymax=1.1,xlabel=$t$, ylabel=$f(t)$, legend pos=north west, width=0.6\textwidth, height=0.5\textwidth]
+          \addplot[blue, ultra thick] {pow(2, 10 * x - 10)};
+          \addlegendentry[text depth=2.5ex]{
+              $f(t) = 
+              \begin{cases}
+                0 & \text{dla } t = 0\\
+                2^{10 \cdot t - 10} & \text{dla } t > 0
+              \end{cases}
+              $
+          };
+      \end{axis}
+  \end{tikzpicture}
+  \caption{Funkcja wygładzająca \textit{expoIn}}
+  \label{fig:c4_expoIn}
+\end{figure}
+\subsubsection{Uniform \texttt{light}}
+Uniform \texttt{light} to ułamek liczby $\pi$ w~zakresie $\lbrack0; 1\rbrack$, który stanowi kąt przesunięcia oświetlanej powierzchni dla światła. Jeśli do sceny zostanie dodane światło kierunkowe to wpływa ono na wygląd atmosfery. W~normalnej sytuacji światło kierunkowe oświetla dokładnie pół kuli. Załóżmy sytuację, w~której kąt padania światła wyznacza wektor rozciągnięty pomiędzy punktami $c'_g$~i~$c_{gtb}$. W~takiej sytuacji atmosfera oświetlona by była na łuku pomiędzy wektorami $\vv {g'''_v}$~i~$\vv {g'_v} + \vv{t'_v}$. Żeby oświetlić pozostałą, widoczną część atmosfery (łuk pomiędzy punktami $c_{gtb}$~i~$c_{gt}$) w~obliczeniach, trzeba uwzględnić kąt $\gamma$.
+
+\subsubsection{Uniform \texttt{power}}
+Uniform \texttt{power} to wykładnik potęgi, do której podniesiona zostaje finalna przezroczystość materiału atmosfery, przed kalkulacją oświetlania. Wartość ta nie jest aktualizaowana i~wynosi $1.25$.
+
+\subsubsection{Uniform \texttt{glowColor}}
+Uniform \texttt{glowColor} to bazowy kolor materiału atmosfery. Nie ulega on zmianie i~ma wartość \texttt{0x87ceeb}. Możliwą poprawą zachowania atmosfery byłaby dynamiczna zmiana koloru atmosfery powiązana z~kątem padania światła, co symulowałoby zmianę koloru w~miejscach zachodu i~wschodu słońca.
+
+\subsubsection{Uniform \texttt{viewVector}}
+Uniform \texttt{viewVector} to wektor jednostkowy skierowany od środka $s$ grupy obrotu do kamery $c_l$. Odpowiada on za orientację wyświetlanej atmosfery zawsze w~kierunku punktu, w~którym znajduje się kamera. Uzyskanie wektora przed normalizacją przedstawiono na równaniu~\ref{eq:c4_atm_1}.
+
+\begin{equation}
+  \label{eq:c4_atm_1}
+  \vv v = q^{-1}([0, 0, \length{\vv{g_v}}]^T + \vv{l_v})q
+\end{equation}
+\begin{eqexpl}[25mm]
+\item {$\vv v$} wektor \texttt{viewVector}
+\item {$q$} kwaternion uzyskany z~macierzy układu odniesienia wizualizacji. W~równaniu obrót następuje w~kierunku odwrotnym.
+\end{eqexpl}
+
+Uniform \texttt{fadeOut} bierze też udział w ujednoliceniu koloru nieba, kiedy kamera schodzi poniżej granicy atmosfery. Zachowanie to nie zostało jednak wystarczajaco rozwinięte, żeby odzwierciedlać realistycznie przejście pomiędzy czernią kosmosu, a niebieskim niebem z użyciem tego samego metariału w procesie rysowania. Pozostałe stałe w opisywanym materiale są uzupełnieniem z obiektu \mbox{\texttt{THREE.UniformsLib.lights}}. Zawierają one dane związane ze światłami obecnymi na scenie. 
+
+Materiał opisujący wygląd drugiej kuli, atmosfery widocznej nad ziemią, ma podobną budowę, korzysta z wyliczonych kątów i podobnych mechanizmów. Biorąc to pod uwagę, nie zostanie on tutaj opisany. 
+
+\section{Ziemia}
+
+Opisane wcześniej wizualizacje kosmosu i atmosfery pozwalają na stworzenie wizualizacji planety. Wizualizacja \texttt{EarthVis} jest wizualizacją planety Ziemi, która prezentuje aktualne jej oświetlenie przez Słońce. Widok początkowy wizualizacji przedstawiono na rysunku~\ref{fig:c4_earthVis_1}. 
+
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{img/c4_earthVis_1.png}
+  \caption{Widok początkowy wizualizacji Ziemi o godzinie 19:50, 27.09.2020r.}
+  \label{fig:c4_earthVis_1} 
+\end{figure}
+  
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{img/c4_earthVis_2.png}
+  \caption{Zachód słońca nad Europą o godzinie 18:54, 27.07.2020r.}
+  \label{fig:c4_earthVis_2} 
+\end{figure}
+  
+Podczas każdej aktualizacji animacji obliczane jest nowe położenie słońca. Poruszając się w układzie odniesienia Ziemi konieczne jest obliczenie deklinacji Słońca, czyli kąta pomiędzy nim, a płaszczyzną równika~\cite{Declination}. Drugą wartością konieczną do wyliczenia jest kąt godzinny~\cite{SolarTime}. Jest to kąt, o jaki obróciło się Słońce od wybranego punktu odniesienia dla wybranej strefy czasowej w konkretnej chwili. Wizualizacja Ziemi stanowi podstawę do wizualizacji połączonych z nią zjawisk dużej skali. Bazują na niej wizualizacje \texttt{ActiveSatellitesVis} oraz \texttt{IssVis} opisane w dalszej cześci pracy. Na rysunku~\ref{fig:c4_earthVis} przedstawiono diagram zależności pomiędzy poszczególnymi wizualizacjami i klasami pomocniczymi.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{diagrams/out/c4_earthVis.png}
+  \caption{Zależności pomiędzy klasami wizualizacji Ziemi}
+  \label{fig:c4_earthVis} 
+\end{figure}
+
+TODO: jakie obiekty na scenia, zmiana shadera day/night, panel kontrolny

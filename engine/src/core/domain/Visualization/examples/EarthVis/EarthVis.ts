@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import moment from "moment";
+import moment, { Moment } from "moment";
 
 import Visualization from "../../../../../core/domain/Visualization/models/Visualization";
 import VisualizationMeta from "../../models/VisualizationMeta";
@@ -46,7 +46,7 @@ export default class EarthVis extends Visualization {
   });
   private directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 
-  constructor(public timestamp = moment.utc()) {
+  constructor(public timestamp?: Moment) {
     super("earthVis");
     this.addParent(new StarsVis());
     this.addParent(new AtmosphereVis());
@@ -70,6 +70,7 @@ export default class EarthVis extends Visualization {
 
     group.add(this.directionalLight);
     group.add(this.directionalLight.target);
+    this.directionalLight.target.position.set(0, 0, 0);
     this.sphereMaterial.needsUpdate = true;
     this.sphereCloudsMaterial.needsUpdate = true;
 
@@ -90,11 +91,15 @@ export default class EarthVis extends Visualization {
       .set(0, 0, 10000)
       .applyAxisAngle(
         new THREE.Vector3(1, 0, 0),
-        TimeService.getSunDeclination(this.timestamp)
+        TimeService.getSunDeclination(this.timestamp || moment.utc())
       )
       .applyAxisAngle(
         new THREE.Vector3(0, -1, 0),
-        TimeService.getHourAngle(undefined, undefined, this.timestamp)
+        TimeService.getHourAngle(
+          undefined,
+          undefined,
+          this.timestamp || moment.utc()
+        )
       );
   }
 

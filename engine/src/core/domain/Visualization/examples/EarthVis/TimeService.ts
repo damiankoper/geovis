@@ -7,7 +7,10 @@ import moment from "moment";
 export default class TimeService {
   static vernalEquinoxReference = moment.utc("2020-03-20 03:49:00");
   static solarYear = moment.duration({
-    days: 365 + 108,
+    days: 365,
+    hours: 5,
+    minutes: 48,
+    seconds: 46,
   });
 
   // Source: https://www.pveducation.org/pvcdrom/properties-of-sunlight/solar-time
@@ -28,9 +31,12 @@ export default class TimeService {
     return THREE.MathUtils.degToRad(HRA);
   }
 
-  // Source: http://mypages.iit.edu/~maslanka/SolarGeo.pdf
+  // Source: https://www.pveducation.org/pvcdrom/properties-of-sunlight/declination-angle
   static getSunDeclination(timestamp = moment.utc()) {
-    return Math.asin(0.39795 * Math.cos(0.08563 * timestamp.dayOfYear() - 173));
+    return -(
+      THREE.MathUtils.degToRad(-23.35) *
+      Math.cos(((2 * Math.PI) / 365) * (timestamp.dayOfYear() + 10))
+    );
   }
 
   static getFirstPointOfAriesAngle(timestamp = moment.utc()) {

@@ -98,8 +98,7 @@ export default class AtmosphereVis extends Visualization {
         .setFromRotationMatrix(this.group.matrix)
         .conjugate();
       const GL = new THREE.Vector3(0, 0, this.G)
-        .applyQuaternion(q)
-        .add(localOrbit.v.clone().applyQuaternion(q));
+        .add(localOrbit.v.clone()).applyQuaternion(q);
 
       const GLNormalized = GL.clone().normalize();
       this.atmosphereMaterial.uniforms.viewVector.value = GLNormalized;

@@ -1,0 +1,50 @@
+@startuml
+skinparam linetype ortho
+hide empty members
+
+class StarsVis <<visualization>>
+class AtmosphereVis <<visualization>>
+class EarthVis <<visualization>>
+class ActiveSatellitesVis <<visualization>>
+class IssVis <<visualization>>
+
+StarsVis <--o EarthVis
+AtmosphereVis <--o EarthVis
+
+EarthVis <--o ActiveSatellitesVis
+EarthVis <--o IssVis
+
+class TimeService <<service>>{
+    +{static} vernalEquinoxReference: any
+    +{static} solarYear: any
+    +{static} getHourAngle(\n\tfromTimezone?: number, \n\tlongitude?: number, \n\ttimestamp?: any\n): number
+    +{static} getSunDeclination(timestamp?: any): number
+    +{static} getFirstPointOfAriesAngle(timestamp?: any): number
+}
+
+StarsVis ...> TimeService
+EarthVis ...> TimeService
+
+class SatelliteObject <<model>> {
+
+}
+class TLEService <<service>>{
+    -_onUpdate: SimpleEventDispatcher<Record<string, TLE>>
+    +onUpdate: ISimpleEvent<Record<string, TLE>>
+    -data: Record<string, TLE>
+    -defaultUrl: string
+    +update(url?: string): Promise<Record<string, TLE>>
+}
+
+class TLE <<T, Orange>> <<type>>{
+    [string, string, string]
+}
+
+TLEService +-> TLE
+
+IssVis *---> TLEService
+IssVis "3" *-->  SatelliteObject
+SatelliteObject *--> TLEService
+ActiveSatellitesVis *---> TLEService
+ActiveSatellitesVis *--> SatelliteObject
+@enduml
