@@ -151,19 +151,19 @@ Uniform \texttt{viewVector} to wektor jednostkowy skierowany od środka $s$ grup
 \item {$q$} kwaternion uzyskany z~macierzy układu odniesienia wizualizacji. W~równaniu obrót następuje w~kierunku odwrotnym.
 \end{eqexpl}
 
-Uniform \texttt{fadeOut} bierze też udział w ujednoliceniu koloru nieba, kiedy kamera schodzi poniżej granicy atmosfery. Zachowanie to nie zostało jednak wystarczajaco rozwinięte, żeby odzwierciedlać realistycznie przejście pomiędzy czernią kosmosu, a niebieskim niebem z użyciem tego samego metariału w procesie rysowania. Pozostałe stałe w opisywanym materiale są uzupełnieniem z obiektu \mbox{\texttt{THREE.UniformsLib.lights}}. Zawierają one dane związane ze światłami obecnymi na scenie. 
+Uniform \texttt{fadeOut} bierze też udział w~ujednoliceniu koloru nieba, kiedy kamera schodzi poniżej granicy atmosfery. Zachowanie to nie zostało jednak wystarczajaco rozwinięte, żeby odzwierciedlać realistycznie przejście pomiędzy czernią kosmosu, a~niebieskim niebem z~użyciem tego samego metariału w~procesie rysowania. Pozostałe stałe w~opisywanym materiale są uzupełnieniem z~obiektu \mbox{\texttt{THREE.UniformsLib.lights}}. Zawierają one dane związane ze światłami obecnymi na scenie. 
 
-Materiał opisujący wygląd drugiej kuli, atmosfery widocznej nad ziemią, ma podobną budowę, korzysta z wyliczonych kątów i podobnych mechanizmów. Biorąc to pod uwagę, nie zostanie on tutaj opisany. 
+Materiał opisujący wygląd drugiej kuli, atmosfery widocznej nad ziemią, ma podobną budowę, korzysta z~wyliczonych kątów i~podobnych mechanizmów. Biorąc to pod uwagę, nie zostanie on tutaj opisany. 
 
 \section{Ziemia}
 
-Opisane wcześniej wizualizacje kosmosu i atmosfery pozwalają na stworzenie wizualizacji planety. Wizualizacja \texttt{EarthVis} jest wizualizacją planety Ziemi, która prezentuje aktualne jej oświetlenie przez Słońce. Widok początkowy wizualizacji przedstawiono na rysunku~\ref{fig:c4_earthVis_1}. 
+Opisane wcześniej wizualizacje kosmosu i~atmosfery pozwalają na stworzenie wizualizacji planety. Wizualizacja \texttt{EarthVis} jest wizualizacją planety Ziemi, która prezentuje aktualne jej oświetlenie przez Słońce. Widok początkowy wizualizacji przedstawiono na rysunku~\ref{fig:c4_earthVis_1}. 
 
 
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{img/c4_earthVis_1.png}
-  \caption{Widok początkowy wizualizacji Ziemi o godzinie 19:50, 27.09.2020r.}
+  \caption{Widok początkowy wizualizacji Ziemi o~godzinie 19:50, 27.09.2020r.}
   \label{fig:c4_earthVis_1} 
 \end{figure}
   
@@ -171,11 +171,11 @@ Opisane wcześniej wizualizacje kosmosu i atmosfery pozwalają na stworzenie wiz
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{img/c4_earthVis_2.png}
-  \caption{Zachód słońca nad Europą o godzinie 18:54, 27.07.2020r.}
+  \caption{Zachód słońca nad Europą o~godzinie 18:54, 27.07.2020r.}
   \label{fig:c4_earthVis_2} 
 \end{figure}
   
-Podczas każdej aktualizacji animacji obliczane jest nowe położenie słońca. Poruszając się w układzie odniesienia Ziemi konieczne jest obliczenie deklinacji Słońca, czyli kąta pomiędzy nim, a płaszczyzną równika~\cite{Declination}. Drugą wartością konieczną do wyliczenia jest kąt godzinny~\cite{SolarTime}. Jest to kąt, o jaki obróciło się Słońce od wybranego punktu odniesienia dla wybranej strefy czasowej w konkretnej chwili. Wizualizacja Ziemi stanowi podstawę do wizualizacji połączonych z nią zjawisk dużej skali. Bazują na niej wizualizacje \texttt{ActiveSatellitesVis} oraz \texttt{IssVis} opisane w dalszej cześci pracy. Na rysunku~\ref{fig:c4_earthVis} przedstawiono diagram zależności pomiędzy poszczególnymi wizualizacjami i klasami pomocniczymi.
+Podczas każdej aktualizacji animacji obliczane jest nowe położenie słońca. Poruszając się w~układzie odniesienia Ziemi konieczne jest obliczenie deklinacji Słońca, czyli kąta pomiędzy nim, a~płaszczyzną równika~\cite{Declination}. Drugą wartością konieczną do wyliczenia jest kąt godzinny~\cite{SolarTime}. Jest to kąt, o~jaki obróciło się Słońce od wybranego punktu odniesienia dla wybranej strefy czasowej w~konkretnej chwili. Wizualizacja Ziemi stanowi podstawę do wizualizacji połączonych z~nią zjawisk dużej skali. Bazują na niej wizualizacje \texttt{ActiveSatellitesVis} oraz \texttt{IssVis} opisane w~dalszej cześci pracy. Na rysunku~\ref{fig:c4_earthVis} przedstawiono diagram zależności pomiędzy poszczególnymi wizualizacjami i~klasami pomocniczymi.
 
 \begin{figure}
   \centering
@@ -184,4 +184,43 @@ Podczas każdej aktualizacji animacji obliczane jest nowe położenie słońca. 
   \label{fig:c4_earthVis} 
 \end{figure}
 
-TODO: jakie obiekty na scenia, zmiana shadera day/night, panel kontrolny
+Na wizualizację składają się wszystkie obiekty ustawiane przez wizualizacje \texttt{AtmosphereVis} i~\texttt{StarsVis}. Na scenie w~układzie współrzędnych wizualizacji znajdują się dwie kule. Pierwsza z~nich odpowiada za wyświetlanie tekstury Ziemi, a~druga, z~promieniem większym o~$4$~km, wyświetla chmury. Materiał pierwszej kuli implementuję model oświetlanie mz cieniowaniem Phonga~\cite[Rozdział 3]{RealTime3DGraphics} za pomocą obiektu \texttt{THREE.MeshPhongMaterial} i~używa trzech map.
+\begin{samepage}
+\begin{enumerate}
+  \item \texttt{map} - mapa zawierająca kolor tekseli tekstury
+  \item \texttt{specular map} - mapa zawierająca poziom odbicia kierunkowego światła dla każdego teksela tekstury
+  \item \texttt{normalMap} - mapa zawierająca wektory normalne w~przestrzeni stycznej wierzchołka modelu.
+\end{enumerate}
+\end{samepage}
+Materiał kuli wyświetlające chmury zawiera tylko mapę definiującą sam kolor tekseli. Jako, że ta mapa jest obrazem chmur na czarnym tle i~nie zawiera kanału \texttt{alpha}, materiał w~procesie renderowania stosuje mieszanie addytywne. Grupa obrotu zawiera również światło kierunkowe, które zawsze skierowane jest do jej środka. Pozycja źródła światła obracana jest zgodnie z~wartościami wyliczonymi przez \texttt{TimeService}, kolejno o~kąt godzinny w~osi~$OY$ i~deklinację w~osi~$OX$. Na rysunku pokazane zostało płynne przejście pomiędze teksturą nocną i~dzienną, która jest wyświetlana w~zależności od oświetlenia planety. Zachowanie to wymagało zmodyfikowania domyślnego fragment shadera i~uzależnienia wyświetlanej tekstury od kąta pomiędzy interpolowanym wektorem normalnym dla teksela, a~kierunkiem padania światła. Na listingu~\ref{lst:earthFrag} pokazano najważniejszą część modyfikacji shadera. Potrzebny kąt wyliczany jest z~wykorzystaniem iloczynu skalarnego wspomnianych wektorów. Wynik ten musi być zmapowany z~przedziału $\lbrack-1; 1\rbrack$ na przedział $\lbrack0; 1\rbrack$. Wartość wyliczoną, która trafia do funkcji wygładzającej, a~następnie do funkcji \texttt{mix}, która miesza wartości tekseli, pokazano na równaniu~\ref{eq:earth_dot}.
+
+\begin{lstlisting}[float=h, language=C++, label={lst:earthFrag}, caption={
+  Modyfikacja fragment shadera materiału \texttt{MeshPhongMaterial}}
+]
+#if NUM_DIR_LIGHTS > 0
+  float dotL =  dot(vNormal, directionalLights[0].direction);
+  vec4 texelColorNight = texture2D( nightMap, vUv );
+  texelColorNight = mapTexelToLinear( texelColorNight );
+
+  outgoingLight = mix(
+    vec3(texelColorNight) + ambientLightColor,
+    outgoingLight,
+    easeInOutExpo(dotL*0.5+0.5)
+  );
+#endif
+\end{lstlisting}
+\begin{equation}
+  \label{eq:earth_dot}
+  x = (\vv{n} \cdot \vv{d}) \cdot 0.5 + 0.5
+\end{equation}
+\begin{eqexpl}[25mm]
+\item {$\vv n$} wektor normalny
+\item {$\vv d$} kierunek padania światła
+\item {$x$} wartość w~przedziale $\lbrack0; 1\rbrack$
+\end{eqexpl}
+\vspace{\baselineskip}
+
+Wizualizacje dostarcza również panel kontrolny, który pokazany został na rysunku~\ref{fig:c3_controls_earth} i~pozwala na przełączanie się pomiędzy trybami kamery - swobodnym i~kompas.
+
+\section{Wybrane satelity}
+
