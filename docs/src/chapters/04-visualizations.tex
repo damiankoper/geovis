@@ -91,7 +91,7 @@ depthWrite: false,
 });
 \end{lstlisting}
 
-Na listingu~\ref{lst:atmosphereVis} przedstawiono inicjalizację materiału odpowiedzialnego za poświatę nad planetą. Klasa \texttt{THREE.ShaderMaterial} pozwala kontrolować cały proces rysowania punktów, ponieważ wymaga dostarczenia obydwu typów shaderów. Tak jak w~przypadku materiału w~wizualizacji \texttt{StarsVis}, materiał definiuje też ustawienia modyfikacji z-bufora i~strony wyświetlanego trójkąta. Materiał definiuje również stałe dla jednego procesu rysowania (\texttt{uniforms}). Stałe te są aktualizaowane w~każdym cyklu animacji. 
+Na listingu~\ref{lst:atmosphereVis} przedstawiono inicjalizację materiału odpowiedzialnego za poświatę nad planetą. Klasa \texttt{THREE.ShaderMaterial} pozwala kontrolować cały proces rysowania punktów, ponieważ wymaga dostarczenia obydwu typów shaderów. Tak jak w~przypadku materiału w~wizualizacji \texttt{StarsVis}, materiał definiuje też ustawienia modyfikacji z-bufora i~strony wyświetlanego trójkąta. Materiał definiuje również stałe dla jednego procesu rysowania (\texttt{uniforms}). Stałe te są aktualizowane w~każdym cyklu animacji. 
 W procesie rysowania poświata generowana jest w~zależności od kąta pomiędzy wektorem normalnym płaszczyzny dla wierzchołka, a~wektorem określającym kierunek obserwacji. Niżej opisano stałe przekazywane do materiału.
 
 \subsubsection{Uniform \texttt{start}}
@@ -134,7 +134,7 @@ Uniform \texttt{fadeOut} to ułamek liczby $\pi$ w~zakresie $\lbrack0; 1\rbrack$
 Uniform \texttt{light} to ułamek liczby $\pi$ w~zakresie $\lbrack0; 1\rbrack$, który stanowi kąt przesunięcia oświetlanej powierzchni dla światła. Jeśli do sceny zostanie dodane światło kierunkowe to wpływa ono na wygląd atmosfery. W~normalnej sytuacji światło kierunkowe oświetla dokładnie pół kuli. Załóżmy sytuację, w~której kąt padania światła wyznacza wektor rozciągnięty pomiędzy punktami $c'_g$~i~$c_{gtb}$. W~takiej sytuacji atmosfera oświetlona by była na łuku pomiędzy wektorami $\vv {g'''_v}$~i~$\vv {g'_v} + \vv{t'_v}$. Żeby oświetlić pozostałą, widoczną część atmosfery (łuk pomiędzy punktami $c_{gtb}$~i~$c_{gt}$) w~obliczeniach, trzeba uwzględnić kąt $\gamma$.
 
 \subsubsection{Uniform \texttt{power}}
-Uniform \texttt{power} to wykładnik potęgi, do której podniesiona zostaje finalna przezroczystość materiału atmosfery, przed kalkulacją oświetlania. Wartość ta nie jest aktualizaowana i~wynosi $1.25$.
+Uniform \texttt{power} to wykładnik potęgi, do której podniesiona zostaje finalna przezroczystość materiału atmosfery, przed kalkulacją oświetlania. Wartość ta nie jest aktualizowana i~wynosi $1.25$.
 
 \subsubsection{Uniform \texttt{glowColor}}
 Uniform \texttt{glowColor} to bazowy kolor materiału atmosfery. Nie ulega on zmianie i~ma wartość \texttt{0x87ceeb}. Możliwą poprawą zachowania atmosfery byłaby dynamiczna zmiana koloru atmosfery powiązana z~kątem padania światła, co symulowałoby zmianę koloru w~miejscach zachodu i~wschodu słońca.
@@ -151,16 +151,16 @@ Uniform \texttt{viewVector} to wektor jednostkowy skierowany od środka $s$ grup
 \item {$q$} kwaternion uzyskany z~macierzy układu odniesienia wizualizacji. W~równaniu obrót następuje w~kierunku odwrotnym.
 \end{eqexpl}
 
-Uniform \texttt{fadeOut} bierze też udział w~ujednoliceniu koloru nieba, kiedy kamera schodzi poniżej granicy atmosfery. Zachowanie to nie zostało jednak wystarczajaco rozwinięte, żeby odzwierciedlać realistycznie przejście pomiędzy czernią kosmosu, a~niebieskim niebem z~użyciem tego samego metariału w~procesie rysowania. Pozostałe stałe w~opisywanym materiale są uzupełnieniem z~obiektu \mbox{\texttt{THREE.UniformsLib.lights}}. Zawierają one dane związane ze światłami obecnymi na scenie. 
+Uniform \texttt{fadeOut} bierze też udział w~ujednoliceniu koloru nieba, kiedy kamera schodzi poniżej granicy atmosfery. Zachowanie to nie zostało jednak wystarczająco rozwinięte, żeby odzwierciedlać realistycznie przejście pomiędzy czernią kosmosu, a~niebieskim niebem z~użyciem tego samego matariału w~procesie rysowania. Pozostałe stałe w~opisywanym materiale są uzupełnieniem z~obiektu \mbox{\texttt{THREE.UniformsLib.lights}}. Zawierają one dane związane ze światłami obecnymi na scenie. 
 
 Materiał opisujący wygląd drugiej kuli, atmosfery widocznej nad ziemią, ma podobną budowę, korzysta z~wyliczonych kątów i~podobnych mechanizmów. Biorąc to pod uwagę, nie zostanie on tutaj opisany. 
 
 \section{Ziemia}
 
-Opisane wcześniej wizualizacje kosmosu i~atmosfery pozwalają na stworzenie wizualizacji planety. Wizualizacja \texttt{EarthVis} jest wizualizacją planety Ziemi, która prezentuje aktualne jej oświetlenie przez Słońce. Widok początkowy wizualizacji przedstawiono na rysunku~\ref{fig:c4_earthVis_1}. 
+Opisane wcześniej wizualizacje kosmosu i~atmosfery pozwalają na stworzenie wizualizacji planety. Wizualizacja \texttt{EarthVis} jest wizualizacją planety Ziemi, która prezentuje jej aktualne oświetlenie przez Słońce. Widok początkowy wizualizacji przedstawiono na rysunku~\ref{fig:c4_earthVis_1}. 
 
 
-\begin{figure}
+\begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{img/c4_earthVis_1.png}
   \caption{Widok początkowy wizualizacji Ziemi o~godzinie 19:50, 27.09.2020r.}
@@ -168,14 +168,14 @@ Opisane wcześniej wizualizacje kosmosu i~atmosfery pozwalają na stworzenie wiz
 \end{figure}
   
 
-\begin{figure}
+\begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{img/c4_earthVis_2.png}
   \caption{Zachód słońca nad Europą o~godzinie 18:54, 27.07.2020r.}
   \label{fig:c4_earthVis_2} 
 \end{figure}
   
-Podczas każdej aktualizacji animacji obliczane jest nowe położenie słońca. Poruszając się w~układzie odniesienia Ziemi konieczne jest obliczenie deklinacji Słońca, czyli kąta pomiędzy nim, a~płaszczyzną równika~\cite{Declination}. Drugą wartością konieczną do wyliczenia jest kąt godzinny~\cite{SolarTime}. Jest to kąt, o~jaki obróciło się Słońce od wybranego punktu odniesienia dla wybranej strefy czasowej w~konkretnej chwili. Wizualizacja Ziemi stanowi podstawę do wizualizacji połączonych z~nią zjawisk dużej skali. Bazują na niej wizualizacje \texttt{ActiveSatellitesVis} oraz \texttt{IssVis} opisane w~dalszej cześci pracy. Na rysunku~\ref{fig:c4_earthVis} przedstawiono diagram zależności pomiędzy poszczególnymi wizualizacjami i~klasami pomocniczymi.
+Podczas każdej aktualizacji animacji obliczane jest nowe położenie słońca. Poruszając się w~układzie odniesienia Ziemi konieczne jest obliczenie deklinacji Słońca, czyli kąta pomiędzy nim, a~płaszczyzną równika~\cite{Declination}. Drugą wartością konieczną do wyliczenia jest kąt godzinny~\cite{SolarTime}. Jest to kąt, o~jaki obróciło się Słońce od wybranego punktu odniesienia dla wybranej strefy czasowej w~konkretnej chwili. Wizualizacja Ziemi stanowi podstawę do wizualizacji połączonych z~nią zjawisk dużej skali. Bazują na niej wizualizacje \texttt{ActiveSatellitesVis} oraz \texttt{IssVis} opisane w~dalszej części pracy. Na rysunku~\ref{fig:c4_earthVis} przedstawiono diagram zależności pomiędzy poszczególnymi wizualizacjami i~klasami pomocniczymi.
 
 \begin{figure}
   \centering
@@ -192,7 +192,9 @@ Na wizualizację składają się wszystkie obiekty ustawiane przez wizualizacje 
   \item \texttt{normalMap} - mapa zawierająca wektory normalne w~przestrzeni stycznej wierzchołka modelu.
 \end{enumerate}
 \end{samepage}
-Materiał kuli wyświetlające chmury zawiera tylko mapę definiującą sam kolor tekseli. Jako, że ta mapa jest obrazem chmur na czarnym tle i~nie zawiera kanału \texttt{alpha}, materiał w~procesie renderowania stosuje mieszanie addytywne. Grupa obrotu zawiera również światło kierunkowe, które zawsze skierowane jest do jej środka. Pozycja źródła światła obracana jest zgodnie z~wartościami wyliczonymi przez \texttt{TimeService}, kolejno o~kąt godzinny w~osi~$OY$ i~deklinację w~osi~$OX$. Na rysunku pokazane zostało płynne przejście pomiędze teksturą nocną i~dzienną, która jest wyświetlana w~zależności od oświetlenia planety. Zachowanie to wymagało zmodyfikowania domyślnego fragment shadera i~uzależnienia wyświetlanej tekstury od kąta pomiędzy interpolowanym wektorem normalnym dla teksela, a~kierunkiem padania światła. Na listingu~\ref{lst:earthFrag} pokazano najważniejszą część modyfikacji shadera. Potrzebny kąt wyliczany jest z~wykorzystaniem iloczynu skalarnego wspomnianych wektorów. Wynik ten musi być zmapowany z~przedziału $\lbrack-1; 1\rbrack$ na przedział $\lbrack0; 1\rbrack$. Wartość wyliczoną, która trafia do funkcji wygładzającej, a~następnie do funkcji \texttt{mix}, która miesza wartości tekseli, pokazano na równaniu~\ref{eq:earth_dot}.
+Materiał kuli wyświetlające chmury zawiera tylko mapę definiującą sam kolor tekseli. Jako, że ta mapa jest obrazem chmur na czarnym tle i~nie zawiera kanału \texttt{alpha}, materiał w~procesie renderowania stosuje mieszanie addytywne. Grupa obrotu zawiera również światło kierunkowe, które zawsze skierowane jest do jej środka. Pozycja źródła światła obracana jest zgodnie z~wartościami wyliczonymi przez serwis \texttt{TimeService}, kolejno o~kąt godzinny w~osi~$OY$ i~deklinację w~osi~$OX$.
+
+Na rysunku~\ref{fig:c4_earthVis_2} pokazane zostało płynne przejście pomiędzy teksturą nocną i~dzienną, która jest wyświetlana w~zależności od oświetlenia planety. Zachowanie to wymagało zmodyfikowania domyślnego fragment shadera i~uzależnienia wyświetlanej tekstury od kąta pomiędzy interpolowanym wektorem normalnym dla teksela, a~kierunkiem padania światła. Na listingu~\ref{lst:earthFrag} pokazano najważniejszą część modyfikacji shadera. Potrzebny kąt wyliczany jest z~wykorzystaniem iloczynu skalarnego wspomnianych wektorów. Wynik ten musi być zmapowany z~przedziału $\lbrack-1; 1\rbrack$ na przedział $\lbrack0; 1\rbrack$. Obliczenie wartości, która trafia do funkcji wygładzającej, a~następnie do funkcji \texttt{mix}, która miesza wartości tekseli, pokazano na równaniu~\ref{eq:earth_dot}.
 
 \begin{lstlisting}[float=h, language=C++, label={lst:earthFrag}, caption={
   Modyfikacja fragment shadera materiału \texttt{MeshPhongMaterial}}
@@ -224,3 +226,51 @@ Wizualizacje dostarcza również panel kontrolny, który pokazany został na rys
 
 \section{Wybrane satelity}
 
+Wizualizacją stworzoną na podstawie wizualizacji Ziemi jest wizualizacja wybranych satelitów orbitujących wokół niej. Klasą definiującą tę wizualizację jest klasa \texttt{IssVis} obecna na rysunku~\ref{fig:c4_earthVis}. Znajdują się na nim również klasy wspomagające wyświetlanie i~wyliczanie pozycji obiektów. Na scenie znajdują się trzy satelity. Są nimi Międzynarodowa Stacja Kosmiczna, Kosmiczny Teleskop Hubble'a oraz Eutelsat Hot Bird 13C. Każda satelita reprezentowana jest za pomocą trzech obiektów, którymi są elipsa reprezentująca kształt orbity, obiekt satelity będący złożonym modelem 3D lub sferą oraz linia łącząca obiekt satelity ze środkiem planety. Pozycja satelitów wyświetlana jest w~czasie rzeczywistym, a~ich pozycja i~orbita kalkulowana jest z~wykorzystaniem danych w~formacie TLE~(ang.~Two-Line Elements).
+
+\subsection{TLE}
+TLE jest formatem zapisu informacji o~satelicie pozwalającym wyznaczyć z~dużym przybliżeniem jej pozycję relatywnie do ciała orbitowanego~\cite{TLE}. Pierwsza linia zawiera nazwę satelity i~może być pomijana w~zapisie. Druga linia jednoznacznie identyfikuje satelitę i~zawiera informacje o~punkcie w~czasie, dla którego określone są parametry orbity - epokę. Zawiera również informacje kontrolne o~samym TLE oraz pierwszą i~drugą pochodną prędkości ruchu. Trzecia linia zawiera parametry orbity. Najważniejszymi z~nich są inklinacja, kąt węzła wstępującego, ekscentryczność i~argument perycentrum, który dla Ziemi nazywa się argumentem perygeum. Poniżej przedstawiono przykładowe dane dla Międzynarodowej Stacji Kosmicznej.
+\begin{verbatim}
+ISS (ZARYA)
+1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927
+2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537
+\end{verbatim}
+
+W stworzonej wizualizacji TLE pobierane są ze strony CelesTrak~\cite{CelesTrak}, która zbiera i~analizuje dane otrzymane od jednostki NORAD (ang. North American Aerospace Defense Command). Dane otrzymywane są w~formacie JSON. Serwis \texttt{TLEService} odpowiedzialny jest za pobranie danych TLE wszystkich aktywnych satelit, sparsowanie je, a~następnie wyemitowanie zdarzenia \texttt{onUpdate}, które może być obsłużone w~procesie inicjalizacji obiektów na scenie. Serwis ten umożliwia również dostęp do danych satelity z~wykorzystaniem jej identyfikatora. Dla satelit, na których pozycję wpływać może atmosfera i~inne nieprzewidziane czynniki, dane TLE mogą z~czasem stawać się nieaktualne. Dzieje się to jednak na przestrzeni dni. Założyć można, że pobranie najnowszej ich wersji w~momencie uruchamiania wizualizacji pozwala na wystarczająco dokładne wyliczenia ich pozycji.
+
+Za obliczenie parametrów orbity, wygenerowanie obiektów sceny i~odpowiednią transformację ich pozycji odpowiada obiekt \texttt{SatelliteObject} reprezentujący pojedynczą satelitę. Oblicza on parametry elipsy i generuje reprezentujący ją obiekt klasy \texttt{THREE.EllipseCurve}. Równania~\ref{eq:sat_1}~-~\ref{eq:sat_3} opisują proces wyliczenia parametrów orbity. Wyliczenia półosi wielkiej $a$ wynika z~trzeciego prawa Kelpera, które łączy jej długość zależnością z~okresem obiegu satelity wokół Ziemi, który to dostarcza TLE. Transformacja aktualizowana jest w~każdym przebiegu pętli animacji.
+
+\begin{samepage}
+  \begin{figure}[h]
+  \begin{align}
+      \label{eq:sat_1}
+      a~&= \frac{G^{\frac{1}{3}}}{(\frac{2n\pi}{86400})^{\frac{2}{3}}} \\
+      \label{eq:sat_2}
+      b &= a\sqrt{1-e^2} \\
+      \label{eq:sat_3}
+      c &= e \cdot a
+  \end{align}
+  \begin{eqexpl}[25mm]
+      \item {$a$} półoś wielka orbity
+      \item {$G$} standardowy parametry grawitacyjny Ziemi
+      \item {$n$} średnia liczba obiegów Ziemi w~ciągu 24 godzin
+      \item {$b$} półoś mała orbity
+      \item {$e$} ekscentryczność orbity
+      \item {$c$} przesunięcie od środka do ogniska orbity
+  \end{eqexpl}
+  \vspace{\baselineskip}
+\end{figure}
+\end{samepage}
+
+Finalna transformacja obiektu elipsy jest z~złożeniem obrotów i~translacji. Najpierw wykonywana jest translacja elipsy tak, aby środek Ziemi pokrywał się z~jej ogniskiem. Następnie w~osi $OX$ elipsa obracana jest o~kąt wynikający z~danych o~inklinacji orbity.  Potem wykonywany jest obrót w~osi $OY$ o~kąt wynikający z~położenia punktu Barana, czyli punktu służącego do orientacji w~odniesieniu do równikowego układu współrzędnych oraz ekliptyki. W~tej samej osi elipsa obracana jest o~kąt wynikający z~kąta węzła wstępującego oraz o~kąt przeciwny do kąta godzinnego, aby uwzględnić obrót Ziemi w~czasie. Na końcu następuje obrót uwzględniający argument perygeum. 
+
+Funkcja \texttt{TimeService.getFirstPointOfAriesAngle} odpowiedzialna jest za obliczanie kąta od punktu Barana. W~obecnej implementacji może ona jednak być czynnikiem wpływającym na brak pokrycia orientacji orbity w~osi $OY$ z~jej faktyczną trajektorią. Sztuczna korekcja staje się również nieaktualna po jakimś czasie. Autor wizualizacji nie był w~stanie dostatecznie zbadać przyczyny tego problemu. 
+
+Za obliczanie pozycji samej satelity na orbicie odpowiada biblioteka \texttt{tle.js}~\cite{tle.js}, która pozwana, na postawie TLE, uzyskać położenie satelity o~podanym czasie. Wizualizacja dostarcza komponent panelu kontrolnego, który umożliwia zmianę trybu pracy kamery oraz zarządzenie widocznością poszczególnych satelitów. 
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{img/c4_issVis.png}
+  \caption{Wybrane satelity - klasa \texttt{IssVis}}
+  \label{fig:c4_issVis} 
+\end{figure}
