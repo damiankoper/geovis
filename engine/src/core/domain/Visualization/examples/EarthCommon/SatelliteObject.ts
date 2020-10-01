@@ -182,7 +182,7 @@ export default class SatelliteObject {
     const positionAndVelocity = Satellite.propagate(this.satrec, date);
     const positionEci = positionAndVelocity.position;
     const gmst = Satellite.gstime(date);
-    return Satellite.eciToGeodetic(positionEci, gmst);
+    return Satellite.eciToGeodetic(positionEci || { x: 0, y: 0, z: 0 }, gmst);
   }
 
   public getPositionTransformMatrix(timestamp = moment.utc()): THREE.Matrix4 {

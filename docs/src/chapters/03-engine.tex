@@ -22,7 +22,7 @@ const gl = canvas.getContext('webgl2');
 Obiekt kontekstu działa jak maszyna stanów. Przechowuje ustawiony stan do czasu jego zmiany przez aplikację. Wszystkie operacje renderowania grafiki korzystają z~globalnie ustawionych parametrów, które definiują stan kontekstu i~mają bezpośredni wpływ na efekt końcowy\cite[Rozdział 1]{RealTime3DGraphics}.
 
 \subsubsection{Rysowanie sceny}
-
+\label{sec:render}
 Rysowanie obiektu rozpoczyna się od utworzenia buforów danych i~umieszczenia w~nich współrzędnych wierzchołków oraz kolejności, według której wierzchołki mają brać udział w~procesie rysowania. Kolejność ma istotne znaczenie w~przypadku różnych trybów rysowania oraz, Cullingu czyli określania widocznej strony rysowanego trójkąta. Bufory są reprezentowane zewnętrznie jako tablice \texttt{TypedArray}. Przechowują one jedynie surowe dane w~postaci binarnej~\cite{TypedArrays}. W~języku JavaScript występuje jeden typ \texttt{number} przechowujący liczby, które wewnętrznie reprezentowane są jako 64b liczba zmiennoprzecinkowa. Dodatkowo każda zmienna numeryczna jest obiektem typu \texttt{Number} z~własnymi metodami. Użycie buforów z~interfejsem tablicy przyspiesza masowe operacje na danych.
 
 \subsubsection{Shadery}

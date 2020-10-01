@@ -226,7 +226,7 @@ Wizualizacje dostarcza również panel kontrolny, który pokazany został na rys
 
 \section{Wybrane satelity}
 
-Wizualizacją stworzoną na podstawie wizualizacji Ziemi jest wizualizacja wybranych satelitów orbitujących wokół niej. Klasą definiującą tę wizualizację jest klasa \texttt{IssVis} obecna na rysunku~\ref{fig:c4_earthVis}. Znajdują się na nim również klasy wspomagające wyświetlanie i~wyliczanie pozycji obiektów. Na scenie znajdują się trzy satelity. Są nimi Międzynarodowa Stacja Kosmiczna, Kosmiczny Teleskop Hubble'a oraz Eutelsat Hot Bird 13C. Każda satelita reprezentowana jest za pomocą trzech obiektów, którymi są elipsa reprezentująca kształt orbity, obiekt satelity będący złożonym modelem 3D lub sferą oraz linia łącząca obiekt satelity ze środkiem planety. Pozycja satelitów wyświetlana jest w~czasie rzeczywistym, a~ich pozycja i~orbita kalkulowana jest z~wykorzystaniem danych w~formacie TLE~(ang.~Two-Line Elements).
+Wizualizacją stworzoną na podstawie wizualizacji Ziemi jest wizualizacja wybranych satelitów orbitujących wokół niej. Klasą definiującą tę wizualizację jest klasa \texttt{IssVis} obecna na rysunku~\ref{fig:c4_earthVis}. Znajdują się na nim również klasy wspomagające wyświetlanie i~wyliczanie pozycji obiektów. Na scenie znajdują się trzy satelity. Są nimi Międzynarodowa Stacja Kosmiczna, Kosmiczny Teleskop Hubble'a oraz Eutelsat Hot Bird 13C. Każda satelita reprezentowana jest za pomocą trzech obiektów, którymi jest elipsa reprezentująca kształt orbity, obiekt satelity będący złożonym modelem 3D lub sferą oraz linia łącząca obiekt satelity ze środkiem planety.  Wizualizacja dostarcza komponent panelu kontrolnego, który umożliwia zmianę trybu pracy kamery oraz zarządzenie widocznością poszczególnych satelitów. Pozycja satelitów wyświetlana jest w~czasie rzeczywistym, a~ich pozycja i~orbita kalkulowana jest z~wykorzystaniem danych w~formacie TLE~(ang.~Two-Line Elements).
 
 \subsection{TLE}
 TLE jest formatem zapisu informacji o~satelicie pozwalającym wyznaczyć z~dużym przybliżeniem jej pozycję relatywnie do ciała orbitowanego~\cite{TLE}. Pierwsza linia zawiera nazwę satelity i~może być pomijana w~zapisie. Druga linia jednoznacznie identyfikuje satelitę i~zawiera informacje o~punkcie w~czasie, dla którego określone są parametry orbity - epokę. Zawiera również informacje kontrolne o~samym TLE oraz pierwszą i~drugą pochodną prędkości ruchu. Trzecia linia zawiera parametry orbity. Najważniejszymi z~nich są inklinacja, kąt węzła wstępującego, ekscentryczność i~argument perycentrum, który dla Ziemi nazywa się argumentem perygeum. Poniżej przedstawiono przykładowe dane dla Międzynarodowej Stacji Kosmicznej.
@@ -236,9 +236,9 @@ ISS (ZARYA)
 2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537
 \end{verbatim}
 
-W stworzonej wizualizacji TLE pobierane są ze strony CelesTrak~\cite{CelesTrak}, która zbiera i~analizuje dane otrzymane od jednostki NORAD (ang. North American Aerospace Defense Command). Dane otrzymywane są w~formacie JSON. Serwis \texttt{TLEService} odpowiedzialny jest za pobranie danych TLE wszystkich aktywnych satelit, sparsowanie je, a~następnie wyemitowanie zdarzenia \texttt{onUpdate}, które może być obsłużone w~procesie inicjalizacji obiektów na scenie. Serwis ten umożliwia również dostęp do danych satelity z~wykorzystaniem jej identyfikatora. Dla satelit, na których pozycję wpływać może atmosfera i~inne nieprzewidziane czynniki, dane TLE mogą z~czasem stawać się nieaktualne. Dzieje się to jednak na przestrzeni dni. Założyć można, że pobranie najnowszej ich wersji w~momencie uruchamiania wizualizacji pozwala na wystarczająco dokładne wyliczenia ich pozycji.
+W stworzonej wizualizacji TLE pobierane są ze strony CelesTrak~\cite{CelesTrak}, która zbiera i~analizuje dane otrzymane od jednostki NORAD (ang. North American Aerospace Defense Command). Dane otrzymywane są w~formacie tekstowym. Serwis \texttt{TLEService} odpowiedzialny jest za pobranie danych TLE wszystkich aktywnych satelit, sparsowanie je, a~następnie wyemitowanie zdarzenia \texttt{onUpdate}, które może być obsłużone w~procesie inicjalizacji obiektów na scenie. Serwis ten umożliwia również dostęp do danych satelity z~wykorzystaniem jej identyfikatora. Dla satelit, na których pozycję wpływać może atmosfera i~inne nieprzewidziane czynniki, dane TLE mogą z~czasem stawać się nieaktualne. Dzieje się to jednak na przestrzeni dni. Założyć można, że pobranie najnowszej ich wersji w~momencie uruchamiania wizualizacji pozwala na wystarczająco dokładne wyliczenia ich pozycji.
 
-Za obliczenie parametrów orbity, wygenerowanie obiektów sceny i~odpowiednią transformację ich pozycji odpowiada obiekt \texttt{SatelliteObject} reprezentujący pojedynczą satelitę. Oblicza on parametry elipsy i generuje reprezentujący ją obiekt klasy \texttt{THREE.EllipseCurve}. Równania~\ref{eq:sat_1}~-~\ref{eq:sat_3} opisują proces wyliczenia parametrów orbity. Wyliczenia półosi wielkiej $a$ wynika z~trzeciego prawa Kelpera, które łączy jej długość zależnością z~okresem obiegu satelity wokół Ziemi, który to dostarcza TLE. Transformacja aktualizowana jest w~każdym przebiegu pętli animacji.
+Za obliczenie parametrów orbity, wygenerowanie obiektów sceny i~odpowiednią transformację ich pozycji odpowiada obiekt \texttt{SatelliteObject} reprezentujący pojedynczą satelitę. Oblicza on parametry elipsy i~generuje reprezentujący ją obiekt klasy \texttt{THREE.EllipseCurve}. Równania~\ref{eq:sat_1}~-~\ref{eq:sat_3} opisują proces wyliczenia parametrów orbity. Wyliczenia półosi wielkiej $a$ wynika z~trzeciego prawa Kelpera, które łączy jej długość zależnością z~okresem obiegu satelity wokół Ziemi, który to dostarcza TLE. Transformacja aktualizowana jest w~każdym przebiegu pętli animacji.
 
 \begin{samepage}
   \begin{figure}[h]
@@ -266,7 +266,7 @@ Finalna transformacja obiektu elipsy jest z~złożeniem obrotów i~translacji. N
 
 Funkcja \texttt{TimeService.getFirstPointOfAriesAngle} odpowiedzialna jest za obliczanie kąta od punktu Barana. W~obecnej implementacji może ona jednak być czynnikiem wpływającym na brak pokrycia orientacji orbity w~osi $OY$ z~jej faktyczną trajektorią. Sztuczna korekcja staje się również nieaktualna po jakimś czasie. Autor wizualizacji nie był w~stanie dostatecznie zbadać przyczyny tego problemu. 
 
-Za obliczanie pozycji samej satelity na orbicie odpowiada biblioteka \texttt{tle.js}~\cite{tle.js}, która pozwana, na postawie TLE, uzyskać położenie satelity o~podanym czasie. Wizualizacja dostarcza komponent panelu kontrolnego, który umożliwia zmianę trybu pracy kamery oraz zarządzenie widocznością poszczególnych satelitów. 
+Za obliczanie pozycji samej satelity na orbicie odpowiada biblioteka \texttt{tle.js}~\cite{tle.js}, która jest używana w~procesie aktualizacji obiektu \texttt{SatelliteObject}. Pozwana ona, na postawie TLE, uzyskać położenie satelity o~podanym czasie. Etykiety generowane są z~użyciem obiektu \texttt{THREE.Sprite}, który wyświetla kwadratową teksturę zawsze zorientowaną w~kierunku obserwatora. Tekstura jest napisem, który rysowany jest dynamicznie na elemencie \texttt{Canvas} przetworzonym przez obiekt \texttt{THREE.CanvasTexture}. Rozmiar etykiet jest wprost proporcjonalny do odległości obiektu od obserwatora. Zachowanie to utrzymuje taki sam rozmiar etykiet niezależnie od orientacji kamery na scenie.
 
 \begin{figure}
   \centering
@@ -274,3 +274,72 @@ Za obliczanie pozycji samej satelity na orbicie odpowiada biblioteka \texttt{tle
   \caption{Wybrane satelity - klasa \texttt{IssVis}}
   \label{fig:c4_issVis} 
 \end{figure}
+
+\section{Aktywne satelity}
+
+Wizualizacja, którą opisuje klasa \texttt{ActiveSatellitesVis}, która pokazana jest na rysunku~\ref{fig:c4_earthVis}, wyświetla wszystkie aktywne satelity na podstawie danych ze strony CelesTrak~\cite{CelesTrak}. Widok początkowy wizualizacji przedstawia za pomocą punktów pozycje satelit w~chwili obecnej. Wizualizacja dostarcza panel kontrolny, dzięki któremu można zmienić tryb ruchu kamery oraz przyspieszyć upływ czasu. Można dzięki temu zobaczyć przybliżoną pozycję satelitów w~przyszłości. Panel kontrolny posiada również możliwość resetu czasu wizualizacji do chwili obecnej. Na rysunku~\ref{fig:c4_activeSatellitesVis} pokazana została wizualizacja oraz jej panel kontrolny. Widać na nim dobrze łuk, którą tworzą satelity na orbicie geostacjonarnej.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{img/c4_activeSatellitesVis.png}
+  \caption{Aktywne satelity - klasa \texttt{ActiveSatellitesVis}}
+  \label{fig:c4_activeSatellitesVis} 
+\end{figure}
+
+Podobnie jak w~przypadku wizualizacji opisanej klasą \texttt{IssVis} dane TLE pobierane są i~zarządzane poprzez klasę \texttt{TLEService}. Kalkulacja pozycji satelitów również wykonywana jest z~użyciem mechanizmów klasy \texttt{SatelliteObject}. Różnicą pomiędzy tymi wizualizacjami jest to, że klasa \texttt{SatelliteObject} nie tworzy i~nie dodaje do sceny obiektów reprezentujących satelity. 
+
+\begin{lstlisting}[float, language=javascript, label={lst:active1}, caption={
+  Fragmenty klasy \texttt{ActiveSatellitesVis}}
+]
+private pointsMaterial = new THREE.PointsMaterial({
+  transparent: true,
+  color: 0xffffff,
+  size: 5,
+  sizeAttenuation: false,
+});
+private points = new THREE.Points(
+  new THREE.BufferGeometry(),
+  this.pointsMaterial
+);
+
+public update(deltaFrac: number) {
+  /* ... */
+  const points: number[] = [];
+  this.sateliteObjects.forEach((o) => {
+    const p = o.getPosition(this.timestamp);
+    points.push(p.x, p.y, p.z);
+  });
+  this.points.geometry.setAttribute(
+    "position",
+    new THREE.BufferAttribute(new Float32Array(points), 3)
+  );
+  /* ... */
+}
+\end{lstlisting}
+
+Dostępne dane zawierają informacje o~około 8000 aktywnych satelitów. Wywołanie polecenia rysowania dla każdego punktu oddzielnie skutkowałoby długim czasem rysowania, ponieważ w~procesie generowania grafiki najwięcej czasu tracone jest na komunikacji z~GPU. Dlatego wizualizacja wywołuje tylko jedno polecenie rysowania dla wszystkich punktów. Listing~\ref{lst:active1} zawiera inicjalizację obiektu materiału \texttt{THREE.PointsMaterial} oraz obiektu \texttt{THREE.Points} odpowiedzialnego za reprezentację punktów na scenie. Inicjalizowany jest on z~pustym buforem reprezentującym pozycje wierzchołków. Rola buforów w~procesie rysowania opisana została w~rozdziale~\ref{sec:render}. W~pokazanej na listingu~~\ref{lst:active1} metodzie \texttt{update}, wykonywanej co każde przejście pętli głównej, bufor uzupełniany jest nowymi współrzędnymi punktów. Wszystkie punkty rysowane są za pomocą jednego polecenia, a~rysowanie każdego z~osobna dzieje się równolegle w~GPU. Największy narzut obliczeniowy spowodowany jest kalkulacją pozycji w obiektach \texttt{SatelliteObject}, który przy dużych liczbach jest już dostrzegalny.
+
+\section{Kafelki i Radar pogodowy}
+
+% Co pokazuje, co może panel kontrolny
+% wiele warstw konfigurowalnych
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{img/c4_osmTilesVis.png}
+  \caption{Opady deszczu nad Europą - klasa \texttt{OsmTilesVis}}
+  \label{fig:c4_osmTilesVis} 
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{img/c4_osmTilesVis_1.png}
+  \caption{Opady deszczu nad Polską - klasa \texttt{OsmTilesVis}}
+  \label{fig:c4_osmTilesVis_1} 
+\end{figure}
+
+% Kafelki subsection
+% Odwzorowanie map
+
+% Implementacja subsection
+% Diagram klas
