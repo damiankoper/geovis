@@ -1,0 +1,31 @@
+@startuml
+hide empty members
+skinparam linetype ortho
+
+class OsmTilesVis <<visualization>>
+
+class TilesService <<service>>
+class TileTreeNode <<model>>
+class TilePainter <<worker>>
+interface TileLayerConfig {
+    +tileUrl: string | ((x: number, y: number, zoom: number) => string)
+    +visible: boolean
+    +filter?: string
+}
+
+OsmTilesVis *--> TilesService
+
+TilesService *--> "1" TileTreeNode
+
+TileTreeNode *--> "0|4" TileTreeNode
+
+TilesService --> TileLayerConfig
+OsmTilesVis ..> TileLayerConfig
+
+TilesService --> TilePainter
+
+TilePainter ..> TileLayerConfig
+
+TilesService <.. TileTreeNode
+
+@enduml

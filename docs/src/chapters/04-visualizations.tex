@@ -317,29 +317,131 @@ public update(deltaFrac: number) {
 }
 \end{lstlisting}
 
-Dostępne dane zawierają informacje o~około 8000 aktywnych satelitów. Wywołanie polecenia rysowania dla każdego punktu oddzielnie skutkowałoby długim czasem rysowania, ponieważ w~procesie generowania grafiki najwięcej czasu tracone jest na komunikacji z~GPU. Dlatego wizualizacja wywołuje tylko jedno polecenie rysowania dla wszystkich punktów. Listing~\ref{lst:active1} zawiera inicjalizację obiektu materiału \texttt{THREE.PointsMaterial} oraz obiektu \texttt{THREE.Points} odpowiedzialnego za reprezentację punktów na scenie. Inicjalizowany jest on z~pustym buforem reprezentującym pozycje wierzchołków. Rola buforów w~procesie rysowania opisana została w~rozdziale~\ref{sec:render}. W~pokazanej na listingu~~\ref{lst:active1} metodzie \texttt{update}, wykonywanej co każde przejście pętli głównej, bufor uzupełniany jest nowymi współrzędnymi punktów. Wszystkie punkty rysowane są za pomocą jednego polecenia, a~rysowanie każdego z~osobna dzieje się równolegle w~GPU. Największy narzut obliczeniowy spowodowany jest kalkulacją pozycji w obiektach \texttt{SatelliteObject}, który przy dużych liczbach jest już dostrzegalny.
+Dostępne dane zawierają informacje o~około 8000 aktywnych satelitów. Wywołanie polecenia rysowania dla każdego punktu oddzielnie skutkowałoby długim czasem rysowania, ponieważ w~procesie generowania grafiki najwięcej czasu tracone jest na komunikacji z~GPU. Dlatego wizualizacja wywołuje tylko jedno polecenie rysowania dla wszystkich punktów. Listing~\ref{lst:active1} zawiera inicjalizację obiektu materiału \texttt{THREE.PointsMaterial} oraz obiektu \texttt{THREE.Points} odpowiedzialnego za reprezentację punktów na scenie. Inicjalizowany jest on z~pustym buforem reprezentującym pozycje wierzchołków. Rola buforów w~procesie rysowania opisana została w~rozdziale~\ref{sec:render}. W~pokazanej na listingu~~\ref{lst:active1} metodzie \texttt{update}, wykonywanej co każde przejście pętli głównej, bufor uzupełniany jest nowymi współrzędnymi punktów. Wszystkie punkty rysowane są za pomocą jednego polecenia, a~rysowanie każdego z~osobna dzieje się równolegle w~GPU. Największy narzut obliczeniowy spowodowany jest kalkulacją pozycji w~obiektach \texttt{SatelliteObject}, który przy dużych liczbach jest już dostrzegalny.
 
-\section{Kafelki i Radar pogodowy}
+\section{Kafelki i~Radar pogodowy}
 
-% Co pokazuje, co może panel kontrolny
-% wiele warstw konfigurowalnych
+Wizualizacja, którą opisuje klasa \texttt{OsmTiles}, przedstawia Ziemię, na którą nałożono wiele warstw tekstur. Pierwszą z~nich jest mapa przeglądowa powierzchni, drugą jest pokrycie terenu zasięgiem radarów meteorologicznych, a~trzecią z~nich jest wizualizacja danych z~owych radarów w~danej chwili. Szczegółowość mapy zależy od przybliżenia kamery. Wizualizacja składa się z~wcześniej opisanych wizualizacji gwiazd oraz atmosfery. Nie zawiera ona dynamicznego oświetlenia, a~światło kierunkowe znajduje się w~układzie odniesienia obserwatora, zawsze oświetlając widoczną stronę planety.
 
-\begin{figure}
+Panel kontrolny dostarczony przez wizualizację pozwala na zmianę trybu pracy kamery, na zmianę widocznych warstw oraz na zmianę czasu dla wizualizowanych opadów. Wizualizacja pozwala również na animację warstwy opadów, pozwalając na zaobserwowanie ich dynamiki w~ostatnim czasie. Na rysunkach~\ref{fig:c4_osmTilesVis}~oraz~\ref{fig:c4_osmTilesVis_1} przedstawiono mapy w~małej i~średniej skali.
+\begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{img/c4_osmTilesVis.png}
   \caption{Opady deszczu nad Europą - klasa \texttt{OsmTilesVis}}
   \label{fig:c4_osmTilesVis} 
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{img/c4_osmTilesVis_1.png}
   \caption{Opady deszczu nad Polską - klasa \texttt{OsmTilesVis}}
   \label{fig:c4_osmTilesVis_1} 
 \end{figure}
 
-% Kafelki subsection
-% Odwzorowanie map
+\subsection{Kafelki}
+Kafelki są sposobem reprezentacji danych mapy. Pozwalają na optymalizację jej wyświetlania, ponieważ dzielą obszar na niezależne fragmenty, z~których można skomponować pożądany widok. Dzięki nim można pobierać te dane, które aktualnie są potrzebne. Kafelki mogą być dowolnymi danymi, które mapują pewne wartości na powiązaną z~nimi pozycję na mapie. W~przypadku opisu wyglądu obiektów na mapie mogą występować w~postaci grafiki wektorowej jak i~rastrowej.
 
-% Implementacja subsection
-% Diagram klas
+W celu odwzorowania powierzchni Ziemi na płaską grafikę zaszła potrzeba dobrania odpowiedniej metody jej projekcji. Odwzorowanie walcowe równokątne, zwane odwzorowaniem Merkatora jest metodą projekcji, w~której kąty pomiędzy równoleżnikami i~południkami są zachowane. Wszystkie południki na mapie są równoległe do siebie, a~co za tym idzie, odwzorowanie to na biegunach dąży do nieskończoności. Web Merkator~\cite{Mercator} to modyfikacja odwzorowania Merkatora wykorzystywana przez zdecydowaną większość map dostępnych w~internecie. Od swojego pierwowzoru różni się tym, że obszar mapowany jest na powierzchni sfery, a~nie tak jak pierwotnie, na elipsoidzie. Projekcja ta nie odwzorowuje też terenu dla szerokości geograficznej większej od~$\ang{85.051129}$. Pozwala to na umieszczenie odwzorowanego terenu na kwadratowej powierzchni. Pojedynczy kafelek rastrowy zwykle jest kwadratem o~boku $256$ pikseli.
+
+Kafelki generowane są dla różnych poziomów szczegółowości, co skutkuje różną wymaganą do ich wyświetlenia rozdzielczością przyjmując ten sam punkt odniesienia. Aby zachować stały rozmiar kafelka, kolejne poziomy szczegółowości zawierają odpowiednio więcej kafelków. Aby ujednolicić poruszanie się po kafelkach wprowadzono system współrzędnych, który jednoznacznie identyfikuje kafelek. Powiązanie kafelków ze współrzędnymi geograficznymi ich lewego górnego rogu opisane zostało za pomocą równań~\ref{eq:tile_1}~-~\ref{eq:tile_2}. Z~równań tych wynika, że dla przybliżenia $z = 0$ mapa składa się z~jednego kafelka. Liczba kafelków $n$, z których składa się mapa, w~zależności od przybliżenia $z$ opisana może zostać zależnością $n = 2^{2z}$.
+
+\begin{samepage}
+  \begin{figure}[h]
+  \begin{align}
+      \label{eq:tile_1}
+      x &= \left\lfloor \frac{lon + 180}{360} \cdot 2^z \right\rfloor \\
+      \label{eq:tile_2}
+      y &=
+          \left\lfloor
+              \left(
+                  1 - \frac{
+                      \ln \left(
+                          \tan \left(
+                              lat \cdot \frac{\pi}{180}
+                          \right) + \frac{1}{\cos \left( lat \cdot \frac{\pi}{180} \right)}
+                      \right)
+                  }{\pi}
+              \right) \cdot 2^{z - 1}
+          \right\rfloor
+  \end{align}
+  \begin{eqexpl}[25mm]
+      \item {$x$} pozycja odpowiadająca długości geograficznej
+      \item {$lon$} długość geograficzna w~stopniach
+      \item {$y$} pozycja odpowiadająca szerokości geograficznej
+      \item {$lat$} szerokość geograficzna w~stopniach
+      \item {$z$} stopień szczegółowości (przybliżenia)
+  \end{eqexpl}
+  \vspace{\baselineskip}
+\end{figure}
+\end{samepage}
+
+\subsection{Implementacja}
+
+Wizualizacja, pobierając potrzebne dane kafelków, korzysta z~domyślnego zestawu warstw map OpenStreetMap~\cite{OSM}. Dane dotyczące radaru i~deszczu udostępniane są przez aplikację RainViewer~\cite{RainViewer}. Kafelki z~obu tych źródeł udostępniane są w~tym samym, pożądanych formacie. Na diagramie na rysunku~\ref{fig:c4_tiles} przedstawiono klasę \texttt{TilesService} oraz jej zależności, która odpowiedzialna jest za generowanie i~zarządzanie geometrią sceny związanej z~kafelkami. Wywołanie konstruktora tej klasy, pokazane na listingu~\ref{lst:tilesVis_1}, zawiera przekazany obiekt konfiguracji, który zawiera metodę zwracającą adres URL kafelka dla pożądanej pozycji i~przybliżenia, ustawienie widoczności i~filtry CSS, modyfikujące oryginalny wygląd pobranej grafiki.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.7]{diagrams/out/c4_tiles.png}
+  \caption{Zależności pomiędzy klasami wizualizacji \texttt{OsmTilesVis}}
+  \label{fig:c4_tiles} 
+\end{figure}
+
+\begin{lstlisting}[float=h, language=javascript, label={lst:tilesVis_1}, caption={
+  Fragmenty klasy \texttt{OsmTilesVis}}
+]
+/* ... */
+this.osmTilesService = new TilesService(
+    [
+      {
+        tileUrl: (x, y, z) =>
+          `https://tile.openstreetmap.org/${z}/${x}/${y}.png`,
+        visible: true,
+        filter: "brightness(60%)",
+      },
+      {
+        tileUrl: (x, y, z) =>
+          `https://tilecache.rainviewer.com/v2/coverage/0/256/${z}/${x}/${y}.png`,
+        visible: true,
+        filter: "opacity(10%)",
+      },
+      {
+        tileUrl: (x, y, z) =>
+          `https://tilecache.rainviewer.com/v2/radar/${
+            this.timestamps[this.timestampIndex]
+          }/256/${z}/${x}/${y}/4/1_1.png`,
+        visible: true,
+        filter: "opacity(60%)",
+      },
+    ],
+    100
+  );
+/* ... */
+\end{lstlisting}
+
+Każdy kafelek jest wycinkiem sfery, za którego utworzenie odpowiada konstruktor klasy \texttt{THREE.SphereGeometry}. Wygenerowana geometria może być współdzielona dla każdego kafelka na tej samej szerokości geograficznej i~z tym samym przybliżeniem, dlatego serwis \texttt{TileService} zapisuje raz wygenerowaną geometrię do map, których kluczami są współrzędne~$y$~i~$z$ kafelków. W przypadku ponownego użycia kafelków dla tych współ©zędnych ich geometria pobierana jest z mapy. Serwis ten definiuje również metody przeliczające długość i~szerokość geograficzną na współrzędne~$x$~i~$y$ dla określonego przybliżenia $z$. Definiuje też przekształcenie odwrotne.
+
+Kafelki tworzą strukturę drzewiastą. Korzeniem drzewa jest kafelek o~współrzędnych $(x, y, z) = (0,0,0)$. Po zwiększeniu przybliżenia dzielony jest on na cztery mniejsze kafelki o~współrzędnych $(0,0,1)$, $(1,0,1)$, $(0,1,1)$ i~$(1,1,1)$. Każdy kafelek w~drzewie może posiadać czterech potomków. Drzewo kafelków rozwijane jest w~sposób możliwie optymalny, a~wyświetlane są zawsze kafelki będące liśćmi tego drzewa. Nie ma potrzeby rozwijać poddrzewa kafelków dla obszaru będącego po drugiej stronie planety, ponieważ nie jest on widoczny. Nie ma również potrzeby wyświetlania kafelków wysokiej rozdzielczości na horyzoncie, ponieważ znajdując się daleko, wyświetlane są one z~użyciem mniejszej ilości pikseli, a~co za tym idzie, wymagają mniejszej dokładności. Serwis \texttt{TilesService} zawiera instancję klasy \texttt{TileTreeNode} reprezentującej węzeł drzewa, który w~tym przypadku jest jego korzeniem. Węzeł drzewa odpowiedzialny jest za generowanie swoich potomków oraz niszczenie samego siebie i~rysowanie swojej tekstury.
+
+Drzewo analizowane jest pod kątem pożądanego stopnia szczegółowości $z$. W~rekurencyjnym rozwijaniu drzewa brana jest pod uwagę odległość kafelka od kafelka, nad którym znajduje się kamera w~metryce taksówkowej na tym samym poziomie szczegółowości oraz kąt pod jakim kamera spogląda na kafelek. Im większa owa odległość i~kąt, tym rozwijanie kafelków zakończy się wcześniej, nie osiągając danego stopnia $z$ w~obszarach, które nie są ważne z~perspektywy generowanego widoku. Działanie to jest główną metodą optymalizacji wyświetlanych kafelków. Rozwinięte wcześniej węzły drzewa, których stopień szczegółowości jest większy niż pożądany, są niszczone. Przykładowe rozwinięcie węzłów drzewa pokazano na diagramie na rysunku~\ref{fig:c4_tilesTree}. Liście oznaczone kolorem czerwonym są wyświetlane. Działanie w~praktyce zaobserwować można na rysunku~\ref{fig:c4_osmTilesVis_custom}, gdzie wszystkie kafelki zawierają grafikę z~ich współrzędnymi. Na horyzoncie widać wyświetlane kafelki z~mniejszym poziomem szczegółowości. 
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{diagrams/out/c4_tilesTree.png}
+  \caption{Przykładowe rozwinięcie drzewa kafelków}
+  \label{fig:c4_tilesTree} 
+\end{figure}
+
+\begin{figure} 
+  \centering
+  \includegraphics[width=\linewidth]{img/c4_osmTilesVis_custom.png}
+  \caption{Rozwinięcie drzewa kafelków - testowe kafelki}
+  \label{fig:c4_osmTilesVis_custom} 
+\end{figure}
+
+Na obiekt kafelka w~procesie rysowania nałożona zostaje dynamicznie tekstura. Pochodzi ona z~obiektu \texttt{Canvas}, który obsługiwany jest przez obiekt \texttt{THREE.CanvasTexture}. Pobieranie obrazów, ich późniejsze dekodowanie i~późniejsza kompozycja warstw w~jedną teksturę kafelka wymaga pewnej mocy obliczeniowej. Przy mapie złożonej z~dużej liczby kafelków czynności te, jeśli zajmowałby się nimi wątek główny JavaScriptu, mogą stanowić obciążenie dla urządzenia wyświetlającego wizualizację. Kod wykonujący się domyślnie w~przeglądarce internetowej może wykonać się tylko w~jednym wątku. Aby wprowadzić możliwość akceleracji obliczeń dla zadań, które mogą wykonywać się w~tle i~nie mają nic wspólnego z~interfejsem użytkownika, stworzone zostały Web~Workery~\cite{Workers}. Aby rozwiązać problem bezpieczeństwa w~komunikacji pomiędzy wątkami, workery korzystają ze ściśle określonego interfejsu. Nie współdzielą one między sobą pamięci, którą można przekazywać jedynie w~jedną stronę poprzez operację transferu. Sama komunikacja opera się na zdarzeniach, których dane są serializowane i~deserializowane na styku wątków. Aby odciążyć główny wątek w~procesie rysowania sceny, operacje pobierania i~kompozycji kafelków odbywają się w~workerze, czyli całkowicie niezależnie od głównej pętli animacji.
+
+Klasa \texttt{TilePainter} reprezentuje obiekt workera. Standardowy obiekt \texttt{Canvas} jest elementem DOM, do którego nie ma dostępu w~workerach, ponieważ nie kontrolują one interfejsu użytkownika. Na potrzeby rysowania grafik w~tle zaproponowano interfejs \texttt{OffscreenCanvas}~\cite{OffscreenCanvas}, który zachowuje się dokładnie tak jak element \texttt{Canvas} dostępny w~głównym wątku.
+
+Kiedy użytkownik zmieni widoczność warstwy lub przesunie kamerę pokazując nowe kafelki wywołane zostają zdarzenia, które po przejściu przez mechanizm \texttt{throttle} wywołują przeliczenie drzewa kafelków. Każdy kafelek, jeśli nigdy nie miał wygenerowanej tekstury lub jeśli wymagania co do wyglądu tekstury uległy zmianie, wysyła, poprzez serwis \texttt{TilesService}, zdarzenie do workera \texttt{TilePainter}. Następnie worker pobiera wymagane kafelki z~ich źródeł i~nakłada je na siebie wykorzystując zdefiniowane filtry. W~zdarzeniu zwrotnym obiekt bitmapy zostaje przetransferowany do wątku głównego i~tam narysowany na elemencie \texttt{Canvas} tekstury z~użyciem szybkiego kontekstu \texttt{bitmaprenderer}. Worker, w~celu zaoszczędzenia pamięci i~transferu sieciowego, prowadzi cache już narysowanych kafelków i~omija proces pobierania i~kompozycji jeśli kafelek został już wcześniej przetworzony.
+
+Obiekty wygenerowanej geometrii wycinków sfer reprezentujących kafelki są przekształcane po wygenerowaniu. Obiekt przesuwany jest tak, że jego centroid znajduje się w środku układu współrzędnych. Następnie, w definiowanej dla niego macierzy przekształcenia, oprócz obrotu o kąt wynikający z długości geograficznej kafelka, to przesunięcie jest odwracane. Działanie to ma na celu zniwelowanie efektu zatracenia precyzji w procesie przetwarzania wierzchołków przez procesor graficzny. Wierzchołki zdefiniowane daleko od środka układu współrzędnych obarczone są większym błędem związanym z funkcjonowaniem liczb zmiennoprzecinkowych. Rozmiar liczby dla typu \texttt{Number} w języku JavaScript wynosi 64b, a procesor graficzny standardowo przetwarza współrzędne zapisane za pomocą liczb o rozmiarze 32b. Dla większych liczb, w procesie wyliczania finalnej pozycji wierzchołka, występuje zanik precyzji spowodowany operacją mnożenia. Zdecydowanie lepiej zdefiniować obiekt z pozycją blisko środka układu współrzędnych, przekształcić go, a następnie wykonać translację na jego finalną pozycję. Translacja, jako operacja dodawania, nie zaburza precyzji.

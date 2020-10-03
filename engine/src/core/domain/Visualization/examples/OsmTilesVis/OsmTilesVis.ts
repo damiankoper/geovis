@@ -36,8 +36,7 @@ export default class OsmTilesVis extends Visualization {
     this.osmTilesService = new TilesService(
       [
         {
-          tileUrl: (x, y, z) =>
-            `https://tile.openstreetmap.org/${z}/${x}/${y}.png`,
+          tileUrl: (x, y, z) => `http://localhost:3001/${z}/${x}/${y}.png`,
           visible: true,
           filter: "brightness(60%)",
         },

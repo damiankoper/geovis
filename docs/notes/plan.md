@@ -181,10 +181,6 @@ Wszędzie schematy
 - Przykład i efekt testu jednostkowego i integracyjnego
 - Dynamicznie generowana dokumentacja + przykład
 
-# 7. Biblioteki pomocnicze
-
-- Opis używanych bibliotek
-
 # 8. Podsumowanie
 
 - Fajnie było
