@@ -427,7 +427,7 @@ Drzewo analizowane jest pod kątem pożądanego stopnia szczegółowości $z$. W
 
 \begin{figure}[h]
   \centering
-  \includegraphics[scale=0.5]{diagrams/out/c4_tilesTree.png}
+  \includegraphics[scale=0.4]{diagrams/out/c4_tilesTree.png}
   \caption{Przykładowe rozwinięcie drzewa kafelków}
   \label{fig:c4_tilesTree} 
 \end{figure}
@@ -439,7 +439,7 @@ Drzewo analizowane jest pod kątem pożądanego stopnia szczegółowości $z$. W
   \label{fig:c4_osmTilesVis_custom} 
 \end{figure}
 
-Na obiekt kafelka w~procesie rysowania nałożona zostaje dynamicznie tekstura. Pochodzi ona z~obiektu \texttt{Canvas}, który obsługiwany jest przez obiekt \texttt{THREE.CanvasTexture}. Pobieranie obrazów, ich późniejsze dekodowanie i~późniejsza kompozycja warstw w~jedną teksturę kafelka wymaga pewnej mocy obliczeniowej. Przy mapie złożonej z~dużej liczby kafelków czynności te, jeśli zajmowałby się nimi wątek główny JavaScriptu, mogą stanowić obciążenie dla urządzenia wyświetlającego wizualizację. Kod wykonujący się domyślnie w~przeglądarce internetowej może wykonać się tylko w~jednym wątku. Aby wprowadzić możliwość akceleracji obliczeń dla zadań, które mogą wykonywać się w~tle i~nie mają nic wspólnego z~interfejsem użytkownika, stworzone zostały Web~Workery~\cite{Workers}. Aby rozwiązać problem bezpieczeństwa w~komunikacji pomiędzy wątkami, workery korzystają ze ściśle określonego interfejsu. Nie współdzielą one między sobą pamięci, którą można przekazywać jedynie w~jedną stronę poprzez operację transferu. Sama komunikacja opera się na zdarzeniach, których dane są serializowane i~deserializowane na styku wątków. Aby odciążyć główny wątek w~procesie rysowania sceny, operacje pobierania i~kompozycji kafelków odbywają się w~workerze, czyli całkowicie niezależnie od głównej pętli animacji.
+Na obiekt kafelka w~procesie rysowania nałożona zostaje dynamicznie tekstura. Pochodzi ona z~obiektu \texttt{Canvas}, który obsługiwany jest przez obiekt \texttt{THREE.CanvasTexture}. Pobieranie obrazów, ich późniejsze dekodowanie i~późniejsza kompozycja warstw w~jedną teksturę kafelka wymaga pewnej mocy obliczeniowej. Przy mapie złożonej z~dużej liczby kafelków czynności te, jeśli zajmowałby się nimi wątek główny JavaScriptu, mogą stanowić obciążenie dla urządzenia wyświetlającego wizualizację. Kod wykonujący się domyślnie w~przeglądarce internetowej może wykonać się tylko w~jednym wątku. Aby wprowadzić możliwość akceleracji obliczeń dla zadań, które mogą wykonywać się w~tle i~nie mają nic wspólnego z~interfejsem użytkownika, stworzone zostały Web~Workery~\cite{Workers}. W~celu rozwiązania problemu bezpieczeństwa w~komunikacji pomiędzy wątkami, workery korzystają ze ściśle określonego interfejsu. Nie współdzielą one między sobą pamięci, którą można przekazywać jedynie w~jedną stronę poprzez operację transferu. Sama komunikacja opera się na zdarzeniach, których dane są serializowane i~deserializowane na styku wątków. Aby odciążyć główny wątek w~procesie rysowania sceny, operacje pobierania i~kompozycji kafelków odbywają się w~workerze, czyli całkowicie niezależnie od głównej pętli animacji.
 
 Klasa \texttt{TilePainter} reprezentuje obiekt workera. Standardowy obiekt \texttt{Canvas} jest elementem DOM, do którego nie ma dostępu w~workerach, ponieważ nie kontrolują one interfejsu użytkownika. Na potrzeby rysowania grafik w~tle zaproponowano interfejs \texttt{OffscreenCanvas}~\cite{OffscreenCanvas}, który zachowuje się dokładnie tak jak element \texttt{Canvas} dostępny w~głównym wątku.
 

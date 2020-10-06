@@ -37,7 +37,7 @@ Podrozdział ten opisuje proces testowania zarówno aplikacji, jak i~komponentu 
 
 Dla komponentu Silnika również podjęta została próba stworzenia testów wizualnej regresji. Efekt nie był jednak zadowalający. Bez problemu stworzone zostały testy sprawdzające wygląd i~funkcjonowanie elementów informacyjnych i~kontrolnych wizualizacji. Jednak do przetestowania poprawności generowanej grafiki niezbędne tutaj użycie było mechanizmu snapshotów, który w~tym wypadku porównuje piksele wygenerowanej grafiki do początkowo ustalonego wzorca. Kontrolowana przeglądarka Electron, która jest domyślną dla biblioteki Cypress, miała problemy z~wydajnością podczas ładowania bardziej złożonych wizualizacji. Zautomatyzowane testowanie wizualizacji pod kątem generowanej grafiki wymaga w~tym wypadku optymalizacji i~mechanizmów testowania, jak i~samych wizualizacji pod tym kątem.
 
-Niektóre klasy pomocnicze w~odpowiadającym ich domenach, na których zachowaniu bazuje wiele mechanizmów posiada testy jednostkowe. Biblioteką używaną do ich wykonywania jest Jest~\cite{Jest}. Jest to najpopularniejsza biblioteka tego typu posiadająca dobrą integrację z~TypeScriptem, pozostałymi frameworkami oraz posiada łatwe w interpretacji API.
+Niektóre klasy pomocnicze w~odpowiadającym ich domenach, na których zachowaniu bazuje wiele mechanizmów posiada testy jednostkowe. Biblioteką używaną do ich wykonywania jest Jest~\cite{Jest}. Jest to najpopularniejsza biblioteka tego typu posiadająca dobrą integrację z~TypeScriptem, pozostałymi frameworkami oraz posiada łatwe w~interpretacji API.
 
 \section{Dokumentacja}
 
