@@ -12,6 +12,11 @@
     \coordinate (atmTangent) at (126.869897646:\gRadius + \atmThickness);
     \coordinate (gTangent) at (143.130102354:\gRadius);
     \coordinate (atmBackTangent) at (184.539722109:\gRadius + \atmThickness);
+    \draw pic["$\alpha$",draw=blue,thick,blue, ->, angle eccentricity=1.2, angle radius = 1.3cm]  {angle=camera--center--atmTangent};
+    \draw pic["$\beta$",draw=orange,thick,orange, ->, angle eccentricity=1.2, angle radius = 1.8cm]  {angle=camera--center--gTangent};
+    \draw pic["$\gamma$",draw=red,thick,red, ->, angle eccentricity=1.2, angle radius = 1cm]  {angle=gTangent--center--atmBackTangent};
+    
+    \tikzset{>={Latex[scale=1.5]}}
 
     \draw[thick] circle (\gRadius);
     \draw[thick,dashed] circle (\gRadius+\atmThickness);
@@ -28,16 +33,13 @@
     \draw[fill] (atmBackTangent) circle (1pt) node[above,left] {$c_{gtb}$};
 
     \draw[->] (center) -- (atmTangent) node[midway,below,sloped] {$\vv {g'_v} + \vv {t'}$ };
-    \draw pic["$\alpha$",draw=blue,thick,blue, ->, angle eccentricity=1.2, angle radius = 1.3cm]  {angle=camera--center--atmTangent};
     \draw pic["$\cdot$",draw, -, angle eccentricity=0.5, angle radius = 0.4cm]  {angle=center--atmTangent--camera};
 
     \draw[->] (center) -- (gTangent) node[midway,below,sloped] {$\vv {g'''_v}$ };
-    \draw pic["$\beta$",draw=orange,thick,orange, ->, angle eccentricity=1.2, angle radius = 1.8cm]  {angle=camera--center--gTangent};
     \draw pic["$\cdot$",draw, -, angle eccentricity=0.5, angle radius = 0.4cm]  {angle=center--gTangent--camera};
 
     \draw[dashed] (gTangent) -- (atmBackTangent);
     \draw pic["$\cdot$",draw, -, angle eccentricity=0.5, angle radius = 0.4cm]  {angle=atmBackTangent--gTangent--center};
-    \draw pic["$\gamma$",draw=red,thick,red, ->, angle eccentricity=1.2, angle radius = 1cm]  {angle=gTangent--center--atmBackTangent};
     \draw[->] (center) -- (atmBackTangent) node[midway,below,sloped] {$\vv {g''_v} + \vv {t''}$ };
     \draw[fill] (0,0) circle (1pt) node[right] {$s$};
     \draw[fill] (G) circle (1pt) node[right] {$c_g$};

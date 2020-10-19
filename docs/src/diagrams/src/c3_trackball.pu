@@ -1,4 +1,5 @@
 @startuml
+scale 2
 skinparam Linetype ortho
 hide empty members
 class GeoPosMapper 

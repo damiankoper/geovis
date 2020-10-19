@@ -1,4 +1,4 @@
-@startdot
+@startdot c4_tilesTree
 
 digraph foo {
     t000 [label="(0,0,0)"]

@@ -1,5 +1,5 @@
 @startuml
-
+scale 2
 
 hide empty members
 class GeoVisCoreVue 

@@ -1,4 +1,5 @@
 @startuml
+scale 2
 start
 
 if(Old visualization exists) then (yes)

@@ -1,4 +1,5 @@
 @startuml
+scale 2
 hide empty members
 skinparam linetype ortho
 

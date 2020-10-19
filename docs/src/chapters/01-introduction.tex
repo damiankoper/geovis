@@ -8,9 +8,9 @@ Dobrze zbudowana wizualizacja danych, jaką jest chociażby prosty wykres punkto
 
 \section{Istota rzeczy}
 
-Jednym z~obszarów, w~którym wizualizacje pełnią istotną rolę, są reprezentacje zjawisk geograficznych oraz tych w~bliskim sąsiedztwie Ziemi. Prezentowane dane mogą być związane z~działalnością człowieka, bądź z~obiektami i~zjawiskami fizycznymi, którymi planeta się cechuje.
+Jednym z~obszarów, w~którym wizualizacje pełnią istotną rolę, są reprezentacje zjawisk geograficznych oraz tych w~bliskim sąsiedztwie Ziemi. Prezentowane dane mogą być związane z~działalnością człowieka, bądź z~obiektami i~zjawiskami fizycznymi, którymi \mbox{planeta się~cechuje.} 
 
-System, który zajmuje się wprowadzaniem, analizowaniem i~wizualizacją danych geograficznych nazywa się Systemem informacji geograficznej (ang. geographic information system, \textbf{GIS}). Może on wyświetlać informacje z~wielu źródeł ujęte w~warstwy, które wyświetlane razem w~różnych kombinacjach mogą nadawać danym różnego kontekstu. Każda wyświetlana informacja jest ściśle powiązana z~pozycją na powierzchni Ziemi. \cite[Rozdział 1.6]{IntroductionToHumanGeography}.
+System, który zajmuje się wprowadzaniem, analizowaniem i~wizualizacją danych geograficznych nazywa się systemem informacji geograficznej (ang. geographic information system, \textbf{GIS}). Może on wyświetlać informacje z~wielu źródeł ujęte w~warstwy, które wyświetlane razem w~różnych kombinacjach mogą nadawać danym różnego kontekstu. Każda wyświetlana informacja jest ściśle powiązana z~pozycją na powierzchni Ziemi. \cite[Rozdział 1.6]{IntroductionToHumanGeography}.
 
 Wizualizacje danych mogą tyczyć się dowolnych zjawisk. GIS może obrazować podział terytorialny państw świata, jak i~położenie obiektów kosmicznych w~bliskim sąsiedztwie Ziemi. Korzystając z~aktualizowanych na bieżąco źródeł danych wizualizacje mogą obrazować zjawiska zmienne, pokazywać stan obecny, przeszły (Rysunek \ref{fig:c1_windy}), jak i~prognozować przyszłość. 
 
@@ -22,7 +22,7 @@ Wizualizacje danych mogą tyczyć się dowolnych zjawisk. GIS może obrazować p
 \end{figure}
 
 Ważnym czynnikiem odbiorze wizualizacji, jest jej przystępność dla użytkownika. Profesjonalne, skomplikowane systemy nierzadko cechują się złożonym interfejsem użytkownika. Duża liczba opcji pomaga łatwo uzyskać pożądane dane przez doświadczonego użytkownika, ale odstraszyć może niezagłębionego w~temat odbiorcę. Przystępność odbioru wiąże się również z~szybkością uzyskania dostępu do samej platformy obsługującej wizualizację. Alternatywą dla instalowanych aplikacji desktopowych jest przeglądarka internetowa. Tworzy ona środowisko, które może być uruchomione na wielu systemach operacyjnych, również na urządzeniach mobilnych, a~zaimplementowane wspomaganie sprzętowe generowania grafiki i~interfejsy takie jak \textit{HTML5 Canvas}\cite{Canvas} i~\textit{WebGL}\cite{WebGL} czynią ją potężnym narzędziem do wydajnego wyświetlania złożonych grafik. 
-Aplikacje webowe oczywiście nie będą nigdy dorównywać profesjonalnym aplikacjom dedykowanym konkretnej platformie, jednak stanowią ich dobrą i~ogólnodostępną alternatywę.
+Aplikacje webowe oczywiście nie będą nigdy dorównywać profesjonalnym aplikacjom dedykowanym konkretnej platformie, jednak stanowią ich dobrą \mbox{i~ogólnodostępną alternatywę.}
 
 Innym kryterium definiującym wizualizację jest jej interaktywność. Definiuje ono w~jakim stopniu użytkownik może dostosować wyświetlany widok, zarządzać warstwami, sterować położeniem kamery, czy też wyszukiwać informacje. Dwuwymiarowy widok mapy (Rysunek \ref{fig:c1_windy}) pozwala jednoznacznie odnieść informacje z~różnych warstw do konkretnego miejsca na planecie. Z~kolej widok trójwymiarowy (Rysunek \ref{fig:c1_google_earth}) pozwala na obserwację sceny z~różnych perspektyw, pokazuje kulistość Ziemi i~redukuje efekty zniekształcenia danych związany z~techniką rzutowania sfery na płaszczyznę. Przy kamerze skierowanej prostopadle do płaszczyzny powierzchni, oraz w~bliskim powiększeniu widok taki jest porównywalny do widoku dwuwymiarowego. Czynniki te zdaniem autora pracy czynią taką wizualizację bardziej atrakcyjną dla ogólnego odbiorcy. Oczywiście wybór techniki wizualizacji zawsze zależy od konkretnego przypadku, jak i~od oczekiwanej wydajności, gdyż złożoność generowania grafiki w~przypadku wizualizacji trójwymiarowych jest z~reguły większa.
 
@@ -40,7 +40,7 @@ Zadaniem twórcy wizualizacji jest zebranie i~przetworzenie danych na formę gra
 
 W środowisku przeglądarki internetowej do tworzenia wizualizacji nie stosuje się zwykle rozbudowanych edytorów graficznych i~formularzy. Biblioteki wyświetlające dane geoprzestrzenne konfigurowalne są zwykle z~poziomu języka JavaScript. Przykładem takiej biblioteki jest \mbox{Cesium~\cite{CesiumJS}}. Potrafi ona generować wizualizacje dwu i~trójwymiarowej różnego rodzaju danych, a~jej konfiguracja następuje poprzez jej API, które dostarcza, ale też ogranicza jej możliwości (listing~\ref{lst:cesium}).
 
-\begin{lstlisting}[label={lst:cesium}, language=javascript, caption={Konfiguracja podstawowej wizualizacji w~bibliotece Cesium. Żródło~\cite{CesiumJSExample}.}]
+\begin{lstlisting}[label={lst:cesium}, language=javascript, caption={Konfiguracja podstawowej wizualizacji w~bibliotece Cesium~\cite{CesiumJSExample}.}]
 <script>
     Cesium.Ion.defaultAccessToken = 'your_access_token';
     var viewer = new Cesium.Viewer('cesiumContainer', {
@@ -57,7 +57,7 @@ W środowisku przeglądarki internetowej do tworzenia wizualizacji nie stosuje s
 \end{lstlisting}
 
 Alternatywnym podejściem, możliwym do zastosowania w~przypadku aplikacji i~desktopowych, i~webowych, jest dostarczenie twórcy tylko podstawowych abstrakcji (najczęściej interfejsów programistycznych) wizualizacji, takich jak sterowanie kamerą, przekazywanie zdarzeń pochodzących od odbiorcy, czy interfejs służący do generowania obiektów na scenie dwu lub trójwymiarowej. Podejście daje to najwięcej możliwości, ale z~drugiej strony wymaga posiadania największej wiedzy o~funkcjonowaniu dostarczonych interfejsów.
-
+\clearpage
 W każdym wypadku istotnym czynnikiem ułatwiającym tworzenie wizualizacji jest dostarczona przez narzędzia i~biblioteki interaktywna dokumentacja. Powinna ona dobrze opisywać dostarczone rozwiązania ze strony praktycznej i~przez swoją interaktywność ułatwiać poruszanie się po niej użytkownikowi. 
 
 \section{Cel projektu i~zawartość pracy}
