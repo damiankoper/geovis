@@ -1,5 +1,14 @@
+
+\newcommand{\req}[3]{
+    \stepcounter{#2}
+    #1\_\arabic{#2} & #3 \\
+    \hline
+}
+\newcounter{c_RA}
+
 \chapter{Wymagania}
 \label{chap:Requirements}
+
 Ze względu na możliwy podział funkcjonalności projektu na wiele typów, zdefiniowano następujące pojęcia:
 \begin{enumerate}
     \item Silnik - komponent odpowiedzialny za definicję i~wyświetlenie wizualizacji.
@@ -17,18 +26,11 @@ Pozwala także na zdefiniowane wielu niezależnych wizualizacji. Z~tego powodu m
 
 Wymagania aplikacji zostały zdefiniowane z~podziałem na typ użytkownika.
 Struktura danych definiująca renderowany obraz, zwana dalej będzie sceną.
-
-\newcommand{\req}[3]{
-    \stepcounter{#2}
-    #1\_\arabic{#2} & #3 \\
-    \hline
-}
-
+\clearpage
 \section{Twórca wizualizacji}
 
 \subsection{Wymagania funkcjonalne}
 
-\newcounter{c_RA}
 
 \begin{table}[H]
     \centering

@@ -5,7 +5,7 @@
 %  Wersja: 0.4
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\documentclass[a4paper,onecolumn,oneside,12pt,extrafontsizes]{memoir}
+\documentclass[a4paper,onecolumn,12pt,twoside,extrafontsizes]{memoir}
 % In order to prepare the manuscript for archives (2x1, double printed) you can:
 % a) produce normal pdf, then convert it to pdf with two pages on one phisical page (solution suggested)
 %
@@ -31,6 +31,7 @@
 
 %\usepackage[cp1250]{inputenc} % for cp1250 file encoding
 \usepackage{amssymb}
+\usepackage{emptypage}
 
 \usepackage[utf8]{inputenc} % for UTF8 file encoding
 \usepackage[T1]{fontenc}
@@ -534,7 +535,7 @@ Listing \thelstlisting: #1\hfill%\hfill%
 \makeoddhead{outer}{}{}{\small\itshape\rightmark}
 \makeevenhead{outer}{\small\itshape\leftmark}{}{}
 \makeoddfoot{outer}{\small\@author:~\@titleShort}{}{\small\thepage}
-\makeevenfoot{outer}{\small\thepage}{}{\small\@author:~\@title}
+\makeevenfoot{outer}{\small\thepage}{}{\small\@author:~\@titleShort}
 \makeheadrule{outer}{\linewidth}{\normalrulethickness}
 \makefootrule{outer}{\linewidth}{\normalrulethickness}{2pt}
 \makeatother
@@ -634,7 +635,7 @@ Listing \thelstlisting: #1\hfill%\hfill%
 \pdfbookmark[0]{Title}{Tytul.1}
 \includepdf[pages={1}]{../out/title}
 
-\newpage
+\cleardoublepage
 
 \chapterstyle{noNumbered}  % Below there are declarations of various lists. Please comment out those which are too short (the list should contain at least 5 items)
 \pagestyle{outer}
@@ -665,11 +666,7 @@ Listing \thelstlisting: #1\hfill%\hfill%
 \include{chapters/04-visualizations}
 \include{chapters/05-app-tests}
 \include{chapters/06-summary}
-% \include{chapter02}
-% \include{chapter03}
-% \include{chapter04}
-% \include{chapter05}
-% \include{chapter06}
+
 
 %\bibliographystyle{plalpha}
 \bibliographystyle{abbrv}
