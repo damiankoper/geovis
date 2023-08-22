@@ -1,5 +1,5 @@
 # Interactive 3D visualization of geographical data based on open sources using web technologies
-Bachelor's degree thesis and project.
+Bachelor's thesis and project.
 
 **Thesis:** [W04_241292_2020_praca inżynierska.pdf](https://github.com/damiankoper/geovis/blob/master/docs/out/W04_241292_2020_praca%20in%C5%BCynierska.pdf)
 
@@ -12,9 +12,9 @@ docker run -p 8080:80 kopernick/geovis-core-storybook:latest
 
 ### What's in here?
 
-For my Bachelor's degree thesis, I've implemented a library for developing geographical visualizations for the web and an example application that utilizes it. Library provides basic orbit camera abstractions and controls. The visualization system is fully extensible, allowing one visualization to be built on top of another.
+For my Bachelor's thesis, I've implemented a library for developing geographical visualizations for the web and an example application that utilizes it. The library provides basic orbit camera abstractions and controls. The visualization system is fully extensible, allowing one visualization to be built on top of another.
 
-Directory description:
+Directories:
 * **docs** - LaTeX source and output of the thesis
 * **engine** - geographical visualization library with example visualizations
 * **testTileService** - service simulating OpenStreetMap endpoints to test visualization based on tiles
